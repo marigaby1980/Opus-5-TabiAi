@@ -60,7 +60,6 @@ main{flex:1;display:flex;min-height:0}
 .lib b{color:var(--ok);font-weight:600}
 .empty{color:var(--dim);font-size:12px;padding:12px 10px;line-height:1.6}
 
-/* agents */
 .agent{display:flex;gap:7px;align-items:center;padding:5px 10px;font-size:12px;cursor:pointer;border-left:2px solid transparent}
 .agent:hover{background:var(--bg3)}
 .agent .dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--dim)}
@@ -93,6 +92,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 .tcall{display:flex;gap:8px;align-items:center;background:#0f1a14;border:1px solid #21402f;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:12px;font-family:var(--mono);color:#8fd6b4}
 .tcall.err{background:#1f1113;border-color:#4a2429;color:var(--bad)}
 .tcall.agentcall{background:#141024;border-color:#332a5c;color:#b9a8f0}
+.tcall.webcall{background:#101a26;border-color:#24405e;color:#9dc4ef}
 .tcall .arg{color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 #composer{flex:none;border-top:1px solid var(--line);background:var(--bg2);padding:10px 20px 12px}
@@ -125,6 +125,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 .logEntry pre{background:#08090b;border-radius:6px;padding:8px;overflow:auto;margin:5px 0 0;font-family:var(--mono);font-size:11.5px;max-height:220px}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:9px 15px;font-size:13px;z-index:99;opacity:0;pointer-events:none;transition:.2s}
 #toast.on{opacity:1}
+#sandbox{position:absolute;width:0;height:0;border:0;visibility:hidden}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-thumb{background:#2c333d;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
 ::-webkit-scrollbar-track{background:transparent}
@@ -176,7 +177,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
   <section class="pane" id="center">
     <div class="scroll" id="msgs"></div>
     <div id="composer"><div id="composerInner">
-      <textarea id="ta" placeholder="Ask anything. The model can read/write the disk, install libraries, build web apps, and delegate to sub-agents."></textarea>
+      <textarea id="ta" placeholder="Ask anything. The model can search the web, read pages, run code, use the disk, install libraries, and delegate to sub-agents."></textarea>
       <div class="row" style="margin-top:7px">
         <span class="hint" id="status">Ready</span>
         <div class="sp"></div>
@@ -211,21 +212,23 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 <div class="mask" id="setMask"><div class="modal">
   <h3>Settings</h3>
   <div class="f"><label>Base URL</label><input id="sBase">
-    <div class="sub">Requests go to <span class="mono">{base}/chat/completions</span>.
-    <b>tabitoken.com refuses browser POSTs</b>, so on a hosted page this must be your Worker,
-    e.g. <span class="mono">https://name.workers.dev/v1</span>.</div></div>
+    <div class="sub">Chat goes to <span class="mono">{base}/chat/completions</span>; web tools use the same host at
+    <span class="mono">/tools/*</span>. <b>tabitoken.com refuses browser POSTs</b>, so this must be your Worker.</div></div>
   <div class="f"><label>API key or app token</label><input id="sKey" type="password" autocomplete="off">
     <div class="sub">Sent as <span class="mono">Authorization: Bearer …</span>. With a Worker this is your
-    <span class="mono">APP_TOKEN</span>, not the real TaBiAI key.
-    <b>Anything hardcoded in this file is public once deployed.</b></div></div>
+    <span class="mono">APP_TOKEN</span>. <b>Anything hardcoded in this file is public once deployed.</b></div></div>
   <div class="f"><label>URL-wrapping proxy (optional)</label><input id="sProxy" placeholder="https://proxy.example/?url=">
-    <div class="sub">Only for generic proxies that take the target as a query param. Leave blank when using a Worker.</div></div>
+    <div class="sub">Only for generic proxies taking the target as a query param. Leave blank when using a Worker.</div></div>
   <div class="f"><label>System prompt (orchestrator)</label><textarea id="sSys" rows="5" class="mono" style="font-size:12px"></textarea></div>
   <div class="f"><label>Max output tokens</label><input id="sMax" type="number" min="256" step="256"></div>
-  <div class="f"><label><input type="checkbox" id="sTools" style="width:auto"> Enable disk / library tools</label></div>
+  <div class="f"><label><input type="checkbox" id="sTools" style="width:auto"> Enable disk / library / sandbox tools</label></div>
+  <div class="f"><label><input type="checkbox" id="sWeb" style="width:auto"> Enable web tools (search, fetch, Wikipedia, npm)</label>
+    <div class="sub">Search and fetch route through your Worker to TinyFish, which needs a
+    <span class="mono">TINYFISH_KEY</span> secret bound there. Free at any balance; limits are 30 searches/min
+    and 150 URLs/min. Wikipedia and npm are called directly from the browser.</div></div>
   <div class="f"><label><input type="checkbox" id="sAgents" style="width:auto"> Enable sub-agents</label>
     <div class="sub">Each sub-agent step is a full billed request carrying the gateway's ~6.5k-token prompt floor.
-    <b>A single message can fan out to dozens of requests.</b> Ceilings: depth ${""}<span id="limTxt"></span>.</div></div>
+    <b>A single message can fan out to dozens of requests.</b> Ceilings: depth <span id="limTxt"></span>.</div></div>
   <div class="f"><label>Default sub-agent model</label><select id="sAgentModel"></select>
     <div class="sub">Used when the orchestrator doesn't name one. Non-thinking models are cheaper for routine subtasks.</div></div>
   <div class="f"><label>Max sub-agents per message</label><input id="sMaxAgents" type="number" min="1" max="40" step="1"></div>
@@ -244,11 +247,12 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
 <div class="mask" id="agentMask"><div class="modal wide">
   <h3 id="agTitle">Agent</h3>
-  <div id="agMeta" class="sub" style="font-size:12px;color:var(--dim);margin-bottom:12px"></div>
+  <div id="agMeta" style="font-size:12px;color:var(--dim);margin-bottom:12px"></div>
   <div id="agLog"></div>
   <div class="row" style="margin-top:12px"><div class="sp"></div><button id="agClose">Close</button></div>
 </div></div>
 
+<iframe id="sandbox" sandbox="allow-scripts"></iframe>
 <div id="toast"></div>
 
 <script>
@@ -275,45 +279,51 @@ const REASONING = {
   max:    {label:"Maximum", effort:"high",   budget:60000}
 };
 
-/* ============================================================
-   Sub-agent ceilings. Enforced in code, not by prompting, so the
-   model cannot argue its way past them.
-   ============================================================ */
-const AGENT = {
-  maxDepth:      2,   // orchestrator = 0; agents may spawn until this depth
-  maxConcurrent: 3,   // simultaneous in-flight agents
-  maxSteps:     12,   // model round-trips per agent
-  maxPerCall:    6    // agents in a single spawn_agents call
-};
+/* Sub-agent ceilings, enforced in code rather than by prompting. */
+const AGENT = { maxDepth:2, maxConcurrent:3, maxSteps:12, maxPerCall:6 };
 
 const DEFAULT_SYS =
-`You are the orchestrator in Opus Studio, a browser IDE. You have a virtual disk (list, read, write, patch, delete), npm library installation via jsDelivr, and a team of sub-agents.
+`You are the orchestrator in Opus Studio, a browser IDE. You have a virtual disk, npm library installation, web research tools, a JavaScript sandbox, and a team of sub-agents.
 
 Disk and build rules:
 - When asked to build anything, WRITE IT TO THE DISK with disk_write instead of only pasting it in chat. Files become live artifacts the user can preview and edit.
 - Web apps: the entry point must be an .html file. Reference sibling files with plain relative paths ("app.js", "styles.css") — the preview resolves them.
 - Installed libraries are auto-injected into every previewed HTML file. Never add your own CDN <script> tag for something you installed with install_library.
-- Read a file before editing it. Prefer disk_edit over rewriting a whole file.
+- Read a file before editing it. Prefer disk_edit over rewriting a whole file. Use disk_grep to find things instead of reading every file.
+- After building or changing a web app, run check_app on the entry HTML to catch runtime errors before telling the user it works.
+
+Research rules:
+- Search the web when the answer depends on current facts, versions, prices, or anything you might be out of date on. Don't guess at API details you can verify.
+- web_search returns titles, URLs, and snippets only. Snippets are not evidence — call web_fetch on a promising result before making a factual claim from it.
+- web_fetch takes up to 10 URLs at once. After a search, fetch all the promising results in a single call rather than one per step.
+- Pass a "purpose" to both search and fetch describing the task behind the request; it measurably improves result quality.
+- Cite the URLs you actually read. If search returns nothing usable, say so rather than filling the gap from memory.
+- Prefer wikipedia for stable background and npm_search for package facts; both are cheaper and more reliable than general search.
+
+Compute rules:
+- Use run_js for arithmetic, data transformation, parsing, and verifying logic. Don't do multi-step math in your head.
+- run_js has no disk or network access. Pass data in through the code string, and return a value or console.log it.
 
 Delegation policy — sub-agents cost real money, so delegate deliberately:
-- Delegate when work fans out across independent pieces (several files to write, several topics to research, several candidates to check), or when a subtask needs a lot of reading whose details you don't need in your own context.
-- Do NOT delegate a task you can finish in one or two tool calls yourself. Do not delegate trivial edits.
+- Delegate when work fans out across independent pieces, or when a subtask needs a lot of reading whose details you don't need in your own context. Research across several sources parallelizes well.
+- Do NOT delegate a task you can finish in one or two tool calls yourself.
 - Send independent agents in ONE spawn_agents call so they run in parallel. Use separate calls only when a later agent needs an earlier one's output.
-- Each agent starts with a blank context and cannot see this conversation or ask the user anything. Its "task" must be fully self-contained: state the goal, the exact file paths to touch, the conventions to follow, and what to report back. Put shared background in "context".
+- Each agent starts with a blank context and cannot see this conversation or ask the user anything. Its "task" must be fully self-contained: the goal, exact file paths to touch, conventions to follow, and what to report back. Put shared background in "context".
 - Give each agent a disjoint set of files. Two agents writing the same path will clobber each other.
 - Agents return only a text report plus the paths they touched. Verify their work with disk_read when it matters, then summarize for the user yourself.`;
 
 const AGENT_SYS = rec =>
 `You are "${rec.name}", an autonomous sub-agent in Opus Studio, working at depth ${rec.depth} of ${AGENT.maxDepth}.
 
-You share one virtual disk with the orchestrator and your sibling agents. Tools: list, read, write, patch, delete files, and install npm libraries.
+You share one virtual disk with the orchestrator and your sibling agents. You have the same tools: files, npm libraries, web search and fetch, and a JavaScript sandbox.
 
 Operating rules:
 - You cannot talk to the user and cannot ask questions. If something is ambiguous, choose the most reasonable interpretation, proceed, and note the assumption in your report.
 - Do the work with tools. Writing code into your reply text instead of onto the disk means the work did not happen.
 - Stay inside your assigned scope. Do not touch files outside it — a sibling agent is probably working on them right now.
+- When researching, batch URLs into one web_fetch call, and verify with fetch before asserting a fact. Include the URLs in your report.
 - You have at most ${AGENT.maxSteps} steps. Work efficiently and don't re-read files you already read.
-- Finish with a final message containing no tool calls: a concise report of what you did, the paths you wrote, anything you could not complete, and any assumption you made. That report is the only thing your caller sees.`;
+- Finish with a final message containing no tool calls: a concise report of what you did, the paths you wrote, URLs you relied on, anything you could not complete, and any assumption you made. That report is the only thing your caller sees.`;
 
 function defaultBase(){
   if(PROXY_BASE) return PROXY_BASE.replace(/\/+$/,"");
@@ -326,7 +336,7 @@ function defaultBase(){
 const SDEF = {
   base: defaultBase(),
   key: "",
-  proxy:"", sys:DEFAULT_SYS, max:8192, tools:true,
+  proxy:"", sys:DEFAULT_SYS, max:8192, tools:true, web:true,
   model:MODELS[0].id, reason:"medium",
   agents:true, agentModel:"claude-opus-4-8", maxAgents:12
 };
@@ -337,7 +347,6 @@ let S, disk, chat;
 function load(){
   let raw={};
   try{ raw = JSON.parse(localStorage.getItem(LS)||"{}"); }catch(e){}
-  // migrate v2 settings/disk if present
   if(!raw.settings){
     try{ const old = JSON.parse(localStorage.getItem("opusStudio.v2")||"{}"); if(old.settings) raw = old; }catch(e){}
   }
@@ -367,9 +376,6 @@ let toastT;
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2800); }
 function norm(p){ return String(p||"").replace(/^\.?\//,"").replace(/\/{2,}/g,"/").trim(); }
 
-/* ============================================================
-   Environment banner
-   ============================================================ */
 function directToGateway(){ return /(^|\.)tabitoken\.com$/.test(hostOf(S.base)); }
 function checkEnv(){
   let msg = "";
@@ -495,8 +501,7 @@ function swapRefs(text, path, url){
   });
   return text;
 }
-function buildPreview(entry){
-  revokeBlobs();
+function composeHtml(entry, shim){
   let html = readFile(entry);
   const others = Object.keys(disk.files).filter(p=>p!==entry);
 
@@ -514,12 +519,14 @@ function buildPreview(entry){
   const tags = disk.libs.map(l => l.type==="css"
     ? `<link rel="stylesheet" href="${esc(l.url)}">`
     : `<script src="${esc(l.url)}"><\/script>`).join("\n");
-  const injected = `<base target="_blank">\n${tags}\n`;
-  html = /<head[^>]*>/i.test(html)
+  const injected = (shim||"") + `<base target="_blank">\n${tags}\n`;
+  return /<head[^>]*>/i.test(html)
     ? html.replace(/<head[^>]*>/i, m => m+"\n"+injected)
     : injected + html;
-
-  return blobFor(entry, html);
+}
+function buildPreview(entry){
+  revokeBlobs();
+  return blobFor(entry, composeHtml(entry));
 }
 
 /* ============================================================
@@ -603,22 +610,180 @@ $("btnCloseArt").onclick=()=>$("right").classList.add("collapsed");
 $("btnArt").onclick=()=>$("right").classList.toggle("collapsed");
 
 /* ============================================================
-   Tools
+   Worker-backed tools (TinyFish search / fetch)
    ============================================================ */
-const BASE_TOOLS = [
+function toolEndpoint(path){
+  let origin;
+  try{ origin = new URL(S.base, location.href).origin; }
+  catch(e){ throw new Error("Base URL is not a valid URL"); }
+  if(directToGateway())
+    throw new Error("Web tools need your Worker: the base URL currently points at tabitoken.com, which has no /tools routes.");
+  const url = origin + path;
+  return S.proxy ? S.proxy + encodeURIComponent(url) : url;
+}
+async function workerTool(path, body){
+  const res = await fetch(toolEndpoint(path), {
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+S.key},
+    body: JSON.stringify(body)
+  });
+  const txt = await res.text();
+  let j; try{ j = JSON.parse(txt); }catch(e){ throw new Error(`Worker returned non-JSON (HTTP ${res.status}): ${txt.slice(0,200)}`); }
+  if(!res.ok || j.error){
+    const m = j.error?.message || `HTTP ${res.status}`;
+    if(res.status===404) throw new Error(m+" — your Worker may predate the /tools routes. Redeploy the current worker.js.");
+    throw new Error(m);
+  }
+  return j;
+}
+
+/* ============================================================
+   Sandboxed JS runner — null-origin iframe, no disk, no network reach
+   ============================================================ */
+let jsSeq = 0;
+function runJs(code, timeoutMs){
+  return new Promise(resolve=>{
+    const id = "js"+(++jsSeq);
+    const ms = Math.min(10000, Math.max(100, Number(timeoutMs)||3000));
+    const frame = $("sandbox");
+    let done = false;
+
+    const onMsg = e => {
+      if(!e.data || e.data.__id !== id) return;
+      finish({logs:e.data.logs, result:e.data.result, error:e.data.error});
+    };
+    const finish = payload => {
+      if(done) return; done = true;
+      clearTimeout(timer);
+      window.removeEventListener("message", onMsg);
+      frame.removeAttribute("srcdoc");
+      resolve(payload);
+    };
+    const timer = setTimeout(()=>finish({logs:[], result:null,
+      error:`Timed out after ${ms}ms. Avoid infinite loops and blocking waits.`}), ms);
+
+    window.addEventListener("message", onMsg);
+    frame.srcdoc =
+`<!DOCTYPE html><meta charset="utf-8"><script>
+(function(){
+  var logs=[];
+  function ser(v){
+    try{
+      if(typeof v==="string") return v;
+      if(typeof v==="function") return "[Function "+(v.name||"anonymous")+"]";
+      if(v instanceof Error) return v.name+": "+v.message;
+      return JSON.stringify(v, function(k,x){ return typeof x==="bigint" ? String(x)+"n" : x; }, 1);
+    }catch(e){ return String(v); }
+  }
+  ["log","warn","error","info"].forEach(function(k){
+    console[k]=function(){ logs.push(k+": "+Array.prototype.map.call(arguments, ser).join(" ")); };
+  });
+  var out=null, err=null;
+  try{
+    out = ser((0,eval)(${JSON.stringify(String(code||""))}));
+  }catch(e){ err = (e && e.stack) ? String(e.stack).split("\\n").slice(0,4).join("\\n") : String(e); }
+  parent.postMessage({__id:${JSON.stringify(id)}, logs:logs.slice(0,200), result:out, error:err}, "*");
+})();
+<\/script>`;
+  });
+}
+
+/* ============================================================
+   check_app — load an entry HTML and capture runtime errors
+   ============================================================ */
+function checkApp(entry, waitMs){
+  return new Promise(resolve=>{
+    const id = "chk"+(++jsSeq);
+    const ms = Math.min(8000, Math.max(300, Number(waitMs)||1500));
+    const shim = `<script>(function(){
+      var E=[];
+      function push(t,m){ E.push(t+": "+m); }
+      window.onerror=function(m,s,l,c){ push("error", m+" (line "+l+")"); };
+      window.addEventListener("unhandledrejection",function(e){ push("unhandled promise", (e.reason&&e.reason.message)||String(e.reason)); });
+      var ce=console.error, cw=console.warn;
+      console.error=function(){ push("console.error", Array.prototype.join.call(arguments," ")); ce.apply(console,arguments); };
+      console.warn =function(){ push("console.warn",  Array.prototype.join.call(arguments," ")); cw.apply(console,arguments); };
+      setTimeout(function(){
+        parent.postMessage({__chk:${JSON.stringify(id)}, errors:E.slice(0,40),
+          title:document.title, nodes:document.body?document.body.querySelectorAll("*").length:0,
+          text:(document.body?document.body.innerText:"").slice(0,600)}, "*");
+      }, ${ms});
+    })();<\/script>\n`;
+
+    let html;
+    try{ html = composeHtml(entry, shim); }
+    catch(e){ return resolve({error:String(e.message||e)}); }
+
+    const frame = document.createElement("iframe");
+    frame.setAttribute("sandbox","allow-scripts allow-same-origin");
+    frame.style.cssText = "position:absolute;width:1024px;height:700px;left:-9999px;top:0;border:0";
+    let done = false;
+    const finish = payload => {
+      if(done) return; done = true;
+      clearTimeout(timer);
+      window.removeEventListener("message", onMsg);
+      frame.remove();
+      resolve(payload);
+    };
+    const onMsg = e => { if(e.data && e.data.__chk === id) finish(e.data); };
+    const timer = setTimeout(()=>finish({errors:["(no report — the page may have failed to load or blocked scripts)"], timedOut:true}), ms+3000);
+
+    window.addEventListener("message", onMsg);
+    document.body.appendChild(frame);
+    frame.src = blobFor(entry, html);
+  });
+}
+
+/* ============================================================
+   Tool schemas
+   ============================================================ */
+const DISK_TOOLS = [
   {type:"function",function:{name:"disk_list",description:"List every file on the virtual disk with size and last-modified time, plus installed libraries.",parameters:{type:"object",properties:{}}}},
-  {type:"function",function:{name:"disk_read",description:"Read the full contents of one file.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
+  {type:"function",function:{name:"disk_tree",description:"Compact indented tree of the disk. Cheaper than disk_list for getting oriented in a large project.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"disk_read",description:"Read one file. Optionally read a line range instead of the whole file.",parameters:{type:"object",properties:{path:{type:"string"},start_line:{type:"integer",description:"1-based first line"},end_line:{type:"integer"}},required:["path"]}}},
   {type:"function",function:{name:"disk_write",description:"Create or overwrite a file. Creates an artifact; .html files get a live preview.",parameters:{type:"object",properties:{path:{type:"string",description:"Relative path, e.g. app/index.html"},content:{type:"string"}},required:["path","content"]}}},
   {type:"function",function:{name:"disk_edit",description:"Replace an exact substring in a file. Cheaper than rewriting. Fails if old_text is absent or ambiguous.",parameters:{type:"object",properties:{path:{type:"string"},old_text:{type:"string"},new_text:{type:"string"}},required:["path","old_text","new_text"]}}},
+  {type:"function",function:{name:"disk_grep",description:"Search file contents across the disk and get matching lines with line numbers. Use this to locate code instead of reading every file.",parameters:{type:"object",properties:{pattern:{type:"string",description:"Substring, or a JS regex source if is_regex is true"},is_regex:{type:"boolean"},path_filter:{type:"string",description:"Only search paths containing this substring, e.g. '.js'"},max_results:{type:"integer"}},required:["pattern"]}}},
+  {type:"function",function:{name:"disk_move",description:"Rename or move a file, preserving its contents.",parameters:{type:"object",properties:{from:{type:"string"},to:{type:"string"},overwrite:{type:"boolean"}},required:["from","to"]}}},
   {type:"function",function:{name:"disk_delete",description:"Delete a file.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
   {type:"function",function:{name:"install_library",description:"Install an npm package from jsDelivr into the web-app environment. Auto-injected into all previewed HTML.",parameters:{type:"object",properties:{name:{type:"string"},version:{type:"string",description:"Defaults to latest"},path:{type:"string",description:"File inside the package, e.g. dist/chart.min.js. Needed for CSS or non-default entries."}},required:["name"]}}},
   {type:"function",function:{name:"list_libraries",description:"List installed libraries and their resolved CDN URLs.",parameters:{type:"object",properties:{}}}},
-  {type:"function",function:{name:"preview",description:"Open a file in the user's artifact panel (preview for HTML, editor otherwise).",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}}
+  {type:"function",function:{name:"preview",description:"Open a file in the user's artifact panel (preview for HTML, editor otherwise).",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
+  {type:"function",function:{name:"check_app",description:"Load an entry .html file in a hidden sandboxed frame and report runtime errors, console errors, unhandled rejections, rendered node count, and visible text. Use this to verify a web app actually runs before claiming it works.",parameters:{type:"object",properties:{path:{type:"string",description:"Entry HTML path"},wait_ms:{type:"integer",description:"How long to let it run before reporting. Default 1500."}},required:["path"]}}},
+  {type:"function",function:{name:"run_js",description:"Execute JavaScript in an isolated sandbox and get back the return value plus console output. No disk or app access. Use for math, data transforms, parsing, and verifying logic.",parameters:{type:"object",properties:{code:{type:"string",description:"Code to run. The final expression's value is returned."},timeout_ms:{type:"integer",description:"Default 3000, max 10000."}},required:["code"]}}}
+];
+
+const WEB_TOOLS = [
+  {type:"function",function:{name:"web_search",description:"Search the web (TinyFish) and get ranked results with titles, URLs, snippets, and dates. Snippets are previews — follow up with web_fetch before asserting a fact. Rate limit is 30 searches/minute.",parameters:{type:"object",properties:{
+    query:{type:"string"},
+    purpose:{type:"string",description:"Why you're searching — the task the results feed into. Improves ranking quality."},
+    count:{type:"integer",description:"1-10, default 6"},
+    domain_type:{type:"string",enum:["web","news","research_paper"],description:"news adds publisher and date; research_paper adds authors, venue, citations, pdf_url."},
+    include_domains:{type:"string",description:"Comma-separated allowlist, e.g. github.com,arxiv.org"},
+    exclude_domains:{type:"string",description:"Comma-separated blocklist, e.g. pinterest.com,quora.com"},
+    recency_minutes:{type:"integer",description:"Only results from the last N minutes. Cannot combine with after_date/before_date."},
+    after_date:{type:"string",description:"YYYY-MM-DD lower bound"},
+    before_date:{type:"string",description:"YYYY-MM-DD upper bound"},
+    location:{type:"string",description:"Country code, e.g. US, GB, DE"},
+    language:{type:"string",description:"Language code, e.g. en, fr"}
+  },required:["query"]}}},
+  {type:"function",function:{name:"web_fetch",description:"Fetch up to 10 URLs (TinyFish) and get clean markdown with nav, ads, and boilerplate stripped. Handles PDFs. Batch related URLs into ONE call — it's one round trip and far cheaper than fetching one at a time. Rate limit is 150 URLs/minute.",parameters:{type:"object",properties:{
+    urls:{type:"array",items:{type:"string"},description:"1-10 URLs. Prefer batching."},
+    url:{type:"string",description:"Convenience single URL; use urls for batches."},
+    purpose:{type:"string",description:"What you need from these pages. Improves extraction."},
+    format:{type:"string",enum:["markdown","html","json"],description:"Default markdown."},
+    max_chars:{type:"integer",description:"Per-page truncation, default 20000, max 120000."},
+    include_selectors:{type:"array",items:{type:"string"},description:"CSS selectors to scope extraction, e.g. [\"main\",\"article\"]. Bypasses auto boilerplate removal."},
+    exclude_selectors:{type:"array",items:{type:"string"},description:"CSS selectors to strip before extraction, e.g. [\"nav\",\".sidebar\"]."},
+    links:{type:"boolean",description:"Include all absolute <a href> URLs found on the page."}
+  }}}},
+  {type:"function",function:{name:"wikipedia",description:"Search Wikipedia, or fetch one article's plain-text extract. Cheap and reliable for stable background facts.",parameters:{type:"object",properties:{query:{type:"string",description:"Search terms, or an exact article title when mode is 'page'"},mode:{type:"string",enum:["search","page"],description:"Default search"},lang:{type:"string",description:"Wiki language code, default en"}},required:["query"]}}},
+  {type:"function",function:{name:"npm_search",description:"Search the npm registry for packages, with version, description, and weekly downloads. Use before install_library to confirm the real package name and current version.",parameters:{type:"object",properties:{query:{type:"string"},count:{type:"integer",description:"1-10, default 5"}},required:["query"]}}}
 ];
 
 const SPAWN_TOOL = {type:"function",function:{
   name:"spawn_agents",
-  description:"Delegate work to autonomous sub-agents that share your disk. All agents in one call run IN PARALLEL — batch independent work into a single call. Each agent starts with an empty context: it cannot see this conversation, cannot ask questions, and returns only a text report. Costs real money per step, so don't delegate what you can do in one or two tool calls.",
+  description:"Delegate work to autonomous sub-agents that share your disk and tools. All agents in one call run IN PARALLEL — batch independent work into a single call. Each agent starts with an empty context: it cannot see this conversation, cannot ask questions, and returns only a text report. Costs real money per step, so don't delegate what you can do in one or two tool calls.",
   parameters:{type:"object",properties:{
     agents:{type:"array",description:`Up to ${AGENT.maxPerCall} agents to run in parallel.`,items:{
       type:"object",properties:{
@@ -632,18 +797,43 @@ const SPAWN_TOOL = {type:"function",function:{
 }};
 
 function toolsFor(depth){
-  const t = BASE_TOOLS.slice();
+  let t = [];
+  if(S.tools) t = t.concat(DISK_TOOLS);
+  if(S.web)   t = t.concat(WEB_TOOLS);
   if(S.agents && depth < AGENT.maxDepth) t.push(SPAWN_TOOL);
   return t;
 }
 
+/* ============================================================
+   Tool execution
+   ============================================================ */
 async function execTool(name, args, ctx){
   switch(name){
+    /* ---- disk ---- */
     case "disk_list": return {
       files: Object.entries(disk.files).map(([p,f])=>({path:p, bytes:f.content.length, modified:new Date(f.updated).toISOString()})),
       libraries: disk.libs.map(l=>({name:l.name, version:l.version, type:l.type}))
     };
-    case "disk_read": return {path:norm(args.path), content:readFile(args.path)};
+    case "disk_tree": {
+      const paths = Object.keys(disk.files).sort();
+      if(!paths.length) return {tree:"(empty disk)"};
+      const lines = paths.map(p=>{
+        const d = p.split("/").length - 1;
+        return "  ".repeat(d) + p.split("/").pop() + "  (" + disk.files[p].content.length + "b)" + (d ? "   ["+p+"]" : "");
+      });
+      return {files:paths.length, tree:lines.join("\n")};
+    }
+    case "disk_read": {
+      const p = norm(args.path), content = readFile(p);
+      if(args.start_line || args.end_line){
+        const all = content.split("\n");
+        const s = Math.max(1, Number(args.start_line)||1);
+        const e = Math.min(all.length, Number(args.end_line)||all.length);
+        return {path:p, start_line:s, end_line:e, total_lines:all.length,
+                content: all.slice(s-1, e).map((l,i)=>(s+i)+"| "+l).join("\n")};
+      }
+      return {path:p, lines:content.split("\n").length, content};
+    }
     case "disk_write": {
       const p = writeFile(args.path, args.content);
       if(ctx.depth===0) openFile(p);
@@ -658,13 +848,115 @@ async function execTool(name, args, ctx){
       if(ctx.depth===0) openFile(p);
       return {ok:true, path:p};
     }
+    case "disk_grep": {
+      const max = Math.min(200, Math.max(1, Number(args.max_results)||60));
+      let test;
+      if(args.is_regex){
+        let re; try{ re = new RegExp(args.pattern, "i"); }catch(e){ throw new Error("Bad regex: "+e.message); }
+        test = l => re.test(l);
+      } else {
+        const needle = String(args.pattern).toLowerCase();
+        test = l => l.toLowerCase().includes(needle);
+      }
+      const filt = args.path_filter ? String(args.path_filter).toLowerCase() : "";
+      const matches = [];
+      for(const p of Object.keys(disk.files).sort()){
+        if(filt && !p.toLowerCase().includes(filt)) continue;
+        const lines = disk.files[p].content.split("\n");
+        for(let i=0;i<lines.length;i++){
+          if(test(lines[i])){
+            matches.push({path:p, line:i+1, text:lines[i].trim().slice(0,240)});
+            if(matches.length >= max) return {matches, truncated:true};
+          }
+        }
+      }
+      return {matches, count:matches.length};
+    }
+    case "disk_move": {
+      const from = norm(args.from), to = norm(args.to);
+      if(!disk.files[from]) throw new Error("No such file: "+from);
+      if(!to) throw new Error("Destination path is empty");
+      if(disk.files[to] && !args.overwrite) throw new Error(to+" already exists. Pass overwrite:true to replace it.");
+      writeFile(to, disk.files[from].content);
+      if(to !== from) deleteFile(from);
+      return {ok:true, from, to};
+    }
     case "disk_delete": deleteFile(args.path); return {ok:true, deleted:norm(args.path)};
+
+    /* ---- libraries / preview ---- */
     case "install_library": {
       const r = await installLibrary(args.name, args.version, args.path);
       return {ok:true, ...r, note:"Injected automatically into previewed HTML — do not add a manual script tag."};
     }
     case "list_libraries": return {libraries:disk.libs};
     case "preview": openFile(args.path, ["html","htm"].includes(ext(norm(args.path)))?"preview":"code"); return {ok:true};
+
+    /* ---- verification / compute ---- */
+    case "check_app": {
+      const p = norm(args.path);
+      if(!disk.files[p]) throw new Error("No such file: "+p);
+      if(!["html","htm"].includes(ext(p))) throw new Error("check_app needs an .html entry point");
+      const r = await checkApp(p, args.wait_ms);
+      return {path:p, errors:r.errors||[], error_count:(r.errors||[]).length,
+              title:r.title, rendered_nodes:r.nodes, visible_text:r.text, timed_out:!!r.timedOut,
+              note:(r.errors&&r.errors.length)?"Fix these before reporting success.":"No runtime errors captured."};
+    }
+    case "run_js": {
+      const r = await runJs(args.code, args.timeout_ms);
+      return {result:r.result, console:r.logs, error:r.error||null};
+    }
+
+    /* ---- web ---- */
+    case "web_search": {
+      if(!S.web) throw new Error("Web tools are disabled in this app's settings.");
+      const j = await workerTool("/tools/search", {
+        query:args.query, purpose:args.purpose, count:args.count,
+        domain_type:args.domain_type, include_domains:args.include_domains, exclude_domains:args.exclude_domains,
+        recency_minutes:args.recency_minutes, after_date:args.after_date, before_date:args.before_date,
+        location:args.location, language:args.language
+      });
+      return {provider:j.provider, query:j.query, results:j.results,
+        reminder:"Snippets are previews. Batch the promising URLs into one web_fetch call before asserting facts."};
+    }
+    case "web_fetch": {
+      if(!S.web) throw new Error("Web tools are disabled in this app's settings.");
+      const urls = Array.isArray(args.urls) ? args.urls : (args.url ? [args.url] : []);
+      if(!urls.length) throw new Error("Pass url or urls");
+      return await workerTool("/tools/fetch", {
+        urls, purpose:args.purpose, format:args.format, max_chars:args.max_chars,
+        include_selectors:args.include_selectors, exclude_selectors:args.exclude_selectors, links:args.links
+      });
+    }
+    case "wikipedia": {
+      const lang = (String(args.lang||"en").match(/^[a-z-]{2,10}$/i)||["en"])[0];
+      if(String(args.mode||"search") === "page"){
+        const u = `https://${lang}.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&redirects=1&format=json&origin=*&titles=`+encodeURIComponent(args.query);
+        const r = await fetch(u); if(!r.ok) throw new Error("Wikipedia HTTP "+r.status);
+        const pages = (await r.json()).query?.pages || {};
+        const first = Object.values(pages)[0];
+        if(!first || first.missing !== undefined) throw new Error("No such article: "+args.query);
+        return {title:first.title, url:`https://${lang}.wikipedia.org/wiki/`+encodeURIComponent(first.title),
+                extract:String(first.extract||"").slice(0,20000)};
+      }
+      const u = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srlimit=8&format=json&origin=*&srsearch=`+encodeURIComponent(args.query);
+      const r = await fetch(u); if(!r.ok) throw new Error("Wikipedia HTTP "+r.status);
+      const hits = (await r.json()).query?.search || [];
+      return {results: hits.map(h=>({title:h.title, url:`https://${lang}.wikipedia.org/wiki/`+encodeURIComponent(h.title),
+              snippet:String(h.snippet||"").replace(/<[^>]+>/g,"")}))};
+    }
+    case "npm_search": {
+      const n = Math.min(10, Math.max(1, Number(args.count)||5));
+      const r = await fetch(`https://registry.npmjs.org/-/v1/search?size=${n}&text=`+encodeURIComponent(args.query));
+      if(!r.ok) throw new Error("npm registry HTTP "+r.status);
+      const j = await r.json();
+      return {results:(j.objects||[]).map(o=>({
+        name:o.package.name, version:o.package.version,
+        description:String(o.package.description||"").slice(0,240),
+        weekly_downloads:o.downloads?.weekly, links:o.package.links?.npm
+      }))};
+    }
+
+    /* ---- delegation ---- */
     case "spawn_agents": return await spawnAgents(args, ctx);
     default: throw new Error("Unknown tool: "+name);
   }
@@ -680,18 +972,12 @@ function resolveModel(m){
   const id = String(m).replace(/\./g,"-").trim();
   return MODELS.some(x=>x.id===id) ? id : S.agentModel;
 }
-
-/* Run tasks with a concurrency cap, preserving input order in the results. */
 async function pool(jobs, limit){
   const out = new Array(jobs.length);
   let i = 0;
-  const workers = Array.from({length:Math.min(limit, jobs.length)}, async ()=>{
-    while(i < jobs.length){
-      const idx = i++;
-      out[idx] = await jobs[idx]();
-    }
-  });
-  await Promise.all(workers);
+  await Promise.all(Array.from({length:Math.min(limit, jobs.length)}, async ()=>{
+    while(i < jobs.length){ const idx = i++; out[idx] = await jobs[idx](); }
+  }));
   return out;
 }
 
@@ -724,11 +1010,10 @@ async function spawnAgents(args, ctx){
 
 async function runAgent(spec, depth){
   const rec = {
-    id: "ag"+(++agentSeq),
-    name: String(spec.name || ("agent-"+agentSeq)).slice(0,40),
-    task: String(spec.task||""),
-    context: String(spec.context||""),
-    model: resolveModel(spec.model),
+    id:"ag"+(++agentSeq),
+    name:String(spec.name || ("agent-"+agentSeq)).slice(0,40),
+    task:String(spec.task||""), context:String(spec.context||""),
+    model:resolveModel(spec.model),
     reason: REASONING[spec.reasoning] ? spec.reasoning : "low",
     depth, status:"running", steps:0, log:[], report:"", started:Date.now()
   };
@@ -743,8 +1028,7 @@ async function runAgent(spec, depth){
     for(let step=0; step<AGENT.maxSteps; step++){
       rec.steps = step+1; renderAgents();
       const out = await callModel({
-        model: rec.model, reason: rec.reason, messages: msgs,
-        tools: toolsFor(depth),
+        model:rec.model, reason:rec.reason, messages:msgs, tools:toolsFor(depth),
         onDelta: st => { rec.live = st.content || st.reasoning || ""; renderAgents(); }
       });
       rec.live = "";
@@ -782,12 +1066,16 @@ async function runAgent(spec, depth){
   renderAgents();
 
   const touched = [...new Set(rec.log
-    .filter(l => l.kind==="tool" && /^disk_(write|edit|delete)$/.test(l.name) && l.args && l.args.path && !l.result?.error)
-    .map(l => norm(l.args.path)))];
+    .filter(l => l.kind==="tool" && /^disk_(write|edit|delete|move)$/.test(l.name) && l.args && (l.args.path||l.args.to) && !l.result?.error)
+    .map(l => norm(l.args.to || l.args.path)))];
+  const sources = [...new Set(rec.log
+    .filter(l => l.kind==="tool" && /^(web_fetch|wikipedia)$/.test(l.name) && l.result)
+    .flatMap(l => l.result.url ? [l.result.url]
+      : (Array.isArray(l.result.results) ? l.result.results.map(x=>x.final_url||x.url).filter(Boolean) : [])))];
 
   return {
-    agent: rec.name, status: rec.status, model: rec.model,
-    steps: rec.steps, files_touched: touched, report: rec.report
+    agent:rec.name, status:rec.status, model:rec.model, steps:rec.steps,
+    files_touched:touched, ...(sources.length?{sources}:{}), report:rec.report
   };
 }
 
@@ -817,7 +1105,6 @@ function showAgent(id){
   $("agTitle").textContent = a.name;
   $("agMeta").innerHTML = `<span class="mono">${esc(a.model)}</span> · reasoning ${esc(a.reason)} · depth ${a.depth} · ${a.steps} step(s) · ${esc(a.status)}`;
   const c = $("agLog"); c.innerHTML = "";
-
   const add = (title, html) => {
     const d = document.createElement("div");
     d.className = "logEntry";
@@ -861,6 +1148,7 @@ function md(src){
     .replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>")
     .replace(/(^|\W)\*([^*\n]+)\*/g,"$1<em>$2</em>")
     .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    .replace(/(^|[\s(])(https?:\/\/[^\s<>"')\]]+)/g,'$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>')
     .replace(/^\s*[-*+] (.*)$/gm,"<li>$1</li>")
     .replace(/^\s*\d+\. (.*)$/gm,"<li>$1</li>")
     .replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g,"<ul>$1</ul>")
@@ -872,12 +1160,10 @@ function md(src){
 /* ============================================================
    Chat rendering
    ============================================================ */
+const WEB_NAMES = /^(web_search|web_fetch|wikipedia|npm_search)$/;
 function renderChat(){
   const c=$("msgs"); c.innerHTML="";
-  chat.forEach(m=>{
-    if(m.role==="system" || m.role==="tool") return;
-    c.appendChild(msgEl(m));
-  });
+  chat.forEach(m=>{ if(m.role==="system"||m.role==="tool") return; c.appendChild(msgEl(m)); });
   c.scrollTop = c.scrollHeight;
 }
 function msgEl(m){
@@ -890,16 +1176,18 @@ function msgEl(m){
     (m.tool_calls||[]).forEach(tc=>{
       const res = chat.find(x=>x.role==="tool" && x.tool_call_id===tc.id);
       const bad = res && /"error"/.test(res.content||"");
-      const isSpawn = tc.function.name==="spawn_agents";
+      const nm = tc.function.name;
+      const isSpawn = nm==="spawn_agents", isWeb = WEB_NAMES.test(nm);
       let a = "";
       try{
         const o = JSON.parse(tc.function.arguments||"{}");
-        a = isSpawn
-          ? (Array.isArray(o.agents) ? o.agents.map(x=>x&&x.name).filter(Boolean).join(", ") : "")
-          : (o.path || o.name || Object.values(o)[0] || "");
+        if(isSpawn) a = Array.isArray(o.agents) ? o.agents.map(x=>x&&x.name).filter(Boolean).join(", ") : "";
+        else if(Array.isArray(o.urls)) a = o.urls.length===1 ? o.urls[0] : o.urls.length+" urls";
+        else a = o.query || o.url || o.path || o.pattern || o.name || o.from || Object.values(o)[0] || "";
       }catch(e){ a = String(tc.function.arguments||"").slice(0,60); }
-      const label = isSpawn ? "spawn_agents ⇉" : tc.function.name;
-      body += `<div class="tcall${bad?" err":""}${isSpawn?" agentcall":""}"><span>${bad?"✕":"✓"}</span><b>${esc(label)}</b><span class="arg">${esc(String(a).slice(0,110))}</span></div>`;
+      const label = isSpawn ? "spawn_agents ⇉" : nm;
+      const cls = bad?" err":(isSpawn?" agentcall":(isWeb?" webcall":""));
+      body += `<div class="tcall${cls}"><span>${bad?"✕":"✓"}</span><b>${esc(label)}</b><span class="arg">${esc(String(a).slice(0,110))}</span></div>`;
     });
     if(m.content) body += `<div class="bubble">${md(m.content)}</div>`;
   }
@@ -908,7 +1196,7 @@ function msgEl(m){
 }
 
 /* ============================================================
-   API layer — one call, reused by orchestrator and every agent
+   API layer — shared by orchestrator and every agent
    ============================================================ */
 const activeCtrls = new Set();
 let busy = false;
@@ -1011,9 +1299,8 @@ async function streamOnce(opts){
 
 /* Retries once without reasoning/thinking params if the gateway rejects them. */
 async function callModel(opts){
-  try{
-    return await streamOnce({...opts, withExtras:true});
-  }catch(e){
+  try{ return await streamOnce({...opts, withExtras:true}); }
+  catch(e){
     if(e.status===400 && /reasoning|thinking|tool|unsupported|unknown|invalid|budget/i.test(e.raw||e.message))
       return await streamOnce({...opts, withExtras:false});
     throw e;
@@ -1039,13 +1326,15 @@ function failureNote(e){
       cause = "Your **Worker** rejected the token from Settings. It must match the `APP_TOKEN` secret exactly.";
     else if(/TABI_KEY is not bound/i.test(raw))
       cause = "The **Worker** has no `TABI_KEY` bound. Add the secret, then redeploy.";
+    else if(/TINYFISH_KEY is not bound/i.test(raw))
+      cause = "The **Worker** has no `TINYFISH_KEY` bound. Add the secret, then redeploy.";
     else if(/invalid token|new_api_error/i.test(raw))
       cause = "**TaBiAI** rejected the key the Worker forwarded — the key itself is wrong or out of credit.";
-    else
-      cause = "Unrecognized rejection — see the raw response below.";
+    else cause = "Unrecognized rejection — see the raw response below.";
     return "**Rejected — HTTP "+e.status+".**\n\n"+cause+"\n\n```\n"+(raw.slice(0,600)||"(empty body)")+"\n```";
   }
-  if(e.status===429) return "**Rate limited (429).** Sub-agents run 3 at a time and can trip this. Wait a moment and retry.\n\n```\n"+String(e.raw||"").slice(0,400)+"\n```";
+  if(e.status===404) return "**404 from the endpoint.** If this happened on a web tool, your Worker predates the `/tools/*` routes — redeploy the current `worker.js`.\n\n```\n"+String(e.raw||"").slice(0,300)+"\n```";
+  if(e.status===429) return "**Rate limited (429).** Sub-agents run 3 at a time; TinyFish allows 30 searches/min. Wait a moment and retry.\n\n```\n"+String(e.raw||"").slice(0,400)+"\n```";
   if(e.status>=500) return "**Upstream error ("+e.status+").**\n\n```\n"+String(e.raw||"").slice(0,600)+"\n```";
   return "**Request failed** — "+String(e.message||e);
 }
@@ -1063,7 +1352,7 @@ async function send(){
   spawnedThisTurn = 0; agents = []; renderAgents();
 
   try{
-    for(let hop=0; hop<24; hop++){
+    for(let hop=0; hop<28; hop++){
       const am = {role:"assistant",content:"",reasoning:"",tool_calls:[]};
       chat.push(am);
       renderChat();
@@ -1081,15 +1370,12 @@ async function send(){
 
       setStatus("Thinking…");
       const out = await callModel({
-        model: S.model, reason: S.reason,
-        messages: apiMessages(),
-        tools: S.tools ? toolsFor(0) : [],
-        onDelta
+        model:S.model, reason:S.reason, messages:apiMessages(),
+        tools:toolsFor(0), onDelta
       });
 
       am.content = out.content; am.reasoning = out.reasoning; am.tool_calls = out.calls;
       save();
-
       if(!out.calls.length){ renderChat(); break; }
 
       for(const tc of out.calls){
@@ -1185,7 +1471,8 @@ $("libAdd").onclick=async()=>{
 
 $("btnSet").onclick=()=>{
   $("sBase").value=S.base; $("sKey").value=S.key; $("sProxy").value=S.proxy;
-  $("sSys").value=S.sys; $("sMax").value=S.max; $("sTools").checked=!!S.tools;
+  $("sSys").value=S.sys; $("sMax").value=S.max;
+  $("sTools").checked=!!S.tools; $("sWeb").checked=!!S.web;
   $("sAgents").checked=!!S.agents; $("sAgentModel").value=S.agentModel; $("sMaxAgents").value=S.maxAgents;
   $("setMask").classList.add("on");
 };
@@ -1197,6 +1484,7 @@ $("setSave").onclick=()=>{
   S.sys=$("sSys").value||DEFAULT_SYS;
   S.max=Math.max(256,Number($("sMax").value)||8192);
   S.tools=$("sTools").checked;
+  S.web=$("sWeb").checked;
   S.agents=$("sAgents").checked;
   S.agentModel=$("sAgentModel").value;
   S.maxAgents=Math.min(40,Math.max(1,Number($("sMaxAgents").value)||12));
@@ -1217,13 +1505,12 @@ if(!chat.length){
   $("msgs").innerHTML = `<div class="msg"><div class="who">Opus Studio</div><div class="bubble">
   <p>Orchestrator <code>${esc(labelOf(S.model))}</code> · agents <code>${esc(labelOf(S.agentModel))}</code> · endpoint <code>${esc(S.base)}</code></p>
   <ul>
-  <li><b>Sub-agents</b> — the orchestrator delegates on its own, up to ${AGENT.maxConcurrent} in parallel, depth ${AGENT.maxDepth}. Watch them in the left panel; click one for its full transcript.</li>
-  <li><b>Reasoning levels</b> — Off through Maximum, per request, for <code>-thinking</code> models.</li>
-  <li><b>Disk</b> — shared by you, the orchestrator, and every agent.</li>
-  <li><b>Artifacts</b> — each file becomes a tab; HTML gets a sandboxed live preview.</li>
-  <li><b>Libraries</b> — any npm package via jsDelivr, auto-injected into previews.</li>
+  <li><b>Research</b> — <code>web_search</code> and <code>web_fetch</code> via TinyFish (clean markdown, 10 URLs per call, PDFs supported), plus <code>wikipedia</code> and <code>npm_search</code>.</li>
+  <li><b>Build</b> — disk read/write/patch/grep/move, npm installs, sandboxed live preview.</li>
+  <li><b>Verify</b> — <code>check_app</code> reports real runtime errors; <code>run_js</code> executes code in isolation.</li>
+  <li><b>Delegate</b> — up to ${AGENT.maxConcurrent} sub-agents in parallel, depth ${AGENT.maxDepth}. Click one in the left panel for its transcript.</li>
   </ul>
-  <p>Try: <i>"Build a recipe app: separate agents for the HTML shell, the CSS theme, and the search logic in app.js"</i></p>
+  <p>Try: <i>"Research the top 3 charting libraries, then build a dashboard with whichever has the best docs"</i></p>
   </div></div>`;
 }
 </script>
