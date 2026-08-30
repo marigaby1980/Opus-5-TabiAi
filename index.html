@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opus Studio — TaBiAI</title>
+<style>
+:root{
+  --bg:#0e1013; --bg2:#15181d; --bg3:#1c2027; --line:#2a3038;
+  --fg:#e6e9ee; --dim:#98a2b3; --acc:#c96442; --acc2:#7aa2f7; --ok:#4ec9a0; --warn:#e0af68;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;color:inherit;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:5px 10px;cursor:pointer}
+button:hover:not(:disabled){border-color:#3d4652;background:#232833}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button.primary:hover:not(:disabled){background:#d97757;border-color:#d97757}
+button.ghost{background:transparent;border-color:transparent;color:var(--dim)}
+button.ghost:hover{color:var(--fg);background:var(--bg3)}
+input,select,textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc2)}
+select{cursor:pointer}
+.row{display:flex;gap:8px;align-items:center}
+.sp{flex:1}
+.mono{font-family:var(--mono)}
+
+header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--line);flex:none}
+.brand{font-weight:700;letter-spacing:.3px}
+.brand span{color:var(--acc)}
+.pill{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:2px 9px;white-space:nowrap}
+header select{width:auto;min-width:180px}
+#reasonWrap{display:flex;gap:6px;align-items:center}
+#reasonWrap.hide{display:none}
+
+#banner{display:none;flex:none;align-items:center;gap:10px;padding:8px 14px;background:#2a1f10;border-bottom:1px solid #4a3a1c;color:#e8cf9a;font-size:13px}
+#banner.on{display:flex}
+#banner b{color:#f0dcae}
+
+main{flex:1;display:flex;min-height:0}
+.pane{display:flex;flex-direction:column;min-width:0;min-height:0}
+#left{width:270px;flex:none;background:var(--bg2);border-right:1px solid var(--line)}
+#center{flex:1}
+#right{width:46%;flex:none;background:var(--bg2);border-left:1px solid var(--line)}
+#right.collapsed{display:none}
+.paneHead{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;flex:none}
+.scroll{overflow:auto;flex:1;min-height:0}
+
+.diskItem{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;font-size:13px;border-left:2px solid transparent}
+.diskItem:hover{background:var(--bg3)}
+.diskItem.active{background:var(--bg3);border-left-color:var(--acc)}
+.diskItem .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:12px}
+.diskItem .x{opacity:0;color:var(--dim)}
+.diskItem:hover .x{opacity:1}
+.secTitle{font-size:11px;color:var(--dim);padding:10px 10px 4px;text-transform:uppercase;letter-spacing:.6px}
+.lib{display:flex;gap:6px;align-items:center;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--dim)}
+.lib b{color:var(--ok);font-weight:600}
+.empty{color:var(--dim);font-size:12px;padding:12px 10px;line-height:1.6}
+
+#msgs{padding:18px 20px 8px}
+.msg{max-width:820px;margin:0 auto 18px}
+.who{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.msg.user .bubble{background:var(--bg3);border:1px solid var(--line);border-radius:10px;padding:10px 12px;white-space:pre-wrap}
+.bubble{word-wrap:break-word;overflow-wrap:anywhere}
+.bubble h1,.bubble h2,.bubble h3{margin:.9em 0 .4em;line-height:1.3}
+.bubble p{margin:.6em 0}
+.bubble ul,.bubble ol{margin:.5em 0;padding-left:22px}
+.bubble code{background:#000;padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:12.5px}
+.bubble pre{background:#08090b;border:1px solid var(--line);border-radius:8px;padding:11px;overflow:auto;margin:.7em 0}
+.bubble pre code{background:none;padding:0;font-size:12.5px;line-height:1.55}
+.bubble a{color:var(--acc2)}
+.bubble table{border-collapse:collapse;margin:.6em 0}
+.bubble td,.bubble th{border:1px solid var(--line);padding:4px 8px}
+details.think{background:#0b1622;border:1px solid #1e3350;border-radius:8px;margin:6px 0;font-size:13px}
+details.think summary{cursor:pointer;padding:6px 10px;color:var(--acc2);font-size:12px;font-weight:600}
+details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-family:var(--mono);font-size:12px;max-height:340px;overflow:auto}
+.tcall{display:flex;gap:8px;align-items:center;background:#0f1a14;border:1px solid #21402f;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:12px;font-family:var(--mono);color:#8fd6b4}
+.tcall.err{background:#1f1113;border-color:#4a2429;color:#f2a0a8}
+.tcall .arg{color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+#composer{flex:none;border-top:1px solid var(--line);background:var(--bg2);padding:10px 20px 12px}
+#composerInner{max-width:820px;margin:0 auto}
+#ta{resize:none;min-height:52px;max-height:200px;background:var(--bg3)}
+.hint{font-size:11px;color:var(--dim);margin-top:5px}
+
+.tabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid var(--line);flex:none;overflow:auto}
+.tab{font-size:12px;padding:4px 9px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--dim);white-space:nowrap;cursor:pointer;font-family:var(--mono)}
+.tab:hover{background:var(--bg3);color:var(--fg)}
+.tab.active{background:var(--bg3);color:var(--fg);border-color:var(--line)}
+#artBody{flex:1;min-height:0;display:flex;flex-direction:column}
+#editor{flex:1;border:0;border-radius:0;background:#08090b;font-family:var(--mono);font-size:12.5px;line-height:1.6;padding:12px;resize:none;white-space:pre;overflow:auto}
+#frame{flex:1;border:0;background:#fff;width:100%}
+.toolbar{display:flex;gap:6px;align-items:center;padding:6px 8px;border-bottom:1px solid var(--line);flex:none}
+.toolbar .path{font-family:var(--mono);font-size:12px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.saved{font-size:11px;color:var(--ok)}
+
+.mask{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.mask.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:18px;width:100%;max-width:540px;max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 14px}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:12px;color:var(--dim);margin-bottom:4px}
+.f .sub{font-size:11px;color:var(--dim);margin-top:4px;line-height:1.5}
+.f .sub b{color:var(--warn)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:9px 15px;font-size:13px;z-index:99;opacity:0;pointer-events:none;transition:.2s}
+#toast.on{opacity:1}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#2c333d;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Opus<span>Studio</span></div>
+  <span class="pill" id="hostPill">…</span>
+  <select id="model" title="Model"></select>
+  <div id="reasonWrap">
+    <span style="font-size:12px;color:var(--dim)">Reasoning</span>
+    <select id="reason" style="min-width:120px"></select>
+  </div>
+  <div class="sp"></div>
+  <button class="ghost" id="btnArt" title="Toggle artifacts panel">▤ Artifacts</button>
+  <button class="ghost" id="btnSet" title="Settings">⚙ Settings</button>
+  <button class="ghost" id="btnNew" title="New chat">✚ New chat</button>
+</header>
+
+<div id="banner">
+  <span id="bannerText"></span>
+  <div class="sp"></div>
+  <button id="bannerFix">Open Settings</button>
+  <button class="ghost" id="bannerHide">✕</button>
+</div>
+
+<main>
+  <section class="pane" id="left">
+    <div class="paneHead">
+      Disk <span class="sp"></span>
+      <button class="ghost" id="btnNewFile" title="New file">＋</button>
+      <button class="ghost" id="btnImport" title="Import files">⭳</button>
+      <button class="ghost" id="btnExport" title="Export disk as JSON">⭱</button>
+    </div>
+    <div class="scroll">
+      <div id="fileList"></div>
+      <div class="secTitle">Installed libraries</div>
+      <div id="libList"></div>
+      <div style="padding:8px 10px"><button id="btnAddLib" style="width:100%">+ Install library</button></div>
+    </div>
+  </section>
+
+  <section class="pane" id="center">
+    <div class="scroll" id="msgs"></div>
+    <div id="composer"><div id="composerInner">
+      <textarea id="ta" placeholder="Ask anything. The model can read/write the disk, install libraries, and build web apps."></textarea>
+      <div class="row" style="margin-top:7px">
+        <span class="hint" id="status">Ready</span>
+        <div class="sp"></div>
+        <button id="btnStop" style="display:none">■ Stop</button>
+        <button class="primary" id="btnSend">Send ↵</button>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="pane" id="right">
+    <div class="paneHead">Artifacts <span class="sp"></span>
+      <button class="ghost" id="btnCloseArt">✕</button>
+    </div>
+    <div class="tabs" id="artTabs"></div>
+    <div id="artBody">
+      <div class="toolbar" id="artToolbar" style="display:none">
+        <span class="path" id="artPath"></span>
+        <span class="saved" id="savedFlag"></span>
+        <button id="btnCode">Code</button>
+        <button id="btnPreview">Preview</button>
+        <button id="btnRun" title="Rebuild preview">⟳</button>
+        <button id="btnPop" title="Open preview in new tab">↗</button>
+        <button id="btnDl" title="Download file">⭳</button>
+      </div>
+      <textarea id="editor" spellcheck="false" style="display:none"></textarea>
+      <iframe id="frame" sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin" style="display:none"></iframe>
+      <div class="empty" id="artEmpty" style="padding:20px">No artifacts yet.<br><br>Ask the model to build something — e.g. <i>"build a todo web app with Tailwind"</i> — and files it writes will show up here with a live preview.</div>
+    </div>
+  </section>
+</main>
+
+<div class="mask" id="setMask"><div class="modal">
+  <h3>Settings</h3>
+  <div class="f"><label>Base URL</label><input id="sBase">
+    <div class="sub">Requests go to <span class="mono">{base}/chat/completions</span>.
+    <b>tabitoken.com blocks direct browser POSTs</b>, so on a hosted page this must point at your own proxy,
+    e.g. <span class="mono">https://name.workers.dev/v1</span>.</div></div>
+  <div class="f"><label>API key or app token</label><input id="sKey" type="password" autocomplete="off">
+    <div class="sub">Sent as <span class="mono">Authorization: Bearer …</span>. If your proxy holds the real
+    TaBiAI key, put your proxy password here instead. <b>Anything saved in this file is public once deployed.</b></div></div>
+  <div class="f"><label>URL-wrapping proxy (optional)</label><input id="sProxy" placeholder="https://proxy.example/?url=">
+    <div class="sub">Only for generic proxies that take the target as a query param. Leave blank when using a Worker as the base URL.</div></div>
+  <div class="f"><label>System prompt</label><textarea id="sSys" rows="5" class="mono" style="font-size:12px"></textarea></div>
+  <div class="f"><label>Max output tokens</label><input id="sMax" type="number" min="256" step="256"></div>
+  <div class="f"><label><input type="checkbox" id="sTools" style="width:auto"> Enable disk / library tools</label></div>
+  <div class="row"><button class="ghost" id="btnWipe">Wipe disk &amp; chat</button><div class="sp"></div>
+    <button id="setCancel">Cancel</button><button class="primary" id="setSave">Save</button></div>
+</div></div>
+
+<div class="mask" id="libMask"><div class="modal" style="max-width:460px">
+  <h3>Install library</h3>
+  <div class="f"><label>npm package</label><input id="lName" placeholder="e.g. lodash, chart.js, three"></div>
+  <div class="f"><label>Version</label><input id="lVer" placeholder="latest"></div>
+  <div class="f"><label>File path inside package (optional)</label><input id="lPath" placeholder="e.g. dist/tailwind.min.css">
+    <div class="sub">Leave blank to use the package's default entry. Resolved via jsDelivr.</div></div>
+  <div class="row"><div class="sp"></div><button id="libCancel">Cancel</button><button class="primary" id="libAdd">Install</button></div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   Models — wire IDs use dashes (claude-opus-4-8); dotted IDs 403.
+   ============================================================ */
+const MODELS = [
+  {id:"claude-opus-5-thinking",   label:"claude-opus-5-thinking"},
+  {id:"claude-opus-5",            label:"claude-opus-5"},
+  {id:"claude-opus-4-8-thinking", label:"claude-opus-4.8-thinking"},
+  {id:"claude-opus-4-8",          label:"claude-opus-4.8"}
+];
+const labelOf = id => (MODELS.find(m=>m.id===id)||{}).label || id;
+const isThinkingModel = m => /-thinking$/.test(m);
+
+const REASONING = {
+  off:    {label:"Off",     effort:null,     budget:0},
+  low:    {label:"Low",     effort:"low",    budget:2048},
+  medium: {label:"Medium",  effort:"medium", budget:8192},
+  high:   {label:"High",    effort:"high",   budget:24576},
+  max:    {label:"Maximum", effort:"high",   budget:60000}
+};
+
+const DEFAULT_SYS =
+`You are an expert engineering assistant running inside Opus Studio, a browser IDE.
+
+You have a virtual disk and can use tools to list, read, write, and delete files, and to install npm libraries via jsDelivr.
+
+Rules:
+- When asked to build anything (app, page, script, document), WRITE IT TO THE DISK with disk_write instead of only pasting it in chat. Files on disk become live artifacts the user can preview and edit.
+- Web apps: the entry point must be an .html file. Reference sibling files with plain relative paths ("app.js", "styles.css") — the preview resolves them.
+- Installed libraries are auto-injected into every previewed HTML file. Do not add your own CDN <script> tags for a library you installed with install_library; call install_library instead, then use the global it exposes.
+- Prefer a few well-organized files over one enormous one. Read a file before editing it.
+- Keep code accessible (labels, roles, keyboard support, sufficient contrast) and avoid unsafe patterns.
+- After using tools, briefly tell the user what you changed. Don't re-dump entire file contents you just wrote.`;
+
+/* Base URL default: localhost gets the same-origin Node proxy; anything else
+   needs an explicit proxy, and the banner will say so. */
+function defaultBase(){
+  const h = location.hostname;
+  if(h==="localhost" || h==="127.0.0.1") return location.origin + "/api/v1";
+  return "https://tabitoken.com/v1";
+}
+
+/* ⚠ Replace with key:"" before committing to a repo whose Pages site is public. */
+const SDEF = {
+  base: defaultBase(),
+  key: "sk-uc3KQXTrrfQsCWl0cdD6FmGJm3EtN2jKJQjqGyW8vZVNJyP8",
+  proxy:"", sys:DEFAULT_SYS, max:8192, tools:true,
+  model:MODELS[0].id, reason:"medium"
+};
+
+const LS = "opusStudio.v2";
+let S, disk, chat;
+
+function load(){
+  let raw={};
+  try{ raw = JSON.parse(localStorage.getItem(LS)||"{}"); }catch(e){}
+  S    = Object.assign({}, SDEF, raw.settings||{});
+  disk = Object.assign({files:{}, libs:[]}, raw.disk||{});
+  chat = Array.isArray(raw.chat) ? raw.chat : [];
+  // migrate dotted model IDs saved by earlier versions
+  if(/\./.test(S.model)) S.model = S.model.replace(/\./g,"-");
+  if(!MODELS.some(m=>m.id===S.model)) S.model = MODELS[0].id;
+}
+function save(){
+  try{ localStorage.setItem(LS, JSON.stringify({settings:S, disk, chat})); }
+  catch(e){ toast("Storage full — disk not saved"); }
+}
+load();
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ext = p => (p.split(".").pop()||"").toLowerCase();
+let toastT;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2800); }
+function norm(p){ return String(p||"").replace(/^\.?\//,"").replace(/\/{2,}/g,"/").trim(); }
+
+/* ============================================================
+   Environment banner
+   ============================================================ */
+function directToGateway(){
+  try{ return new URL(S.base).hostname.endsWith("tabitoken.com"); }catch(e){ return false; }
+}
+function checkEnv(){
+  let msg = "";
+  if(location.protocol === "file:"){
+    msg = "<b>Opened as a file://</b> — its origin is <span class='mono'>null</span>, which CORS always rejects. Serve this over http(s) instead.";
+  } else if(directToGateway() && !S.proxy){
+    msg = "<b>No proxy configured.</b> tabitoken.com refuses POST requests from browsers, so chat will fail. Point the base URL at your own proxy.";
+  }
+  $("banner").classList.toggle("on", !!msg);
+  $("bannerText").innerHTML = msg;
+}
+$("bannerFix").onclick = ()=>$("btnSet").click();
+$("bannerHide").onclick = ()=>$("banner").classList.remove("on");
+
+/* ============================================================
+   Disk
+   ============================================================ */
+function writeFile(path, content){
+  path = norm(path);
+  if(!path) throw new Error("Empty path");
+  disk.files[path] = {content:String(content ?? ""), updated:Date.now()};
+  save(); renderDisk(); renderTabs();
+  return path;
+}
+function readFile(path){
+  const f = disk.files[norm(path)];
+  if(!f) throw new Error("No such file: "+path);
+  return f.content;
+}
+function deleteFile(path){
+  path = norm(path);
+  if(!disk.files[path]) throw new Error("No such file: "+path);
+  delete disk.files[path];
+  openTabs = openTabs.filter(t=>t!==path);
+  if(active===path) active = openTabs[0]||null;
+  save(); renderDisk(); renderTabs(); renderArtifact();
+}
+function icon(p){
+  const e=ext(p);
+  if(e==="html"||e==="htm") return "🌐";
+  if(["js","mjs","jsx","ts","tsx"].includes(e)) return "🟨";
+  if(e==="css") return "🎨";
+  if(e==="json") return "🔧";
+  if(e==="md") return "📝";
+  if(["png","jpg","jpeg","gif","svg","webp"].includes(e)) return "🖼";
+  return "📄";
+}
+function renderDisk(){
+  const paths = Object.keys(disk.files).sort();
+  const fl = $("fileList");
+  fl.innerHTML = paths.length ? "" :
+    '<div class="empty">Disk is empty.<br>Create a file, or ask the model to build something.</div>';
+  paths.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="diskItem"+(p===active?" active":"");
+    d.innerHTML = `<span>${icon(p)}</span><span class="nm" title="${esc(p)}">${esc(p)}</span><span class="x">✕</span>`;
+    d.onclick = e => {
+      if(e.target.classList.contains("x")){ if(confirm("Delete "+p+"?")) deleteFile(p); }
+      else openFile(p);
+    };
+    fl.appendChild(d);
+  });
+
+  const ll=$("libList");
+  ll.innerHTML = disk.libs.length ? "" : '<div class="empty">None installed.</div>';
+  disk.libs.forEach((l,i)=>{
+    const d=document.createElement("div");
+    d.className="lib";
+    d.innerHTML=`<b>${esc(l.name)}</b><span>@${esc(l.version)}</span><span class="sp"></span>
+      <span style="opacity:.6">${esc(l.type)}</span><button class="ghost" title="Remove">✕</button>`;
+    d.querySelector("button").onclick=()=>{ disk.libs.splice(i,1); save(); renderDisk(); rebuildIfPreview(); };
+    ll.appendChild(d);
+  });
+}
+
+async function installLibrary(name, version, path){
+  name = String(name||"").trim();
+  if(!name) throw new Error("Library name required");
+  version = String(version||"latest").trim() || "latest";
+
+  if(version === "latest"){
+    try{
+      const r = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${encodeURIComponent(name)}/resolved`);
+      if(r.ok){ const j = await r.json(); if(j.version) version = j.version; }
+    }catch(e){}
+  }
+
+  const url = `https://cdn.jsdelivr.net/npm/${name}@${version}` + (path ? "/"+String(path).replace(/^\//,"") : "");
+  const probe = await fetch(url);
+  if(!probe.ok) throw new Error(`Could not resolve ${url} (HTTP ${probe.status}). Try specifying a file path inside the package.`);
+
+  const finalUrl = probe.url || url;
+  const type = /\.css($|\?)/.test(finalUrl) ? "css" : "js";
+  const rec = {name, version, path:path||"", url:finalUrl, type};
+  const at = disk.libs.findIndex(l=>l.name===name && (l.path||"")===(path||""));
+  if(at>=0) disk.libs[at]=rec; else disk.libs.push(rec);
+
+  save(); renderDisk(); rebuildIfPreview();
+  return rec;
+}
+
+/* ============================================================
+   Preview builder
+   ============================================================ */
+let blobUrls = [];
+function revokeBlobs(){ blobUrls.forEach(u=>URL.revokeObjectURL(u)); blobUrls=[]; }
+function mime(p){
+  return {html:"text/html",htm:"text/html",js:"text/javascript",mjs:"text/javascript",
+    css:"text/css",json:"application/json",svg:"image/svg+xml",txt:"text/plain"}[ext(p)] || "text/plain";
+}
+function blobFor(path, content){
+  const u = URL.createObjectURL(new Blob([content], {type:mime(path)}));
+  blobUrls.push(u); return u;
+}
+function swapRefs(text, path, url){
+  const base = path.split("/").pop();
+  const cands = [...new Set([path, "./"+path, "/"+path, base, "./"+base])].sort((a,b)=>b.length-a.length);
+  cands.forEach(c=>{
+    const re = new RegExp('(["\'\\(])'+c.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+'(["\'\\)])','g');
+    text = text.replace(re, (m,a,b)=>a+url+b);
+  });
+  return text;
+}
+function buildPreview(entry){
+  revokeBlobs();
+  let html = readFile(entry);
+  const others = Object.keys(disk.files).filter(p=>p!==entry);
+
+  const assetUrls = {};
+  others.filter(p=>!["js","mjs","jsx"].includes(ext(p))).forEach(p=>{
+    assetUrls[p] = blobFor(p, disk.files[p].content);
+  });
+  others.filter(p=>["js","mjs","jsx"].includes(ext(p))).forEach(p=>{
+    let src = disk.files[p].content;
+    Object.entries(assetUrls).forEach(([q,u])=>{ src = swapRefs(src,q,u); });
+    assetUrls[p] = blobFor(p, src);
+  });
+  Object.entries(assetUrls).forEach(([p,u])=>{ html = swapRefs(html,p,u); });
+
+  const tags = disk.libs.map(l => l.type==="css"
+    ? `<link rel="stylesheet" href="${esc(l.url)}">`
+    : `<script src="${esc(l.url)}"><\/script>`).join("\n");
+  const injected = `<base target="_blank">\n${tags}\n`;
+  html = /<head[^>]*>/i.test(html)
+    ? html.replace(/<head[^>]*>/i, m => m+"\n"+injected)
+    : injected + html;
+
+  return blobFor(entry, html);
+}
+
+/* ============================================================
+   Artifacts panel
+   ============================================================ */
+let openTabs = [], active = null, mode = "code", dirtyT;
+
+function openFile(p, wantMode){
+  p = norm(p);
+  if(!disk.files[p]) return;
+  if(!openTabs.includes(p)) openTabs.push(p);
+  active = p;
+  mode = wantMode ?? (["html","htm"].includes(ext(p)) ? "preview" : "code");
+  $("right").classList.remove("collapsed");
+  renderDisk(); renderTabs(); renderArtifact();
+}
+function renderTabs(){
+  openTabs = openTabs.filter(p=>disk.files[p]);
+  const c=$("artTabs"); c.innerHTML="";
+  openTabs.forEach(p=>{
+    const b=document.createElement("button");
+    b.className="tab"+(p===active?" active":"");
+    b.textContent = p.split("/").pop();
+    b.title = p;
+    b.onclick=()=>openFile(p);
+    c.appendChild(b);
+  });
+}
+function renderArtifact(){
+  const has = active && disk.files[active];
+  $("artEmpty").style.display = has ? "none" : "block";
+  $("artToolbar").style.display = has ? "flex" : "none";
+  $("editor").style.display = has && mode==="code" ? "block" : "none";
+  $("frame").style.display  = has && mode==="preview" ? "block" : "none";
+  if(!has) return;
+
+  $("artPath").textContent = active;
+  const isHtml = ["html","htm"].includes(ext(active));
+  $("btnPreview").disabled = !isHtml;
+  $("btnRun").disabled = !isHtml;
+  $("btnPop").disabled = !isHtml;
+
+  if(mode==="code"){
+    if($("editor").value !== disk.files[active].content) $("editor").value = disk.files[active].content;
+  } else {
+    try{ $("frame").src = buildPreview(active); }
+    catch(e){ toast("Preview failed: "+e.message); mode="code"; renderArtifact(); }
+  }
+}
+function rebuildIfPreview(){ if(active && mode==="preview") renderArtifact(); }
+
+$("editor").addEventListener("input", ()=>{
+  if(!active) return;
+  clearTimeout(dirtyT);
+  dirtyT = setTimeout(()=>{
+    disk.files[active] = {content:$("editor").value, updated:Date.now()};
+    save();
+    $("savedFlag").textContent="saved";
+    setTimeout(()=>$("savedFlag").textContent="", 1200);
+  }, 350);
+});
+$("editor").addEventListener("keydown", e=>{
+  if(e.key==="Tab"){ e.preventDefault();
+    const t=e.target, s=t.selectionStart;
+    t.value=t.value.slice(0,s)+"  "+t.value.slice(t.selectionEnd);
+    t.selectionStart=t.selectionEnd=s+2;
+    t.dispatchEvent(new Event("input"));
+  }
+});
+$("btnCode").onclick    = ()=>{ mode="code"; renderArtifact(); };
+$("btnPreview").onclick = ()=>{ mode="preview"; renderArtifact(); };
+$("btnRun").onclick     = ()=>{ mode="preview"; renderArtifact(); };
+$("btnPop").onclick     = ()=>{ if(active) window.open(buildPreview(active),"_blank"); };
+$("btnDl").onclick      = ()=>{
+  if(!active) return;
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([disk.files[active].content],{type:mime(active)}));
+  a.download=active.split("/").pop(); a.click();
+};
+$("btnCloseArt").onclick=()=>$("right").classList.add("collapsed");
+$("btnArt").onclick=()=>$("right").classList.toggle("collapsed");
+
+/* ============================================================
+   Tools
+   ============================================================ */
+const TOOLS = [
+  {type:"function",function:{name:"disk_list",description:"List every file on the virtual disk with size and last-modified time, plus installed libraries.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"disk_read",description:"Read the full contents of one file.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
+  {type:"function",function:{name:"disk_write",description:"Create or overwrite a file. Creates an artifact; .html files get a live preview.",parameters:{type:"object",properties:{path:{type:"string",description:"Relative path, e.g. app/index.html"},content:{type:"string"}},required:["path","content"]}}},
+  {type:"function",function:{name:"disk_edit",description:"Replace an exact substring in a file. Cheaper than rewriting. Fails if old_text is absent or ambiguous.",parameters:{type:"object",properties:{path:{type:"string"},old_text:{type:"string"},new_text:{type:"string"}},required:["path","old_text","new_text"]}}},
+  {type:"function",function:{name:"disk_delete",description:"Delete a file.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
+  {type:"function",function:{name:"install_library",description:"Install an npm package from jsDelivr into the web-app environment. Auto-injected into all previewed HTML.",parameters:{type:"object",properties:{name:{type:"string"},version:{type:"string",description:"Defaults to latest"},path:{type:"string",description:"File inside the package, e.g. dist/chart.min.js. Needed for CSS or non-default entries."}},required:["name"]}}},
+  {type:"function",function:{name:"list_libraries",description:"List installed libraries and their resolved CDN URLs.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"preview",description:"Open a file in the user's artifact panel (preview for HTML, editor otherwise).",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}}
+];
+
+async function execTool(name, args){
+  switch(name){
+    case "disk_list": return {
+      files: Object.entries(disk.files).map(([p,f])=>({path:p, bytes:f.content.length, modified:new Date(f.updated).toISOString()})),
+      libraries: disk.libs.map(l=>({name:l.name, version:l.version, type:l.type}))
+    };
+    case "disk_read": return {path:norm(args.path), content:readFile(args.path)};
+    case "disk_write": {
+      const p = writeFile(args.path, args.content);
+      openFile(p);
+      return {ok:true, path:p, bytes:String(args.content??"").length};
+    }
+    case "disk_edit": {
+      const p = norm(args.path), cur = readFile(p);
+      const n = cur.split(args.old_text).length - 1;
+      if(n === 0) throw new Error("old_text not found in "+p);
+      if(n > 1)   throw new Error(`old_text appears ${n} times in ${p} — include more surrounding context to make it unique`);
+      writeFile(p, cur.replace(args.old_text, args.new_text));
+      openFile(p);
+      return {ok:true, path:p};
+    }
+    case "disk_delete": deleteFile(args.path); return {ok:true, deleted:norm(args.path)};
+    case "install_library": {
+      const r = await installLibrary(args.name, args.version, args.path);
+      return {ok:true, ...r, note:"Injected automatically into previewed HTML — do not add a manual script tag."};
+    }
+    case "list_libraries": return {libraries:disk.libs};
+    case "preview": openFile(args.path, ["html","htm"].includes(ext(norm(args.path)))?"preview":"code"); return {ok:true};
+    default: throw new Error("Unknown tool: "+name);
+  }
+}
+
+/* ============================================================
+   Markdown-lite
+   ============================================================ */
+function md(src){
+  const blocks=[];
+  let s = String(src||"").replace(/```(\w*)\n?([\s\S]*?)```/g, (m,lang,code)=>{
+    blocks.push(`<pre><code data-lang="${esc(lang)}">${esc(code.replace(/\n$/,""))}</code></pre>`);
+    return `\u0000${blocks.length-1}\u0000`;
+  });
+  s = esc(s)
+    .replace(/`([^`\n]+)`/g,(m,c)=>`<code>${c}</code>`)
+    .replace(/^#{4,6} (.*)$/gm,"<h3>$1</h3>")
+    .replace(/^### (.*)$/gm,"<h3>$1</h3>")
+    .replace(/^## (.*)$/gm,"<h2>$1</h2>")
+    .replace(/^# (.*)$/gm,"<h1>$1</h1>")
+    .replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>")
+    .replace(/(^|\W)\*([^*\n]+)\*/g,"$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    .replace(/^\s*[-*+] (.*)$/gm,"<li>$1</li>")
+    .replace(/^\s*\d+\. (.*)$/gm,"<li>$1</li>")
+    .replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g,"<ul>$1</ul>")
+    .replace(/^---$/gm,"<hr>");
+  s = s.split(/\n{2,}/).map(p=>/^\s*<(h\d|ul|ol|pre|hr|table|li)/.test(p)?p:`<p>${p.replace(/\n/g,"<br>")}</p>`).join("");
+  return s.replace(/\u0000(\d+)\u0000/g,(m,i)=>blocks[+i]);
+}
+
+/* ============================================================
+   Chat rendering
+   ============================================================ */
+function renderChat(){
+  const c=$("msgs"); c.innerHTML="";
+  chat.forEach(m=>{
+    if(m.role==="system" || m.role==="tool") return;
+    c.appendChild(msgEl(m));
+  });
+  c.scrollTop = c.scrollHeight;
+}
+function msgEl(m){
+  const d=document.createElement("div");
+  d.className="msg "+m.role;
+  let body = `<div class="who">${m.role==="user"?"You":"Assistant"}</div>`;
+  if(m.reasoning) body += `<details class="think"><summary>Thinking</summary><div class="body">${esc(m.reasoning)}</div></details>`;
+  if(m.role==="user") body += `<div class="bubble">${esc(m.content||"")}</div>`;
+  else{
+    (m.tool_calls||[]).forEach(tc=>{
+      const res = chat.find(x=>x.role==="tool" && x.tool_call_id===tc.id);
+      const bad = res && /"error"/.test(res.content||"");
+      let a = tc.function.arguments||"";
+      try{ const o=JSON.parse(a); a = o.path||o.name||Object.values(o)[0]||""; }catch(e){}
+      body += `<div class="tcall${bad?" err":""}"><span>${bad?"✕":"✓"}</span><b>${esc(tc.function.name)}</b><span class="arg">${esc(String(a).slice(0,90))}</span></div>`;
+    });
+    if(m.content) body += `<div class="bubble">${md(m.content)}</div>`;
+  }
+  d.innerHTML = body;
+  return d;
+}
+
+/* ============================================================
+   API + tool loop
+   ============================================================ */
+let ctrl=null, busy=false;
+
+function endpoint(){
+  const url = S.base.replace(/\/+$/,"") + "/chat/completions";
+  return S.proxy ? S.proxy + encodeURIComponent(url) : url;
+}
+function apiMessages(){
+  const out=[{role:"system",content:S.sys}];
+  chat.forEach(m=>{
+    if(m.role==="user") out.push({role:"user",content:m.content});
+    else if(m.role==="assistant"){
+      const a={role:"assistant",content:m.content||""};
+      if(m.tool_calls && m.tool_calls.length) a.tool_calls=m.tool_calls;
+      out.push(a);
+    }
+    else if(m.role==="tool") out.push({role:"tool",tool_call_id:m.tool_call_id,content:m.content});
+  });
+  return out;
+}
+function buildBody(withExtras){
+  const b = {
+    model: S.model,
+    messages: apiMessages(),
+    max_tokens: Math.max(256, Number(S.max)||8192),
+    stream: true
+  };
+  if(S.tools){ b.tools = TOOLS; b.tool_choice = "auto"; }
+  if(withExtras && isThinkingModel(S.model)){
+    const r = REASONING[S.reason] || REASONING.medium;
+    if(r.budget > 0){
+      b.reasoning_effort = r.effort;
+      b.thinking = {type:"enabled", budget_tokens: r.budget};
+      // Anthropic requires max_tokens > budget_tokens
+      b.max_tokens = Math.max(b.max_tokens, r.budget + 4096);
+    } else {
+      b.reasoning_effort = "none";
+    }
+  }
+  return b;
+}
+
+async function streamOnce(withExtras, onDelta){
+  ctrl = new AbortController();
+  let res;
+  try{
+    res = await fetch(endpoint(), {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+S.key },
+      body: JSON.stringify(buildBody(withExtras)),
+      signal: ctrl.signal
+    });
+  }catch(e){
+    if(e.name === "AbortError") throw e;
+    const err = new Error("network");
+    err.network = true; err.detail = e.message;
+    throw err;
+  }
+  if(!res.ok){
+    const txt = await res.text().catch(()=>"");
+    const err = new Error(`HTTP ${res.status}: ${txt.slice(0,400)}`);
+    err.status = res.status; err.raw = txt;
+    throw err;
+  }
+
+  const reader = res.body.getReader(), dec = new TextDecoder();
+  let buf="", content="", reasoning="", calls=[];
+
+  while(true){
+    const {done,value} = await reader.read();
+    if(done) break;
+    buf += dec.decode(value,{stream:true});
+    const parts = buf.split(/\r?\n\r?\n/);
+    buf = parts.pop();
+    for(const part of parts){
+      for(const line of part.split(/\r?\n/)){
+        if(!line.startsWith("data:")) continue;
+        const data = line.slice(5).trim();
+        if(!data || data==="[DONE]") continue;
+        let j; try{ j=JSON.parse(data); }catch(e){ continue; }
+        if(j.error) throw new Error(j.error.message||JSON.stringify(j.error));
+        const d = j.choices?.[0]?.delta; if(!d) continue;
+
+        const rc = d.reasoning_content ?? d.reasoning ??
+                   (typeof d.thinking==="string" ? d.thinking : d.thinking?.thinking);
+        if(rc){ reasoning += rc; onDelta({reasoning}); }
+        if(typeof d.content === "string" && d.content){ content += d.content; onDelta({content}); }
+        else if(Array.isArray(d.content)){
+          d.content.forEach(b=>{ if(b.type==="text"&&b.text) content+=b.text; });
+          onDelta({content});
+        }
+        (d.tool_calls||[]).forEach(t=>{
+          const i = t.index ?? 0;
+          calls[i] = calls[i] || {id:"", type:"function", function:{name:"",arguments:""}};
+          if(t.id) calls[i].id = t.id;
+          if(t.function?.name) calls[i].function.name = t.function.name;
+          if(t.function?.arguments) calls[i].function.arguments += t.function.arguments;
+          onDelta({calls});
+        });
+      }
+    }
+  }
+  return {content, reasoning, calls: calls.filter(Boolean)};
+}
+
+function failureNote(e){
+  if(e.network){
+    return "**Request failed — could not reach the API.**\n\n"+
+      "The browser blocked it or the host refused the connection (`"+esc(e.detail||"")+"`).\n\n"+
+      (location.protocol==="file:"
+        ? "This page is on `file://`, whose origin is `null`. CORS rejects that unconditionally — serve it over http(s)."
+        : directToGateway()
+          ? "The base URL points straight at `tabitoken.com`, which refuses browser POSTs. Set the base URL to your own proxy in Settings."
+          : "Check that your proxy is running and that it returns `Access-Control-Allow-Origin` for this origin.");
+  }
+  if(e.status===401 || e.status===403){
+    return "**Rejected — "+e.status+".**\n\nEither the key/token is wrong, or the model ID isn't available on this key. "+
+           "Note the wire IDs use dashes (`claude-opus-4-8`); dotted forms return 403.";
+  }
+  return "**Request failed** — "+String(e.message||e);
+}
+
+async function send(){
+  if(busy) return;
+  const text = $("ta").value.trim();
+  if(!text) return;
+  if(!S.key){ toast("Set an API key or app token in Settings"); return; }
+
+  $("ta").value=""; $("ta").style.height="";
+  chat.push({role:"user",content:text});
+  renderChat(); save();
+  busy = true; setBusy(true);
+
+  try{
+    for(let hop=0; hop<24; hop++){
+      const am = {role:"assistant",content:"",reasoning:"",tool_calls:[]};
+      chat.push(am);
+      renderChat();
+      let live = $("msgs").lastElementChild;
+
+      const onDelta = st => {
+        if(st.reasoning!==undefined) am.reasoning  = st.reasoning;
+        if(st.content!==undefined)   am.content    = st.content;
+        if(st.calls!==undefined)     am.tool_calls = st.calls.filter(Boolean);
+        const near = $("msgs").scrollHeight - $("msgs").scrollTop - $("msgs").clientHeight < 140;
+        const fresh = msgEl(am);
+        live.replaceWith(fresh); live = fresh;
+        if(near) $("msgs").scrollTop = $("msgs").scrollHeight;
+      };
+
+      let out;
+      try{
+        setStatus("Thinking…");
+        out = await streamOnce(true, onDelta);
+      }catch(e){
+        if(e.status===400 && /reasoning|thinking|tool|unsupported|unknown|invalid|budget/i.test(e.raw||e.message)){
+          setStatus("Retrying without extended params…");
+          out = await streamOnce(false, onDelta);
+        } else throw e;
+      }
+
+      am.content = out.content; am.reasoning = out.reasoning; am.tool_calls = out.calls;
+      save();
+
+      if(!out.calls.length){ renderChat(); break; }
+
+      for(const tc of out.calls){
+        let args={};
+        try{ args = tc.function.arguments ? JSON.parse(tc.function.arguments) : {}; }
+        catch(e){ chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify({error:"Invalid JSON arguments: "+e.message})}); continue; }
+        setStatus("Running "+tc.function.name+"…");
+        try{
+          const r = await execTool(tc.function.name, args);
+          chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify(r).slice(0,60000)});
+        }catch(e){
+          chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify({error:String(e.message||e)})});
+        }
+      }
+      renderChat(); save();
+    }
+  }catch(e){
+    if(e.name==="AbortError") setStatus("Stopped");
+    else{ chat.push({role:"assistant",content:failureNote(e)}); renderChat(); checkEnv(); }
+    save();
+  }finally{
+    busy=false; setBusy(false); setStatus("Ready"); ctrl=null;
+  }
+}
+function setBusy(b){ $("btnSend").disabled=b; $("btnStop").style.display=b?"inline-block":"none"; }
+function setStatus(t){ $("status").textContent=t; }
+
+/* ============================================================
+   UI wiring
+   ============================================================ */
+MODELS.forEach(m=>{ const o=document.createElement("option"); o.value=m.id; o.textContent=m.label; $("model").appendChild(o); });
+Object.entries(REASONING).forEach(([k,v])=>{ const o=document.createElement("option"); o.value=k; o.textContent=v.label; $("reason").appendChild(o); });
+
+function syncHeader(){
+  $("model").value = S.model;
+  $("reason").value = S.reason;
+  $("reasonWrap").classList.toggle("hide", !isThinkingModel(S.model));
+  let h = S.base;
+  try{ h = new URL(S.base, location.href).host; }catch(e){}
+  $("hostPill").textContent = h;
+  $("hostPill").title = S.base;
+}
+$("model").onchange  = e => { S.model=e.target.value; save(); syncHeader(); };
+$("reason").onchange = e => { S.reason=e.target.value; save(); };
+
+$("ta").addEventListener("keydown", e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
+$("ta").addEventListener("input", e=>{ e.target.style.height="auto"; e.target.style.height=Math.min(e.target.scrollHeight,200)+"px"; });
+$("btnSend").onclick = send;
+$("btnStop").onclick = ()=>ctrl && ctrl.abort();
+$("btnNew").onclick  = ()=>{
+  if(chat.length && !confirm("Start a new chat? The disk is kept.")) return;
+  chat=[]; save(); renderChat();
+};
+
+$("btnNewFile").onclick = ()=>{
+  const p = prompt("New file path:", "index.html");
+  if(!p) return;
+  if(disk.files[norm(p)] && !confirm("Overwrite existing "+norm(p)+"?")) return;
+  const seed = ["html","htm"].includes(ext(p))
+    ? '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>New app</title>\n</head>\n<body>\n<h1>Hello</h1>\n</body>\n</html>\n'
+    : "";
+  openFile(writeFile(p, seed), "code");
+};
+$("btnImport").onclick = ()=>{
+  const i=document.createElement("input"); i.type="file"; i.multiple=true;
+  i.onchange=async()=>{
+    for(const f of i.files){ try{ writeFile(f.name, await f.text()); }catch(e){ toast("Skipped "+f.name); } }
+    toast("Imported "+i.files.length+" file(s)");
+  };
+  i.click();
+};
+$("btnExport").onclick = ()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({files:disk.files,libs:disk.libs},null,2)],{type:"application/json"}));
+  a.download="opus-studio-disk.json"; a.click();
+};
+
+$("btnAddLib").onclick=()=>{ $("libMask").classList.add("on"); $("lName").focus(); };
+$("libCancel").onclick=()=>$("libMask").classList.remove("on");
+$("libAdd").onclick=async()=>{
+  const b=$("libAdd"); b.disabled=true; b.textContent="Installing…";
+  try{
+    const r=await installLibrary($("lName").value, $("lVer").value, $("lPath").value);
+    toast("Installed "+r.name+"@"+r.version);
+    $("libMask").classList.remove("on"); $("lName").value=$("lVer").value=$("lPath").value="";
+  }catch(e){ toast(e.message); }
+  finally{ b.disabled=false; b.textContent="Install"; }
+};
+
+$("btnSet").onclick=()=>{
+  $("sBase").value=S.base; $("sKey").value=S.key; $("sProxy").value=S.proxy;
+  $("sSys").value=S.sys; $("sMax").value=S.max; $("sTools").checked=!!S.tools;
+  $("setMask").classList.add("on");
+};
+$("setCancel").onclick=()=>$("setMask").classList.remove("on");
+$("setSave").onclick=()=>{
+  S.base=$("sBase").value.trim()||defaultBase();
+  S.key=$("sKey").value.trim();
+  S.proxy=$("sProxy").value.trim();
+  S.sys=$("sSys").value||DEFAULT_SYS;
+  S.max=Math.max(256,Number($("sMax").value)||8192);
+  S.tools=$("sTools").checked;
+  save(); syncHeader(); checkEnv(); $("setMask").classList.remove("on"); toast("Settings saved");
+};
+$("btnWipe").onclick=()=>{
+  if(!confirm("Erase the entire disk, all libraries, and the chat history? This cannot be undone.")) return;
+  disk={files:{},libs:[]}; chat=[]; openTabs=[]; active=null;
+  save(); renderDisk(); renderTabs(); renderArtifact(); renderChat();
+  $("setMask").classList.remove("on"); toast("Wiped");
+};
+document.querySelectorAll(".mask").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("on"); }));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".mask.on").forEach(m=>m.classList.remove("on")); });
+
+/* boot */
+syncHeader(); renderDisk(); renderTabs(); renderArtifact(); renderChat(); checkEnv();
+if(!chat.length){
+  $("msgs").innerHTML = `<div class="msg"><div class="who">Opus Studio</div><div class="bubble">
+  <p>Model <code>${esc(labelOf(S.model))}</code> · endpoint <code>${esc(S.base)}</code></p>
+  <ul>
+  <li><b>Reasoning levels</b> — Off through Maximum, shown for <code>-thinking</code> models.</li>
+  <li><b>Disk</b> — the model can list, read, write, patch, and delete files; you can edit them inline.</li>
+  <li><b>Artifacts</b> — every file written becomes a tab; HTML files get a sandboxed live preview.</li>
+  <li><b>Libraries</b> — install any npm package via jsDelivr; auto-injected into previews.</li>
+  </ul>
+  <p>Try: <i>"Build a kanban board web app with drag and drop, install sortablejs"</i></p>
+  </div></div>`;
+}
+</script>
+</body>
+</html>
