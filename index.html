@@ -30,8 +30,9 @@ select{cursor:pointer}
 header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--line);flex:none}
 .brand{font-weight:700;letter-spacing:.3px}
 .brand span{color:var(--acc)}
-.pill{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:2px 9px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
-header select{width:auto;min-width:180px}
+.pill{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:2px 9px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+#chatPill{border-color:#33405a;color:#c3d3ee;max-width:230px}
+header select{width:auto;min-width:172px}
 #reasonWrap{display:flex;gap:6px;align-items:center}
 #reasonWrap.hide{display:none}
 
@@ -42,19 +43,37 @@ header select{width:auto;min-width:180px}
 
 main{flex:1;display:flex;min-height:0}
 .pane{display:flex;flex-direction:column;min-width:0;min-height:0}
-#left{width:280px;flex:none;background:var(--bg2);border-right:1px solid var(--line)}
+#left{width:288px;flex:none;background:var(--bg2);border-right:1px solid var(--line)}
 #center{flex:1}
 #right{width:48%;flex:none;background:var(--bg2);border-left:1px solid var(--line)}
 #right.collapsed{display:none}
 .paneHead{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;flex:none}
+.paneHead.sub{border-top:1px solid var(--line)}
 .scroll{overflow:auto;flex:1;min-height:0}
+#chatWrap{flex:none;max-height:196px;overflow:auto;border-bottom:1px solid var(--line)}
+#quotaLine{flex:none;font-size:10.5px;color:var(--dim);padding:4px 10px 6px;font-family:var(--mono);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px}
+#quotaBar{flex:1;height:3px;background:#22282f;border-radius:2px;overflow:hidden}
+#quotaFill{height:100%;width:0;background:var(--ok)}
+
+.chatRow{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;font-size:12.5px;border-left:2px solid transparent}
+.chatRow:hover{background:var(--bg3)}
+.chatRow.active{background:#1b2130;border-left-color:var(--acc2)}
+.chatRow .ci{flex:1;min-width:0}
+.chatRow .ct{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chatRow .cm{font-size:10px;color:var(--dim);font-family:var(--mono)}
+.chatRow .acts{display:flex;gap:2px;opacity:0}
+.chatRow:hover .acts{opacity:1}
+.chatRow .acts button{padding:1px 5px;font-size:11px;background:transparent;border-color:transparent;color:var(--dim)}
+.chatRow .acts button:hover{color:var(--fg);background:#2a313d}
 
 .diskItem{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;font-size:13px;border-left:2px solid transparent}
 .diskItem:hover{background:var(--bg3)}
 .diskItem.active{background:var(--bg3);border-left-color:var(--acc)}
 .diskItem .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:12px}
+.diskItem .sz{font-size:10px;color:var(--dim);font-family:var(--mono)}
 .diskItem .x{opacity:0;color:var(--dim)}
 .diskItem:hover .x{opacity:1}
+.diskItem:hover .sz{display:none}
 .secTitle{font-size:11px;color:var(--dim);padding:10px 10px 4px;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:6px}
 .lib{display:flex;gap:6px;align-items:center;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--dim)}
 .lib b{color:var(--ok);font-weight:600}
@@ -137,7 +156,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 #lightbox{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;z-index:80;padding:20px;cursor:zoom-out}
 #lightbox.on{display:flex}
 #lightbox img{max-width:100%;max-height:100%;background:#fff;border-radius:6px}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:9px 15px;font-size:13px;z-index:99;opacity:0;pointer-events:none;transition:.2s}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:9px 15px;font-size:13px;z-index:99;opacity:0;pointer-events:none;transition:.2s;max-width:70vw;text-align:center}
 #toast.on{opacity:1}
 #sandbox{position:absolute;width:0;height:0;border:0;visibility:hidden}
 #hidden{position:absolute;left:-10000px;top:0;width:0;height:0;overflow:hidden}
@@ -150,16 +169,17 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
 <header>
   <div class="brand">Opus<span>Studio</span></div>
+  <span class="pill" id="chatPill" title="Active chat">…</span>
   <span class="pill" id="hostPill">…</span>
   <select id="model" title="Orchestrator model"></select>
   <div id="reasonWrap">
     <span style="font-size:12px;color:var(--dim)">Reasoning</span>
-    <select id="reason" style="min-width:120px"></select>
+    <select id="reason" style="min-width:118px"></select>
   </div>
   <div class="sp"></div>
   <button class="ghost" id="btnArt" title="Toggle artifacts panel">▤ Artifacts</button>
   <button class="ghost" id="btnSet" title="Settings">⚙ Settings</button>
-  <button class="ghost" id="btnNew" title="New chat">✚ New chat</button>
+  <button class="ghost" id="btnNew" title="New chat (new disk)">✚ New chat</button>
 </header>
 
 <div id="banner">
@@ -171,12 +191,21 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
 <main>
   <section class="pane" id="left">
-    <div class="paneHead">
-      Disk <span class="sp"></span>
-      <button class="ghost" id="btnNewFile" title="New file">＋</button>
-      <button class="ghost" id="btnImport" title="Import files">⭳</button>
-      <button class="ghost" id="btnExport" title="Export disk as JSON">⭱</button>
+    <div class="paneHead">Chats <span class="sp"></span>
+      <button class="ghost" id="btnNewChat" title="New chat with an empty disk">＋</button>
+      <button class="ghost" id="btnDupChat" title="Duplicate this chat and its disk">⧉</button>
     </div>
+    <div id="chatWrap"><div id="chatList"></div></div>
+
+    <div class="paneHead sub" style="border-top:0">Disk <span class="sp"></span>
+      <button class="ghost" id="btnNewFile" title="New file">＋</button>
+      <button class="ghost" id="btnImport" title="Import files into this chat's disk">⭳</button>
+      <button class="ghost" id="btnExport" title="Export this chat (files, libraries, transcript)">⭱</button>
+    </div>
+    <div id="quotaLine" title="Browser storage used by all chats">
+      <span id="quotaText">storage…</span><span id="quotaBar"><span id="quotaFill"></span></span>
+    </div>
+
     <div class="scroll">
       <div id="fileList"></div>
       <div class="secTitle">Sub-agents <span class="sp"></span><span id="agentBudget" style="text-transform:none;letter-spacing:0"></span></div>
@@ -192,7 +221,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
   <section class="pane" id="center">
     <div class="scroll" id="msgs"></div>
     <div id="composer"><div id="composerInner">
-      <textarea id="ta" placeholder="Ask anything. The model can search the web, build apps, playtest them with real keyboard and mouse input, and screenshot what it sees."></textarea>
+      <textarea id="ta" placeholder="Ask anything. Each chat has its own disk. The model can research, build, playtest with real input, and screenshot the result."></textarea>
       <div class="row" style="margin-top:7px">
         <span class="hint" id="status">Ready</span>
         <div class="sp"></div>
@@ -213,7 +242,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
         <span class="saved" id="savedFlag"></span>
         <button id="btnCode">Code</button>
         <button id="btnPreview">Preview</button>
-        <button id="btnRun" title="Rebuild preview">⟳</button>
+        <button id="btnRun" title="Rebuild / restart">⟳</button>
         <button id="btnShot" title="Screenshot this app now">◉</button>
         <button id="btnPop" title="Open preview in new tab">↗</button>
         <button id="btnDl" title="Download file">⭳</button>
@@ -221,7 +250,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
       <textarea id="editor" spellcheck="false" style="display:none"></textarea>
       <iframe id="frame" sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin" style="display:none"></iframe>
       <div id="stage"><div id="stageInner"><div id="stageLabel">AI DRIVING</div></div></div>
-      <div class="empty" id="artEmpty" style="padding:20px">No artifacts yet.<br><br>Ask the model to build something — e.g. <i>"build a snake game and playtest it"</i> — and files it writes will show up here with a live preview.</div>
+      <div class="empty" id="artEmpty" style="padding:20px">No artifacts in this chat yet.<br><br>Ask the model to build something — e.g. <i>"build a snake game and playtest it"</i> — and files it writes appear here with a live preview.</div>
       <div id="shotStrip"></div>
     </div>
   </section>
@@ -229,6 +258,13 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
 <div class="mask" id="setMask"><div class="modal">
   <h3>Settings</h3>
+  <div class="f"><label>Storage</label>
+    <div class="sub" id="storeInfo" style="margin-top:0"></div>
+    <div class="row" style="margin-top:8px">
+      <button id="btnPersist">Request persistent storage</button>
+      <button id="btnExportAll">Export all chats</button>
+    </div>
+  </div>
   <div class="f"><label>Base URL</label><input id="sBase">
     <div class="sub">Chat goes to <span class="mono">{base}/chat/completions</span>; web tools use the same host at
     <span class="mono">/tools/*</span>. <b>tabitoken.com refuses browser POSTs</b>, so this must be your Worker.</div></div>
@@ -242,18 +278,17 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
   <div class="f"><label><input type="checkbox" id="sWeb" style="width:auto"> Web tools (TinyFish search &amp; fetch, Wikipedia, npm)</label>
     <div class="sub">Needs a <span class="mono">TINYFISH_KEY</span> secret on your Worker. Free; 30 searches/min, 150 URLs/min.</div></div>
   <div class="f"><label><input type="checkbox" id="sTest" style="width:auto"> Playtest tools (keyboard, mouse, DOM inspection)</label>
-    <div class="sub">Runs your app in a visible frame the model drives. You can watch it happen in the Artifacts panel.</div></div>
+    <div class="sub">Runs your app in a visible frame the model drives. Watch it in the Artifacts panel.</div></div>
   <div class="f"><label><input type="checkbox" id="sVision" style="width:auto"> Send screenshots to the model (vision)</label>
-    <div class="sub">Each screenshot costs roughly 1–2k input tokens. <b>Requires a funded balance</b> — image requests
-    place a larger pre-authorization hold than text. If the gateway rejects images, this turns itself off and the model
-    falls back to <span class="mono">inspect_dom</span>.</div></div>
+    <div class="sub">Roughly 1–2k input tokens per image. <b>Requires a funded balance</b> — image requests hold more credit
+    than text. If the gateway rejects images this turns itself off and the model falls back to <span class="mono">inspect_dom</span>.</div></div>
   <div class="f"><label>Screenshot width (px, downscaled before sending)</label><input id="sShotW" type="number" min="320" max="1600" step="32"></div>
   <div class="f"><label><input type="checkbox" id="sAgents" style="width:auto"> Sub-agents</label>
     <div class="sub">Each step is a full billed request carrying the gateway's ~6.5k-token prompt floor.
     <b>One message can fan out to dozens.</b> Ceilings: depth <span id="limTxt"></span>.</div></div>
   <div class="f"><label>Default sub-agent model</label><select id="sAgentModel"></select></div>
   <div class="f"><label>Max sub-agents per message</label><input id="sMaxAgents" type="number" min="1" max="40" step="1"></div>
-  <div class="row"><button class="ghost" id="btnWipe">Wipe disk &amp; chat</button><div class="sp"></div>
+  <div class="row"><button class="ghost" id="btnWipe">Delete every chat</button><div class="sp"></div>
     <button id="setCancel">Cancel</button><button class="primary" id="setSave">Save</button></div>
 </div></div>
 
@@ -306,24 +341,26 @@ const H2C = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min
 const DEFAULT_SYS =
 `You are the orchestrator in Opus Studio, a browser IDE. You have a virtual disk, npm library installation, web research, a JavaScript sandbox, a playtest harness that drives real input into your apps, and a team of sub-agents.
 
+The disk belongs to the current chat. Other chats have their own separate disks that you cannot see. Never assume a file exists because it was mentioned in a different conversation — check with disk_tree or disk_list.
+
 Disk and build rules:
 - When asked to build anything, WRITE IT TO THE DISK with disk_write instead of only pasting it in chat. Files become live artifacts the user can preview and edit.
 - Web apps: the entry point must be an .html file. Reference sibling files with plain relative paths ("app.js", "styles.css") — the preview resolves them.
 - Installed libraries are auto-injected into every previewed HTML file. Never add your own CDN <script> tag for something you installed with install_library.
-- Read a file before editing it. Prefer disk_edit over rewriting a whole file. Use disk_grep to locate code instead of reading every file.
+- Read a file before editing it. Prefer disk_edit over rewriting a whole file. Use disk_grep to locate code instead of reading every file. For very large files, a line range keeps your context smaller.
 
 Playtesting — you are expected to actually test what you build, not just claim it works:
 - playtest opens the app in a real frame and runs a list of steps: click, click_at, type, key, keys, hold, hover, scroll, drag, set, wait, wait_for, assert, eval, and screenshot. You have the whole keyboard, including arrows, Enter, Escape, Tab, modifiers, and held keys for games.
 - Pass keep_open:true and reuse the returned session id to keep driving the same live instance across several calls. State persists between calls; a fresh path always starts clean.
 - Every playtest reports runtime errors, console errors, and failed assertions. Fix what it finds, then re-run before reporting success.
 - For games and canvas apps, drive with hold (e.g. hold ArrowRight for 400ms) and click_at coordinates, then screenshot to confirm something actually moved.
-- After a UI change, take a screenshot and look at it. If vision is unavailable the screenshot tool will tell you so — use inspect_dom instead, which gives exact geometry, text, colors, and overflow, and is cheaper than an image anyway.
+- After a UI change, take a screenshot and look at it. If vision is unavailable the tool will say so — use inspect_dom instead, which gives exact geometry, text, colours, and overflow, and is cheaper than an image.
 - Use inspect_dom rather than a screenshot when the question is "is this laid out correctly", "is this element visible", or "what does this element contain".
-- Close sessions with session_close when finished so they stop consuming memory.
+- Close sessions with session_close when finished.
 
 Research rules:
 - Search when the answer depends on current facts, versions, or prices. Don't guess at API details you can verify.
-- web_search returns snippets only — they are previews, not evidence. Call web_fetch before asserting a fact from them.
+- web_search returns snippets only — previews, not evidence. Call web_fetch before asserting a fact from them.
 - web_fetch takes up to 10 URLs at once; batch them into one call rather than one per step.
 - Pass a "purpose" to search and fetch describing the task behind the request; it improves result quality.
 - Cite the URLs you actually read.
@@ -368,43 +405,12 @@ const SDEF = {
   agents:true, agentModel:"claude-opus-4-8", maxAgents:12
 };
 
-const LS = "opusStudio.v4";
-let S, disk, chat;
-
-function load(){
-  let raw={};
-  try{ raw = JSON.parse(localStorage.getItem(LS)||"{}"); }catch(e){}
-  if(!raw.settings){
-    for(const k of ["opusStudio.v3","opusStudio.v2"]){
-      try{ const old = JSON.parse(localStorage.getItem(k)||"{}"); if(old.settings){ raw = old; break; } }catch(e){}
-    }
-  }
-  S    = Object.assign({}, SDEF, raw.settings||{});
-  disk = Object.assign({files:{}, libs:[]}, raw.disk||{});
-  chat = Array.isArray(raw.chat) ? raw.chat : [];
-  if(/\./.test(S.model)) S.model = S.model.replace(/\./g,"-");
-  if(!MODELS.some(m=>m.id===S.model)) S.model = MODELS[0].id;
-  if(/\./.test(S.agentModel||"")) S.agentModel = S.agentModel.replace(/\./g,"-");
-  if(!MODELS.some(m=>m.id===S.agentModel)) S.agentModel = SDEF.agentModel;
-  if(PROXY_BASE && /(^|\.)tabitoken\.com/.test(hostOf(S.base))) S.base = defaultBase();
-}
-function hostOf(u){ try{ return new URL(u, location.href).hostname; }catch(e){ return ""; } }
-
-/* Images are stripped before persisting — base64 would blow the storage quota. */
-function storableChat(){
-  return chat.map(m=>{
-    if(Array.isArray(m.content)){
-      return {...m, content:m.content.map(b=>
-        (b.type==="image_url"||b.type==="image") ? {type:"text",text:"[screenshot — not persisted]"} : b)};
-    }
-    return m;
-  });
-}
-function save(){
-  try{ localStorage.setItem(LS, JSON.stringify({settings:S, disk, chat:storableChat()})); }
-  catch(e){ toast("Storage full — disk not saved"); }
-}
-load();
+/* Synchronous defaults so nothing is undefined before boot() finishes. */
+let S = Object.assign({}, SDEF);
+let index = [];                       // chat summaries: {id,title,created,updated,files,bytes,msgs}
+let curId = null;                     // active chat id
+let chat = [];                        // active transcript
+let disk = {files:{}, libs:[]};       // active chat's resident disk
 
 /* ============================================================
    Helpers
@@ -413,14 +419,275 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ext = p => (p.split(".").pop()||"").toLowerCase();
 let toastT;
-function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2800); }
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),3200); }
 function norm(p){ return String(p||"").replace(/^\.?\//,"").replace(/\/{2,}/g,"/").trim(); }
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function fmtBytes(n){
+  n = Number(n)||0;
+  if(n < 1024) return n+" B";
+  if(n < 1048576) return (n/1024).toFixed(n<10240?1:0)+" KB";
+  if(n < 1073741824) return (n/1048576).toFixed(n<10485760?1:0)+" MB";
+  return (n/1073741824).toFixed(2)+" GB";
+}
+function fmtWhen(t){
+  const d = Date.now()-t;
+  if(d < 60000) return "just now";
+  if(d < 3600000) return Math.floor(d/60000)+"m ago";
+  if(d < 86400000) return Math.floor(d/3600000)+"h ago";
+  if(d < 604800000) return Math.floor(d/86400000)+"d ago";
+  return new Date(t).toLocaleDateString();
+}
 
+/* ============================================================
+   Storage — IndexedDB, with an in-memory fallback
+   ============================================================ */
+const DB_NAME = "opusStudio", DB_VER = 1;
+let db = null, dbBroken = null;
+const mem = {meta:new Map(), chats:new Map(), files:new Map()};
+
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    if(!self.indexedDB) return rej(new Error("IndexedDB unavailable"));
+    const r = indexedDB.open(DB_NAME, DB_VER);
+    r.onupgradeneeded = ()=>{
+      const d = r.result;
+      if(!d.objectStoreNames.contains("meta"))  d.createObjectStore("meta");
+      if(!d.objectStoreNames.contains("chats")) d.createObjectStore("chats",{keyPath:"id"});
+      if(!d.objectStoreNames.contains("files")){
+        const s = d.createObjectStore("files",{keyPath:"key"});
+        s.createIndex("chatId","chatId");
+      }
+    };
+    r.onsuccess = ()=>res(r.result);
+    r.onerror   = ()=>rej(r.error||new Error("could not open IndexedDB"));
+    r.onblocked = ()=>rej(new Error("IndexedDB blocked by another tab"));
+  });
+}
+const store = (name,mode) => db.transaction(name,mode).objectStore(name);
+const wrap = r => new Promise((res,rej)=>{ r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+
+async function dbGet(name,key){
+  if(!db) return mem[name].get(key);
+  return wrap(store(name,"readonly").get(key));
+}
+async function dbPut(name,val,key){
+  if(!db){ mem[name].set(key !== undefined ? key : val.id ?? val.key, val); return; }
+  try{ return await wrap(key !== undefined ? store(name,"readwrite").put(val,key) : store(name,"readwrite").put(val)); }
+  catch(e){
+    if(/quota/i.test(e.name||e.message)) toast("Browser storage is full — free space or delete a chat");
+    throw e;
+  }
+}
+async function dbDel(name,key){
+  if(!db){ mem[name].delete(key); return; }
+  return wrap(store(name,"readwrite").delete(key));
+}
+const fkey = (chatId,path) => chatId+"\u0000"+path;
+async function dbFiles(chatId){
+  if(!db) return [...mem.files.values()].filter(f=>f.chatId===chatId);
+  return wrap(store("files","readonly").index("chatId").getAll(chatId));
+}
+async function dbDelFiles(chatId){
+  if(!db){ [...mem.files.keys()].forEach(k=>{ if(mem.files.get(k).chatId===chatId) mem.files.delete(k); }); return; }
+  const s = store("files","readwrite");
+  const rows = await wrap(s.index("chatId").getAllKeys(chatId));
+  await Promise.all(rows.map(k=>wrap(s.delete(k))));
+}
+
+/* Pending-write tracking, so a chat switch or unload never loses data. */
+const inflight = new Set();
+function track(p){
+  inflight.add(p);
+  p.catch(e=>console.warn("storage write failed:",e)).finally(()=>inflight.delete(p));
+  return p;
+}
+async function flushAll(){
+  saveNow();
+  await Promise.allSettled([...inflight]);
+}
+
+/* Images are stripped before persisting — base64 would bloat every transcript. */
+function storableChat(){
+  return chat.map(m=>{
+    if(Array.isArray(m.content))
+      return {...m, content:m.content.map(b =>
+        (b.type==="image_url"||b.type==="image") ? {type:"text",text:"[screenshot — not persisted]"} : b)};
+    return m;
+  });
+}
+
+let saveT = null, dirty = false;
+function save(){ dirty = true; clearTimeout(saveT); saveT = setTimeout(saveNow, 400); }
+function saveNow(){
+  clearTimeout(saveT); saveT = null;
+  if(!dirty) return;
+  dirty = false;
+  track(dbPut("meta", S, "settings"));
+  if(!curId) return;
+  const e = index.find(c=>c.id===curId);
+  if(e){ e.updated = Date.now(); e.msgs = chat.filter(m=>m.role==="user"||m.role==="assistant").length; }
+  track(dbPut("chats", {id:curId, messages:storableChat(), libs:disk.libs}));
+  track(dbPut("meta", index, "index"));
+  renderChatList();
+}
+function sumCur(){
+  const e = index.find(c=>c.id===curId);
+  if(!e) return;
+  const paths = Object.keys(disk.files);
+  e.files = paths.length;
+  e.bytes = paths.reduce((n,p)=>n+disk.files[p].content.length, 0);
+  e.updated = Date.now();
+  renderChatList();
+  scheduleQuota();
+}
+
+/* ============================================================
+   Chats
+   ============================================================ */
+async function createChat(title, activate){
+  const rec = {id:uid(), title:title||"New chat", created:Date.now(), updated:Date.now(), files:0, bytes:0, msgs:0};
+  index.unshift(rec);
+  await dbPut("chats", {id:rec.id, messages:[], libs:[]});
+  await dbPut("meta", index, "index");
+  if(activate) await switchChat(rec.id, true);
+  else renderChatList();
+  return rec.id;
+}
+
+async function switchChat(id, force){
+  if(id === curId && !force) return;
+  if(busy && !force){ toast("Finish or stop the current run before switching chats"); return; }
+  await flushAll();
+  closeAllSessions();
+  revokeBlobs();
+
+  curId = id;
+  const rec = (await dbGet("chats", id)) || {id, messages:[], libs:[]};
+  chat = Array.isArray(rec.messages) ? rec.messages : [];
+  disk = {files:{}, libs:Array.isArray(rec.libs) ? rec.libs : []};
+  (await dbFiles(id)).forEach(r=>{ disk.files[r.path] = {content:r.content, updated:r.updated}; });
+
+  openTabs = []; active = null; mode = "code";
+  shots = []; agents = []; spawnedThisTurn = 0; pendingVision = [];
+  await dbPut("meta", id, "active");
+  sumCur();
+  renderAll();
+}
+
+async function renameChat(id){
+  const e = index.find(c=>c.id===id); if(!e) return;
+  const t = prompt("Chat name:", e.title);
+  if(t === null) return;
+  e.title = t.trim() || e.title;
+  e.updated = Date.now();
+  await dbPut("meta", index, "index");
+  renderChatList(); syncHeader();
+}
+
+async function duplicateChat(id){
+  const src = index.find(c=>c.id===id); if(!src) return;
+  const rec = (await dbGet("chats", id)) || {messages:[], libs:[]};
+  const files = await dbFiles(id);
+  const nid = uid();
+  index.unshift({id:nid, title:src.title+" (copy)", created:Date.now(), updated:Date.now(),
+                 files:files.length, bytes:files.reduce((n,f)=>n+f.content.length,0), msgs:src.msgs});
+  await dbPut("chats", {id:nid, messages:rec.messages||[], libs:rec.libs||[]});
+  for(const f of files) await dbPut("files", {key:fkey(nid,f.path), chatId:nid, path:f.path, content:f.content, updated:f.updated});
+  await dbPut("meta", index, "index");
+  renderChatList();
+  toast("Duplicated "+files.length+" file(s) into a new chat");
+  return nid;
+}
+
+async function deleteChat(id){
+  const e = index.find(c=>c.id===id); if(!e) return;
+  if(!confirm(`Delete "${e.title}" and its ${e.files} file(s)? This cannot be undone.`)) return;
+  index = index.filter(c=>c.id!==id);
+  await dbDelFiles(id);
+  await dbDel("chats", id);
+  await dbPut("meta", index, "index");
+  if(id === curId){
+    if(!index.length) await createChat("New chat", true);
+    else await switchChat(index[0].id, true);
+  } else renderChatList();
+  scheduleQuota();
+}
+
+function renderChatList(){
+  const c = $("chatList");
+  const list = index.slice().sort((a,b)=>b.updated-a.updated);
+  c.innerHTML = "";
+  list.forEach(e=>{
+    const d = document.createElement("div");
+    d.className = "chatRow"+(e.id===curId?" active":"");
+    d.innerHTML =
+      `<div class="ci"><div class="ct">${esc(e.title)}</div>
+       <div class="cm">${e.files||0} file${e.files===1?"":"s"} · ${fmtBytes(e.bytes||0)} · ${esc(fmtWhen(e.updated))}</div></div>
+       <div class="acts">
+         <button title="Rename">✎</button>
+         <button title="Duplicate">⧉</button>
+         <button title="Delete">✕</button>
+       </div>`;
+    const [bR,bD,bX] = d.querySelectorAll(".acts button");
+    bR.onclick = ev => { ev.stopPropagation(); renameChat(e.id); };
+    bD.onclick = ev => { ev.stopPropagation(); duplicateChat(e.id); };
+    bX.onclick = ev => { ev.stopPropagation(); deleteChat(e.id); };
+    d.onclick = ()=>switchChat(e.id);
+    c.appendChild(d);
+  });
+}
+
+/* ============================================================
+   Quota reporting
+   ============================================================ */
+let quotaT = null, persisted = false;
+function scheduleQuota(){ clearTimeout(quotaT); quotaT = setTimeout(refreshQuota, 700); }
+async function refreshQuota(){
+  const totalChats = index.length;
+  const localBytes = index.reduce((n,c)=>n+(c.bytes||0),0);
+  let txt, pct = 0;
+  if(navigator.storage && navigator.storage.estimate){
+    try{
+      const {usage=0, quota=0} = await navigator.storage.estimate();
+      pct = quota ? Math.min(100, usage/quota*100) : 0;
+      txt = `${fmtBytes(usage)} / ${fmtBytes(quota)}`;
+    }catch(e){ txt = fmtBytes(localBytes)+" in "+totalChats+" chat(s)"; }
+  } else txt = fmtBytes(localBytes)+" in "+totalChats+" chat(s)";
+  if(!db) txt = "MEMORY ONLY — nothing persists";
+  $("quotaText").textContent = txt;
+  $("quotaFill").style.width = pct+"%";
+  $("quotaFill").style.background = pct>90 ? "var(--bad)" : pct>70 ? "var(--warn)" : "var(--ok)";
+  $("quotaLine").title = (db ? "IndexedDB" : "in-memory fallback")+
+    ` · ${totalChats} chat(s) · this chat holds ${fmtBytes(index.find(c=>c.id===curId)?.bytes||0)}`+
+    (persisted ? " · persistent" : " · not marked persistent (the browser may evict it)");
+
+  const info = $("storeInfo");
+  if(info){
+    let est = "unavailable";
+    if(navigator.storage?.estimate){
+      try{ const e2 = await navigator.storage.estimate(); est = `${fmtBytes(e2.usage||0)} used of ${fmtBytes(e2.quota||0)} available`; }catch(e){}
+    }
+    info.innerHTML = db
+      ? `Backend <b style="color:var(--ok)">IndexedDB</b> — ${esc(est)}.<br>
+         ${totalChats} chat(s), ${fmtBytes(localBytes)} of file content.
+         Persistence: <b style="color:${persisted?"var(--ok)":"var(--warn)"}">${persisted?"granted":"not granted"}</b>.
+         Without it a browser under disk pressure may clear this data.`
+      : `<b>IndexedDB is unavailable</b> (${esc(String(dbBroken||"unknown"))}). Running in memory only —
+         everything is lost on reload. Private/incognito windows commonly cause this.`;
+  }
+}
+
+/* ============================================================
+   Environment banner
+   ============================================================ */
 function directToGateway(){ return /(^|\.)tabitoken\.com$/.test(hostOf(S.base)); }
+function hostOf(u){ try{ return new URL(u, location.href).hostname; }catch(e){ return ""; } }
 function checkEnv(){
   let msg = "";
-  if(location.protocol === "file:")
+  if(!db)
+    msg = "<b>Storage unavailable</b> — running in memory only, so chats and disks vanish on reload. Private browsing usually causes this.";
+  else if(location.protocol === "file:")
     msg = "<b>Opened as file://</b> — its origin is <span class='mono'>null</span>, which CORS always rejects. Serve this over http(s).";
   else if(directToGateway() && !S.proxy)
     msg = "<b>No proxy configured.</b> tabitoken.com refuses POSTs from browsers, so chat will fail. Set the base URL to your Worker.";
@@ -436,13 +703,15 @@ $("lightbox").onclick = ()=>$("lightbox").classList.remove("on");
 function zoom(src){ $("lightboxImg").src = src; $("lightbox").classList.add("on"); }
 
 /* ============================================================
-   Disk
+   Disk (active chat)
    ============================================================ */
 function writeFile(path, content){
   path = norm(path);
   if(!path) throw new Error("Empty path");
-  disk.files[path] = {content:String(content ?? ""), updated:Date.now()};
-  save(); renderDisk(); renderTabs();
+  const c = String(content ?? ""), now = Date.now();
+  disk.files[path] = {content:c, updated:now};
+  track(dbPut("files", {key:fkey(curId,path), chatId:curId, path, content:c, updated:now}));
+  sumCur(); renderDisk(); renderTabs();
   return path;
 }
 function readFile(path){
@@ -454,9 +723,10 @@ function deleteFile(path){
   path = norm(path);
   if(!disk.files[path]) throw new Error("No such file: "+path);
   delete disk.files[path];
+  track(dbDel("files", fkey(curId,path)));
   openTabs = openTabs.filter(t=>t!==path);
   if(active===path) active = openTabs[0]||null;
-  save(); renderDisk(); renderTabs(); renderArtifact();
+  sumCur(); renderDisk(); renderTabs(); renderArtifact();
 }
 function icon(p){
   const e=ext(p);
@@ -465,18 +735,20 @@ function icon(p){
   if(e==="css") return "🎨";
   if(e==="json") return "🔧";
   if(e==="md") return "📝";
-  if(["png","jpg","jpeg","gif","svg","webp"].includes(e)) return "🖼";
+  if(["png","jpg","jpeg","gif","svg","webp","ico","avif"].includes(e)) return "🖼";
+  if(["mp3","wav","ogg","m4a"].includes(e)) return "🔊";
   return "📄";
 }
 function renderDisk(){
   const paths = Object.keys(disk.files).sort();
   const fl = $("fileList");
   fl.innerHTML = paths.length ? "" :
-    '<div class="empty">Disk is empty.<br>Create a file, or ask the model to build something.</div>';
+    '<div class="empty">This chat\'s disk is empty.<br>Create a file, or ask the model to build something.</div>';
   paths.forEach(p=>{
     const d=document.createElement("div");
     d.className="diskItem"+(p===active?" active":"");
-    d.innerHTML = `<span>${icon(p)}</span><span class="nm" title="${esc(p)}">${esc(p)}</span><span class="x">✕</span>`;
+    d.innerHTML = `<span>${icon(p)}</span><span class="nm" title="${esc(p)}">${esc(p)}</span>
+      <span class="sz">${fmtBytes(disk.files[p].content.length)}</span><span class="x">✕</span>`;
     d.onclick = e => {
       if(e.target.classList.contains("x")){ if(confirm("Delete "+p+"?")) deleteFile(p); }
       else openFile(p);
@@ -485,7 +757,7 @@ function renderDisk(){
   });
 
   const ll=$("libList");
-  ll.innerHTML = disk.libs.length ? "" : '<div class="empty">None installed.</div>';
+  ll.innerHTML = disk.libs.length ? "" : '<div class="empty">None in this chat.</div>';
   disk.libs.forEach((l,i)=>{
     const d=document.createElement("div");
     d.className="lib";
@@ -519,7 +791,7 @@ async function installLibrary(name, version, path){
 }
 
 /* ============================================================
-   Composition — relative refs become blob URLs
+   Composition — relative refs become blob URLs; data: URIs pass through
    ============================================================ */
 let blobUrls = [];
 function revokeBlobs(){ blobUrls.forEach(u=>URL.revokeObjectURL(u)); blobUrls=[]; }
@@ -530,6 +802,9 @@ function mime(p){
 function blobFor(path, content){
   const u = URL.createObjectURL(new Blob([content], {type:mime(path)}));
   blobUrls.push(u); return u;
+}
+function urlForAsset(path, content){
+  return /^data:/.test(content.slice(0,40)) ? content.trim() : blobFor(path, content);
 }
 function swapRefs(text, path, url){
   const base = path.split("/").pop();
@@ -545,7 +820,7 @@ function composeHtml(entry, shim){
   const others = Object.keys(disk.files).filter(p=>p!==entry);
   const assetUrls = {};
   others.filter(p=>!["js","mjs","jsx"].includes(ext(p))).forEach(p=>{
-    assetUrls[p] = blobFor(p, disk.files[p].content);
+    assetUrls[p] = urlForAsset(p, disk.files[p].content);
   });
   others.filter(p=>["js","mjs","jsx"].includes(ext(p))).forEach(p=>{
     let src = disk.files[p].content;
@@ -595,7 +870,7 @@ function byText(t,strict){
       var txt=((el.innerText||el.value||el.getAttribute("aria-label")||el.getAttribute("placeholder")||"")+"").trim().toLowerCase();
       if(!txt) continue;
       var hit = strict ? txt===want : (txt===want||txt.indexOf(want)>=0);
-      if(hit && (!best || el.innerText===undefined || (txt.length < (best.__l||1e9)))){ best=el; best.__l=txt.length; }
+      if(hit && (!best || txt.length<(best.__l||1e9))){ best=el; best.__l=txt.length; }
     }
     if(best) return best;
   }
@@ -628,7 +903,7 @@ function normKey(k){
 function kInit(k,m){
   m=m||{}; var key=normKey(k), kc=KC[key]!==undefined?KC[key]:(KC[k]!==undefined?KC[k]:(key.length===1?key.toUpperCase().charCodeAt(0):0));
   return {key:key, code:codeOf(key), keyCode:kc, which:kc, bubbles:true, cancelable:true, composed:true,
-          ctrlKey:!!m.ctrl, shiftKey:!!m.shift, altKey:!!m.alt, metaKey:!!m.meta};
+          ctrlKey:!!m.ctrl, shiftKey:!!m.shift, altKey:!!m.alt, metaKey:!!m.meta, repeat:!!m.repeat};
 }
 function target(s){
   if(s&&(s.selector||s.text)){ try{ return pick(s); }catch(e){} }
@@ -638,7 +913,7 @@ function keyEv(el,type,k,m){ el.dispatchEvent(new KeyboardEvent(type,kInit(k,m))
 function setVal(el,v){
   var proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
   var d = Object.getOwnPropertyDescriptor(proto,"value");
-  if(d&&d.set) d.set.call(el,v); else el.value=v;   // works with React-style setters
+  if(d&&d.set) d.set.call(el,v); else el.value=v;   // native setter: frameworks notice
 }
 function mouse(el,type,pt,btn){
   var p = pt || center(el);
@@ -660,15 +935,13 @@ function typeInto(el,text,clear,delay){
   return new Promise(function(res){
     if(el.focus) try{ el.focus(); }catch(e){}
     var editable = ("value" in el) && (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement);
-    if(clear){ if(editable) setVal(el,""); else if(el.isContentEditable) el.textContent=""; el.dispatchEvent(new Event("input",{bubbles:true})); }
+    if(clear){ if(editable) setVal(el,""); else if(el.isContentEditable) el.textContent="";
+      el.dispatchEvent(new Event("input",{bubbles:true})); }
     var i=0, chars=String(text).split("");
     (function step(){
-      if(i>=chars.length){
-        el.dispatchEvent(new Event("change",{bubbles:true}));
-        return res();
-      }
+      if(i>=chars.length){ el.dispatchEvent(new Event("change",{bubbles:true})); return res(); }
       var ch=chars[i++];
-      keyEv(el,"keydown",ch,{}); 
+      keyEv(el,"keydown",ch,{});
       try{ el.dispatchEvent(new KeyboardEvent("keypress",kInit(ch,{}))); }catch(e){}
       if(ch==="\\n"){ keyEv(el,"keydown","Enter",{}); keyEv(el,"keyup","Enter",{}); }
       else if(editable){ setVal(el, el.value + ch); el.dispatchEvent(new InputEvent("input",{bubbles:true,data:ch,inputType:"insertText"})); }
@@ -736,7 +1009,7 @@ function domSnap(o){
       if(el.checked) extra.push("checked");
       if(el.tagName==="CANVAS") extra.push("canvas "+el.width+"x"+el.height);
       if(el.tagName==="IMG") extra.push("img "+(el.naturalWidth?("loaded "+el.naturalWidth+"x"+el.naturalHeight):"BROKEN"));
-      if(o.include_styles){ extra.push("color="+st.color, "bg="+st.backgroundColor, "font="+st.fontSize); }
+      if(o.include_styles){ extra.push("color="+st.color,"bg="+st.backgroundColor,"font="+st.fontSize); }
       if(el.scrollWidth>el.clientWidth+2) over.push(d+" overflows horizontally ("+el.scrollWidth+">"+el.clientWidth+")");
       lines.push("  ".repeat(Math.min(depth,10))+d+" ["+b.x+","+b.y+" "+b.w+"x"+b.h+"]"+
                  (extra.length?" {"+extra.join(", ")+"}":"")+(own?'  "'+own+'"':""));
@@ -785,8 +1058,7 @@ function doStep(s){
       return typeInto(el,s.text||"",s.clear!==false,s.delay).then(function(){ r.value=("value" in el)?String(el.value).slice(0,120):undefined; return r; });
     case "set": {
       el=pick(s);
-      if("value" in el){ setVal(el,String(s.value)); }
-      else el.textContent=String(s.value);
+      if("value" in el) setVal(el,String(s.value)); else el.textContent=String(s.value);
       el.dispatchEvent(new Event("input",{bubbles:true}));
       el.dispatchEvent(new Event("change",{bubbles:true}));
       r.value=String(s.value); return Promise.resolve(r);
@@ -803,13 +1075,13 @@ function doStep(s){
       r.sequence=seq; return Promise.resolve(r);
     }
     case "hold": {
-      var t3=target(s), ms=Math.min(6000,Math.max(10,s.ms||300)), mods3={ctrl:s.ctrl,shift:s.shift,alt:s.alt,meta:s.meta};
-      keyEv(t3,"keydown",s.key,mods3);
+      var t3=target(s), ms=Math.min(6000,Math.max(10,s.ms||300)), m3={ctrl:s.ctrl,shift:s.shift,alt:s.alt,meta:s.meta};
+      keyEv(t3,"keydown",s.key,m3);
       if(s.repeat_while!==false){
-        var iv=setInterval(function(){ keyEv(t3,"keydown",s.key,Object.assign({repeat:true},mods3)); },50);
-        return new Promise(function(res){ setTimeout(function(){ clearInterval(iv); keyEv(t3,"keyup",s.key,mods3); r.key=s.key; r.ms=ms; res(r); },ms); });
+        var iv=setInterval(function(){ keyEv(t3,"keydown",s.key,Object.assign({repeat:true},m3)); },50);
+        return new Promise(function(res){ setTimeout(function(){ clearInterval(iv); keyEv(t3,"keyup",s.key,m3); r.key=s.key; r.ms=ms; res(r); },ms); });
       }
-      return new Promise(function(res){ setTimeout(function(){ keyEv(t3,"keyup",s.key,mods3); r.key=s.key; r.ms=ms; res(r); },ms); });
+      return new Promise(function(res){ setTimeout(function(){ keyEv(t3,"keyup",s.key,m3); r.key=s.key; r.ms=ms; res(r); },ms); });
     }
     case "scroll": {
       if(s.selector){ el=pick(s); el.scrollTop=s.y!==undefined?s.y:el.scrollTop; el.scrollLeft=s.x!==undefined?s.x:el.scrollLeft; }
@@ -832,8 +1104,10 @@ function doStep(s){
     case "assert": {
       var okv=true, detail="";
       if(s.selector){ var e3=document.querySelector(s.selector); okv=!!e3&&(s.visible===false||vis(e3)); detail="selector "+s.selector; }
-      if(okv&&s.text){ var hay=(document.body.innerText||""); var has=hay.toLowerCase().indexOf(String(s.text).toLowerCase())>=0;
-        okv = s.absent ? !has : has; detail+=(detail?" + ":"")+"text "+JSON.stringify(s.text)+(s.absent?" absent":" present"); }
+      if(okv&&s.text){ var hay=(document.body.innerText||"");
+        var has=hay.toLowerCase().indexOf(String(s.text).toLowerCase())>=0;
+        okv = s.absent ? !has : has;
+        detail+=(detail?" + ":"")+"text "+JSON.stringify(s.text)+(s.absent?" absent":" present"); }
       if(!okv) throw new Error("assertion failed: "+detail);
       r.asserted=detail; return Promise.resolve(r);
     }
@@ -856,12 +1130,11 @@ function run(steps){
   return new Promise(function(res){
     (function next(){
       if(i>=steps.length) return res(out);
-      var s=steps[i++];
-      var p;
+      var s=steps[i++], p;
       try{ p=Promise.resolve(doStep(s)); }catch(e){ p=Promise.reject(e); }
       p.then(function(r){ out.push(Object.assign({step:i,ok:true},r)); })
        .catch(function(e){ out.push({step:i,ok:false,action:s.action,error:String(e.message||e)}); })
-       .then(function(){ setTimeout(next, 0); });
+       .then(function(){ setTimeout(next,0); });
     })();
   });
 }
@@ -872,11 +1145,11 @@ addEventListener("message",function(ev){
   function ok(data){ post({id:id,ok:true,data:data,errors:errors.slice()}); }
   function bad(e){ post({id:id,ok:false,error:String(e&&e.message||e),errors:errors.slice()}); }
   try{
-    if(d.cmd==="run")     return run(d.steps||[]).then(ok,bad);
-    if(d.cmd==="shot")    return shoot(d.opt||{}).then(ok,bad);
-    if(d.cmd==="dom")     return ok(domSnap(d.opt||{}));
-    if(d.cmd==="errors")  return ok({errors:errors.slice()});
-    if(d.cmd==="clear")   { errors=[]; return ok({cleared:true}); }
+    if(d.cmd==="run")    return run(d.steps||[]).then(ok,bad);
+    if(d.cmd==="shot")   return shoot(d.opt||{}).then(ok,bad);
+    if(d.cmd==="dom")    return ok(domSnap(d.opt||{}));
+    if(d.cmd==="errors") return ok({errors:errors.slice()});
+    if(d.cmd==="clear")  { errors=[]; return ok({cleared:true}); }
     bad(new Error("unknown cmd "+d.cmd));
   }catch(e){ bad(e); }
 });
@@ -899,10 +1172,7 @@ class Session {
     this.w = Math.min(1600, Math.max(320, w||900));
     this.h = Math.min(1200, Math.max(240, h||620));
     this.pending = new Map();
-    this.cmdSeq = 0;
-    this.ready = false;
-    this.visible = false;
-    this.created = Date.now();
+    this.cmdSeq = 0; this.ready = false; this.created = Date.now();
   }
   async open(){
     const html = composeHtml(this.path, HARNESS(this.id));
@@ -911,7 +1181,7 @@ class Session {
     f.style.cssText = `width:${this.w}px;height:${this.h}px;border:0;background:#fff`;
     this.frame = f;
     sessions.set(this.id, this);
-    stageMount(this);            // visible so the user can watch
+    stageMount(this);
     const ready = new Promise((res,rej)=>{
       this._onReady = res;
       setTimeout(()=>rej(new Error("app frame never signalled ready — it may have failed to parse")), 8000);
@@ -960,7 +1230,6 @@ function stageMount(sess){
   inner.style.height = sess.h+"px";
   inner.appendChild(sess.frame);
   stageOwner = sess.id;
-  sess.visible = true;
   $("right").classList.remove("collapsed");
   mode = "stage"; renderArtifact();
 }
@@ -988,19 +1257,18 @@ function closeAllSessions(){ [...sessions.values()].forEach(s=>s.close()); }
 async function getSession(args){
   if(args.session){
     const s = sessions.get(args.session);
-    if(!s) throw new Error(`no live session "${args.session}". Sessions close on Stop or New chat — pass a path to start a fresh one.`);
+    if(!s) throw new Error(`no live session "${args.session}". Sessions close on Stop, a chat switch, or reload — pass a path to start a fresh one.`);
     return {sess:s, temp:false};
   }
   const p = norm(args.path||"");
   if(!p) throw new Error("pass either a path (new session) or a session id (existing one)");
-  if(!disk.files[p]) throw new Error("No such file: "+p);
+  if(!disk.files[p]) throw new Error("No such file in this chat's disk: "+p);
   if(!["html","htm"].includes(ext(p))) throw new Error("playtesting needs an .html entry point");
   if(sessions.size >= 4) throw new Error("too many open sessions (4). Close one with session_close first.");
   const s = await new Session(p, args.width, args.height).open();
   return {sess:s, temp:!args.keep_open};
 }
 
-/* Screenshot bookkeeping. Images go to the UI always, to the model only if vision is on. */
 function addShot(dataUrl, label, w, h){
   const rec = {id:"shot"+(++shotSeq), dataUrl, label:label||"screenshot", w, h, at:Date.now()};
   shots.push(rec);
@@ -1020,13 +1288,8 @@ function renderShotStrip(){
   });
 }
 
-/* Images queued for delivery to the model after the current tool batch. */
 let pendingVision = [];
-function queueVision(rec){
-  if(!S.vision) return false;
-  pendingVision.push(rec);
-  return true;
-}
+function queueVision(rec){ if(!S.vision) return false; pendingVision.push(rec); return true; }
 function visionMessage(list){
   const content = [{type:"text", text:"Screenshot"+(list.length>1?"s":"")+": "+
     list.map(s=>`${s.label} (${s.w}×${s.h})`).join(", ")+". Look at "+(list.length>1?"them":"it")+" and judge the actual visual result."}];
@@ -1049,7 +1312,7 @@ function stripImages(messages){
 }
 
 /* ============================================================
-   Sandboxed JS runner (no disk, no app access)
+   Sandboxed JS runner
    ============================================================ */
 let jsSeq = 0;
 function runJs(code, timeoutMs){
@@ -1154,11 +1417,10 @@ $("editor").addEventListener("input", ()=>{
   if(!active) return;
   clearTimeout(dirtyT);
   dirtyT = setTimeout(()=>{
-    disk.files[active] = {content:$("editor").value, updated:Date.now()};
-    save();
+    writeFile(active, $("editor").value);
     $("savedFlag").textContent="saved";
     setTimeout(()=>$("savedFlag").textContent="", 1200);
-  }, 350);
+  }, 400);
 });
 $("editor").addEventListener("keydown", e=>{
   if(e.key==="Tab"){ e.preventDefault();
@@ -1170,9 +1432,14 @@ $("editor").addEventListener("keydown", e=>{
 });
 $("btnCode").onclick    = ()=>{ if(active){ mode="code"; renderArtifact(); } };
 $("btnPreview").onclick = ()=>{ if(active){ mode="preview"; renderArtifact(); } };
-$("btnRun").onclick     = ()=>{ if(mode==="stage"){ const s=sessions.get(stageOwner); if(s){ const p=s.path,w=s.w,h=s.h; s.close(); new Session(p,w,h).open().catch(e=>toast(e.message)); } } else { mode="preview"; renderArtifact(); } };
-$("btnPop").onclick     = ()=>{ if(active) window.open(buildPreview(active),"_blank"); };
-$("btnDl").onclick      = ()=>{
+$("btnRun").onclick     = ()=>{
+  if(mode==="stage"){
+    const s=sessions.get(stageOwner);
+    if(s){ const p=s.path,w=s.w,h=s.h; s.close(); new Session(p,w,h).open().catch(e=>toast(e.message)); }
+  } else { mode="preview"; renderArtifact(); }
+};
+$("btnPop").onclick = ()=>{ if(active) window.open(buildPreview(active),"_blank"); };
+$("btnDl").onclick  = ()=>{
   if(!active) return;
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([disk.files[active].content],{type:mime(active)}));
@@ -1224,15 +1491,16 @@ async function workerTool(path, body){
    Tool schemas
    ============================================================ */
 const DISK_TOOLS = [
-  {type:"function",function:{name:"disk_list",description:"List every file on the virtual disk with size and last-modified time, plus installed libraries.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"disk_list",description:"List every file on this chat's disk with size and last-modified time, plus installed libraries.",parameters:{type:"object",properties:{}}}},
   {type:"function",function:{name:"disk_tree",description:"Compact indented tree of the disk. Cheaper than disk_list for getting oriented.",parameters:{type:"object",properties:{}}}},
-  {type:"function",function:{name:"disk_read",description:"Read one file. Optionally a line range instead of the whole file.",parameters:{type:"object",properties:{path:{type:"string"},start_line:{type:"integer"},end_line:{type:"integer"}},required:["path"]}}},
+  {type:"function",function:{name:"disk_read",description:"Read one file in full. Pass start_line/end_line to read only a range, which is cheaper for large files.",parameters:{type:"object",properties:{path:{type:"string"},start_line:{type:"integer"},end_line:{type:"integer"}},required:["path"]}}},
   {type:"function",function:{name:"disk_write",description:"Create or overwrite a file. Creates an artifact; .html files get a live preview.",parameters:{type:"object",properties:{path:{type:"string"},content:{type:"string"}},required:["path","content"]}}},
   {type:"function",function:{name:"disk_edit",description:"Replace an exact substring in a file. Fails if old_text is absent or ambiguous.",parameters:{type:"object",properties:{path:{type:"string"},old_text:{type:"string"},new_text:{type:"string"}},required:["path","old_text","new_text"]}}},
   {type:"function",function:{name:"disk_grep",description:"Search file contents across the disk, returning matching lines with numbers.",parameters:{type:"object",properties:{pattern:{type:"string"},is_regex:{type:"boolean"},path_filter:{type:"string"},max_results:{type:"integer"}},required:["pattern"]}}},
   {type:"function",function:{name:"disk_move",description:"Rename or move a file.",parameters:{type:"object",properties:{from:{type:"string"},to:{type:"string"},overwrite:{type:"boolean"}},required:["from","to"]}}},
   {type:"function",function:{name:"disk_delete",description:"Delete a file.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
-  {type:"function",function:{name:"install_library",description:"Install an npm package from jsDelivr. Auto-injected into all previewed HTML.",parameters:{type:"object",properties:{name:{type:"string"},version:{type:"string"},path:{type:"string",description:"File inside the package, e.g. dist/chart.min.js"}},required:["name"]}}},
+  {type:"function",function:{name:"disk_stats",description:"Total file count and byte size of this chat's disk, plus browser storage usage and quota.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"install_library",description:"Install an npm package from jsDelivr into this chat. Auto-injected into all previewed HTML.",parameters:{type:"object",properties:{name:{type:"string"},version:{type:"string"},path:{type:"string",description:"File inside the package, e.g. dist/chart.min.js"}},required:["name"]}}},
   {type:"function",function:{name:"list_libraries",description:"List installed libraries and their resolved CDN URLs.",parameters:{type:"object",properties:{}}}},
   {type:"function",function:{name:"preview",description:"Open a file in the user's artifact panel.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
   {type:"function",function:{name:"run_js",description:"Execute JavaScript in an isolated sandbox; returns the value plus console output. No disk or app access.",parameters:{type:"object",properties:{code:{type:"string"},timeout_ms:{type:"integer"}},required:["code"]}}}
@@ -1245,62 +1513,48 @@ const TEST_TOOLS = [
     parameters:{type:"object",properties:{
       path:{type:"string",description:"Entry .html to open in a NEW session."},
       session:{type:"string",description:"Existing session id to continue driving. Omit path when using this."},
-      keep_open:{type:"boolean",description:"Keep the session alive after these steps so you can continue."},
+      keep_open:{type:"boolean",description:"Keep the session alive after these steps."},
       width:{type:"integer",description:"Viewport width, default 900."},
       height:{type:"integer",description:"Viewport height, default 620."},
       settle_ms:{type:"integer",description:"Wait after load before the first step. Default 500."},
       screenshot_at_end:{type:"boolean",description:"Capture a screenshot after the last step. Default true."},
-      steps:{type:"array",description:"Actions run in order. Each is an object with an 'action' field.",items:{type:"object",properties:{
+      steps:{type:"array",description:"Actions run in order.",items:{type:"object",properties:{
         action:{type:"string",enum:["click","dblclick","rightclick","click_at","move_to","drag","hover","focus","blur","type","set","check","key","keys","hold","scroll","wait","wait_for","assert","eval","screenshot"]},
         selector:{type:"string",description:"CSS selector for the target."},
-        text:{type:"string",description:"For click/hover: match a visible element by its text. For type: the text to type. For assert: text to look for on the page."},
-        exact:{type:"boolean",description:"Text match must be exact rather than substring."},
-        value:{type:"string",description:"For set/check: the value to apply (range, select, checkbox)."},
-        clear:{type:"boolean",description:"For type: clear the field first. Default true."},
-        delay:{type:"integer",description:"For type: ms between keystrokes. Default 12."},
-        key:{type:"string",description:"For key/hold: e.g. Enter, Escape, Tab, ArrowLeft, a, 1, F2, Space."},
-        sequence:{type:"array",items:{type:"string"},description:"For keys: a list of keys pressed in order."},
-        repeat:{type:"integer",description:"For key: press it this many times."},
-        ms:{type:"integer",description:"For hold: how long to hold the key down. For wait: how long to wait."},
+        text:{type:"string",description:"For click/hover: match a visible element by text. For type: the text to type. For assert: text to find on the page."},
+        exact:{type:"boolean"},
+        value:{type:"string",description:"For set/check: the value to apply."},
+        clear:{type:"boolean",description:"For type: clear first. Default true."},
+        delay:{type:"integer",description:"For type: ms between keystrokes."},
+        key:{type:"string",description:"For key/hold: Enter, Escape, Tab, ArrowLeft, a, 1, F2, Space…"},
+        sequence:{type:"array",items:{type:"string"},description:"For keys: keys pressed in order."},
+        repeat:{type:"integer",description:"For key: press this many times."},
+        ms:{type:"integer",description:"For hold: how long to hold. For wait: how long to wait."},
         ctrl:{type:"boolean"},shift:{type:"boolean"},alt:{type:"boolean"},meta:{type:"boolean"},
-        x:{type:"number",description:"For click_at/move_to/scroll: viewport coordinate."},
-        y:{type:"number"},
-        from:{type:"object",description:"For drag: {x,y} start point."},
-        to:{type:"object",description:"For drag: {x,y} end point."},
-        timeout_ms:{type:"integer",description:"For wait_for."},
-        absent:{type:"boolean",description:"For assert: require the text to be ABSENT."},
-        visible:{type:"boolean",description:"For assert/wait_for: require visibility. Default true."},
-        code:{type:"string",description:"For eval: JS run inside the app, with access to its globals. Returns the value."},
-        label:{type:"string",description:"For screenshot: a short name for this shot."},
-        full_page:{type:"boolean",description:"For screenshot: capture beyond the viewport."}
+        x:{type:"number",description:"Viewport coordinate."}, y:{type:"number"},
+        from:{type:"object",description:"For drag: {x,y} start."}, to:{type:"object",description:"For drag: {x,y} end."},
+        timeout_ms:{type:"integer"}, absent:{type:"boolean"}, visible:{type:"boolean"},
+        code:{type:"string",description:"For eval: JS run inside the app with access to its globals."},
+        label:{type:"string"}, full_page:{type:"boolean"}
       },required:["action"]}}
     }}}},
   {type:"function",function:{
     name:"screenshot",
-    description:"Render an app to an image and, if vision is available, look at it. Prefer inspect_dom for layout questions — it is exact and cheaper. Each image costs roughly 1-2k input tokens.",
+    description:"Render an app to an image and, if vision is available, look at it. Prefer inspect_dom for layout questions — exact and cheaper. Each image costs roughly 1-2k input tokens.",
     parameters:{type:"object",properties:{
-      path:{type:"string",description:"Entry .html (opens a temporary session)."},
-      session:{type:"string",description:"Existing playtest session to capture instead."},
-      selector:{type:"string",description:"Capture only this element."},
-      full_page:{type:"boolean",description:"Capture the whole scrollable page."},
-      width:{type:"integer",description:"Viewport width for a new session, default 900."},
-      height:{type:"integer",description:"Viewport height for a new session, default 620."},
-      settle_ms:{type:"integer",description:"Wait before capturing. Default 700."},
-      label:{type:"string"}
+      path:{type:"string"}, session:{type:"string"}, selector:{type:"string"},
+      full_page:{type:"boolean"}, width:{type:"integer"}, height:{type:"integer"},
+      settle_ms:{type:"integer"}, label:{type:"string"}
     }}}},
   {type:"function",function:{
     name:"inspect_dom",
-    description:"Structured snapshot of a running app: element tree with exact pixel geometry, text, values, roles, broken images, canvas sizes, overflow warnings, focus, scroll position, and all visible text. Use this for layout and content questions instead of a screenshot.",
+    description:"Structured snapshot of a running app: element tree with exact pixel geometry, text, values, roles, broken images, canvas sizes, overflow warnings, focus, scroll position, and all visible text.",
     parameters:{type:"object",properties:{
-      path:{type:"string",description:"Entry .html (opens a temporary session)."},
-      session:{type:"string",description:"Existing playtest session to inspect."},
-      selector:{type:"string",description:"Subtree root. Defaults to body."},
-      max_nodes:{type:"integer",description:"Default 120, max 400."},
-      include_styles:{type:"boolean",description:"Include colour and font-size per node."},
-      settle_ms:{type:"integer",description:"Wait before snapshotting. Default 500."}
+      path:{type:"string"}, session:{type:"string"}, selector:{type:"string"},
+      max_nodes:{type:"integer"}, include_styles:{type:"boolean"}, settle_ms:{type:"integer"}
     }}}},
   {type:"function",function:{name:"session_close",description:"Close a playtest session and free its frame.",parameters:{type:"object",properties:{session:{type:"string",description:"Session id, or 'all'."}},required:["session"]}}},
-  {type:"function",function:{name:"check_app",description:"Quick load check: open an app, wait, and report runtime errors, console errors, rendered node count, and visible text. Cheaper than a full playtest when you only want to know whether it boots.",parameters:{type:"object",properties:{path:{type:"string"},wait_ms:{type:"integer"}},required:["path"]}}}
+  {type:"function",function:{name:"check_app",description:"Quick load check: open an app, wait, and report runtime errors, console errors, and visible text. Cheaper than a full playtest.",parameters:{type:"object",properties:{path:{type:"string"},wait_ms:{type:"integer"}},required:["path"]}}}
 ];
 
 const WEB_TOOLS = [
@@ -1324,12 +1578,12 @@ const WEB_TOOLS = [
 
 const SPAWN_TOOL = {type:"function",function:{
   name:"spawn_agents",
-  description:"Delegate to autonomous sub-agents sharing your disk and tools. All agents in one call run IN PARALLEL. Each starts with an empty context, cannot ask questions, and returns only a text report. Costs real money per step.",
+  description:"Delegate to autonomous sub-agents sharing this chat's disk and tools. All agents in one call run IN PARALLEL. Each starts with an empty context, cannot ask questions, and returns only a text report. Costs real money per step.",
   parameters:{type:"object",properties:{
     agents:{type:"array",description:`Up to ${AGENT.maxPerCall} agents run in parallel.`,items:{
       type:"object",properties:{
         name:{type:"string",description:"Short kebab-case id, e.g. build-ui."},
-        task:{type:"string",description:"Self-contained instructions: goal, exact file paths, conventions, what to report. Assume zero prior knowledge."},
+        task:{type:"string",description:"Self-contained instructions: goal, exact file paths, conventions, what to report."},
         context:{type:"string",description:"Shared background: decisions made, file names, API shapes, style rules."},
         model:{type:"string",description:"Optional override. One of: "+MODELS.map(m=>m.id).join(", ")},
         reasoning:{type:"string",enum:Object.keys(REASONING)}
@@ -1351,8 +1605,8 @@ function toolsFor(depth){
    ============================================================ */
 async function execTool(name, args, ctx){
   switch(name){
-    /* ---- disk ---- */
     case "disk_list": return {
+      chat: index.find(c=>c.id===curId)?.title,
       files: Object.entries(disk.files).map(([p,f])=>({path:p, bytes:f.content.length, modified:new Date(f.updated).toISOString()})),
       libraries: disk.libs.map(l=>({name:l.name, version:l.version, type:l.type}))
     };
@@ -1361,19 +1615,19 @@ async function execTool(name, args, ctx){
       if(!paths.length) return {tree:"(empty disk)"};
       return {files:paths.length, tree:paths.map(p=>{
         const d = p.split("/").length - 1;
-        return "  ".repeat(d)+p.split("/").pop()+"  ("+disk.files[p].content.length+"b)"+(d?"   ["+p+"]":"");
+        return "  ".repeat(d)+p.split("/").pop()+"  ("+fmtBytes(disk.files[p].content.length)+")"+(d?"   ["+p+"]":"");
       }).join("\n")};
     }
     case "disk_read": {
       const p = norm(args.path), content = readFile(p);
+      const all = content.split("\n");
       if(args.start_line || args.end_line){
-        const all = content.split("\n");
         const s = Math.max(1, Number(args.start_line)||1);
         const e = Math.min(all.length, Number(args.end_line)||all.length);
         return {path:p, start_line:s, end_line:e, total_lines:all.length,
                 content: all.slice(s-1,e).map((l,i)=>(s+i)+"| "+l).join("\n")};
       }
-      return {path:p, lines:content.split("\n").length, content};
+      return {path:p, lines:all.length, bytes:content.length, content};
     }
     case "disk_write": {
       const p = writeFile(args.path, args.content);
@@ -1423,6 +1677,16 @@ async function execTool(name, args, ctx){
       return {ok:true, from, to};
     }
     case "disk_delete": deleteFile(args.path); return {ok:true, deleted:norm(args.path)};
+    case "disk_stats": {
+      const paths = Object.keys(disk.files);
+      const bytes = paths.reduce((n,p)=>n+disk.files[p].content.length,0);
+      let est = null;
+      if(navigator.storage?.estimate){ try{ est = await navigator.storage.estimate(); }catch(e){} }
+      return {chat:index.find(c=>c.id===curId)?.title, files:paths.length, bytes, human:fmtBytes(bytes),
+              chats_total:index.length,
+              browser_storage: est ? {used:fmtBytes(est.usage||0), quota:fmtBytes(est.quota||0)} : "unavailable",
+              note:"Storage is IndexedDB-backed and shared across chats. Reading a huge file in full still costs context for the rest of the conversation — a line range is cheaper."};
+    }
 
     case "install_library": {
       const r = await installLibrary(args.name, args.version, args.path);
@@ -1435,14 +1699,13 @@ async function execTool(name, args, ctx){
       return {result:r.result, console:r.logs, error:r.error||null};
     }
 
-    /* ---- playtest ---- */
     case "playtest": {
       if(!S.test) throw new Error("Playtest tools are disabled in this app's settings.");
       const steps = Array.isArray(args.steps) ? args.steps.slice(0,60) : [];
       const {sess, temp} = await getSession(args);
       try{
         await sleep(Math.min(5000, Math.max(0, args.settle_ms ?? 500)));
-        const res = await sleep(0).then(()=>sess.send("run", {steps}, 120000));
+        const res = await sess.send("run", {steps}, 120000);
         const out = [], captured = [];
         (res.data||[]).forEach(r=>{
           if(r.shot){
@@ -1495,9 +1758,7 @@ async function execTool(name, args, ctx){
       const {sess, temp} = await getSession(args);
       try{
         await sleep(Math.min(6000, Math.max(0, args.settle_ms ?? 700)));
-        const r = await sess.send("shot", {opt:{
-          max_width:S.shotW, selector:args.selector, full_page:!!args.full_page
-        }}, 45000);
+        const r = await sess.send("shot", {opt:{max_width:S.shotW, selector:args.selector, full_page:!!args.full_page}}, 45000);
         const rec = addShot(r.data.dataUrl, (args.label||"screenshot")+" · "+sess.path, r.data.w, r.data.h);
         const sent = queueVision(rec);
         return {
@@ -1517,9 +1778,7 @@ async function execTool(name, args, ctx){
       const {sess, temp} = await getSession(args);
       try{
         await sleep(Math.min(5000, Math.max(0, args.settle_ms ?? 500)));
-        const r = await sess.send("dom", {opt:{
-          selector:args.selector, max_nodes:args.max_nodes, include_styles:!!args.include_styles
-        }}, 30000);
+        const r = await sess.send("dom", {opt:{selector:args.selector, max_nodes:args.max_nodes, include_styles:!!args.include_styles}}, 30000);
         return {path:sess.path, session: temp?null:sess.id, ...r.data, runtime_errors:(r.errors||[]).slice(0,20)};
       } finally { if(temp) sess.close(); }
     }
@@ -1548,7 +1807,6 @@ async function execTool(name, args, ctx){
       } finally { sess.close(); }
     }
 
-    /* ---- web ---- */
     case "web_search": {
       if(!S.web) throw new Error("Web tools are disabled in this app's settings.");
       const j = await workerTool("/tools/search", {
@@ -1670,7 +1928,9 @@ async function runAgent(spec, depth){
 
       if(!out.calls.length){ rec.report = out.content || "(empty report)"; break; }
 
-      pendingVision = [];
+      const localVision = [];
+      const before = pendingVision;
+      pendingVision = localVision;
       for(const tc of out.calls){
         let a = {};
         try{ a = tc.function.arguments ? JSON.parse(tc.function.arguments) : {}; }
@@ -1687,7 +1947,8 @@ async function runAgent(spec, depth){
         rec.log.push({kind:"tool", name:tc.function.name, args:a, result:res});
         renderAgents();
       }
-      if(pendingVision.length){ msgs.push(visionMessage(pendingVision)); pendingVision = []; }
+      pendingVision = before;
+      if(localVision.length) msgs.push(visionMessage(localVision));
     }
     if(!rec.report){
       rec.report = `(stopped after the ${AGENT.maxSteps}-step limit without a final report — work may be incomplete)`;
@@ -1797,10 +2058,11 @@ function md(src){
 /* ============================================================
    Chat rendering
    ============================================================ */
-const WEB_NAMES = /^(web_search|web_fetch|wikipedia|npm_search)$/;
+const WEB_NAMES  = /^(web_search|web_fetch|wikipedia|npm_search)$/;
 const TEST_NAMES = /^(playtest|screenshot|inspect_dom|check_app|session_close)$/;
 function renderChat(){
   const c=$("msgs"); c.innerHTML="";
+  if(!chat.length){ c.innerHTML = welcomeHtml(); return; }
   chat.forEach(m=>{ if(m.role==="system"||m.role==="tool") return; c.appendChild(msgEl(m)); });
   c.scrollTop = c.scrollHeight;
 }
@@ -1841,6 +2103,20 @@ function msgEl(m){
   d.innerHTML = body;
   d.querySelectorAll(".shots img").forEach(i=>i.onclick=()=>zoom(i.src));
   return d;
+}
+function welcomeHtml(){
+  const e = index.find(c=>c.id===curId);
+  return `<div class="msg"><div class="who">Opus Studio</div><div class="bubble">
+  <p><b>${esc(e?e.title:"New chat")}</b> — orchestrator <code>${esc(labelOf(S.model))}</code> · agents <code>${esc(labelOf(S.agentModel))}</code> · endpoint <code>${esc(S.base)}</code></p>
+  <ul>
+  <li><b>Chats</b> — each one owns its own disk, libraries, and transcript. Switch in the panel on the left; nothing leaks between them.</li>
+  <li><b>Playtest</b> — <code>playtest</code> drives your app with real clicks, typing, held keys, drags, and coordinate hits. Watch it run on the right.</li>
+  <li><b>See</b> — <code>screenshot</code> sends an image to the model when vision is on; <code>inspect_dom</code> returns exact geometry and is always available.</li>
+  <li><b>Research</b> — TinyFish search and fetch, Wikipedia, npm.</li>
+  <li><b>Delegate</b> — up to ${AGENT.maxConcurrent} sub-agents in parallel, depth ${AGENT.maxDepth}.</li>
+  </ul>
+  <p>Try: <i>"Build a snake game with arrow-key controls, then playtest it: hold each arrow and confirm the snake turns"</i></p>
+  </div></div>`;
 }
 
 /* ============================================================
@@ -1945,7 +2221,6 @@ async function streamOnce(opts){
 
 const IMG_ERR = /image|media_type|multimodal|vision|content block|invalid.*content|unsupported.*type/i;
 
-/* Retries without reasoning params, then with the other image encoding, then without images. */
 async function callModel(opts){
   try{
     return await streamOnce({...opts, withExtras:true});
@@ -1966,11 +2241,8 @@ async function callModel(opts){
           return b;
         })};
       });
-      try{
-        const r = await streamOnce({...opts, messages:flipped, withExtras:true});
-        save();
-        return r;
-      }catch(e3){
+      try{ const r = await streamOnce({...opts, messages:flipped, withExtras:true}); save(); return r; }
+      catch(e3){
         S.vision = false; save();
         toast("This gateway rejected images — vision turned off");
         return await streamOnce({...opts, messages:stripImages(opts.messages), withExtras:true});
@@ -2022,8 +2294,18 @@ async function send(){
   if(!text) return;
   if(!S.key){ toast("Set your app token in Settings"); $("btnSet").click(); return; }
 
+  const firstMsg = !chat.some(m=>m.role==="user");
   $("ta").value=""; $("ta").style.height="";
   chat.push({role:"user",content:text});
+
+  /* Name an untouched chat after its first message. */
+  if(firstMsg){
+    const e = index.find(c=>c.id===curId);
+    if(e && /^(New chat|Imported.*)$/.test(e.title)){
+      e.title = text.replace(/\s+/g," ").slice(0,48) + (text.length>48?"…":"");
+      renderChatList(); syncHeader();
+    }
+  }
   renderChat(); save();
   busy = true; setBusy(true);
   spawnedThisTurn = 0; agents = []; renderAgents();
@@ -2079,7 +2361,7 @@ async function send(){
     else{ chat.push({role:"assistant",content:failureNote(e)}); renderChat(); checkEnv(); }
     save();
   }finally{
-    busy=false; setBusy(false); setStatus("Ready");
+    busy=false; setBusy(false); setStatus("Ready"); saveNow();
   }
 }
 function setBusy(b){ $("btnSend").disabled=b; $("btnStop").style.display=b?"inline-block":"none"; }
@@ -2101,19 +2383,22 @@ function syncHeader(){
   $("reasonWrap").classList.toggle("hide", !isThinkingModel(S.model));
   $("hostPill").textContent = hostOf(S.base) || S.base;
   $("hostPill").title = S.base;
+  const e = index.find(c=>c.id===curId);
+  $("chatPill").textContent = e ? e.title : "…";
+  $("chatPill").title = e ? `${e.title} — ${e.files||0} file(s), ${fmtBytes(e.bytes||0)}` : "";
 }
-$("model").onchange  = e => { S.model=e.target.value; save(); syncHeader(); };
-$("reason").onchange = e => { S.reason=e.target.value; save(); };
+function renderAll(){
+  syncHeader(); renderChatList(); renderDisk(); renderTabs(); renderArtifact();
+  renderChat(); renderAgents(); renderSessions(); renderShotStrip(); checkEnv(); scheduleQuota();
+}
 
 $("ta").addEventListener("keydown", e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
 $("ta").addEventListener("input", e=>{ e.target.style.height="auto"; e.target.style.height=Math.min(e.target.scrollHeight,200)+"px"; });
 $("btnSend").onclick = send;
 $("btnStop").onclick = ()=>{ activeCtrls.forEach(c=>c.abort()); closeAllSessions(); toast("Aborted requests and closed playtest sessions"); };
-$("btnNew").onclick  = ()=>{
-  if(chat.length && !confirm("Start a new chat? The disk is kept.")) return;
-  chat=[]; agents=[]; spawnedThisTurn=0; shots=[]; closeAllSessions();
-  save(); renderChat(); renderAgents(); renderShotStrip();
-};
+$("btnNew").onclick     = ()=>createChat("New chat", true);
+$("btnNewChat").onclick = ()=>createChat("New chat", true);
+$("btnDupChat").onclick = async ()=>{ const id = await duplicateChat(curId); if(id) switchChat(id); };
 
 $("btnNewFile").onclick = ()=>{
   const p = prompt("New file path:", "index.html");
@@ -2124,18 +2409,46 @@ $("btnNewFile").onclick = ()=>{
     : "";
   openFile(writeFile(p, seed), "code");
 };
+const TEXTY = /\.(html?|css|js|mjs|jsx|ts|tsx|json|md|txt|csv|svg|xml|yml|yaml)$/i;
 $("btnImport").onclick = ()=>{
   const i=document.createElement("input"); i.type="file"; i.multiple=true;
   i.onchange=async()=>{
-    for(const f of i.files){ try{ writeFile(f.name, await f.text()); }catch(e){ toast("Skipped "+f.name); } }
-    toast("Imported "+i.files.length+" file(s)");
+    let n=0;
+    for(const f of i.files){
+      try{
+        if(TEXTY.test(f.name)) writeFile(f.name, await f.text());
+        else writeFile(f.name, await new Promise((res,rej)=>{     // binary → data URI, usable in previews
+          const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(f);
+        }));
+        n++;
+      }catch(e){ toast("Skipped "+f.name+": "+e.message); }
+    }
+    toast("Imported "+n+" file(s) into this chat");
   };
   i.click();
 };
 $("btnExport").onclick = ()=>{
+  const e = index.find(c=>c.id===curId);
+  const blob = {kind:"opus-studio-chat", exported:new Date().toISOString(),
+    title:e?.title, files:disk.files, libs:disk.libs, messages:storableChat()};
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([JSON.stringify({files:disk.files,libs:disk.libs},null,2)],{type:"application/json"}));
-  a.download="opus-studio-disk.json"; a.click();
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(blob,null,2)],{type:"application/json"}));
+  a.download=(e?.title||"chat").replace(/[^\w.-]+/g,"_").slice(0,40)+".json"; a.click();
+};
+$("btnExportAll").onclick = async ()=>{
+  await flushAll();
+  const out = {kind:"opus-studio-workspace", exported:new Date().toISOString(), chats:[]};
+  for(const e of index){
+    const rec = (await dbGet("chats", e.id)) || {};
+    const files = await dbFiles(e.id);
+    out.chats.push({title:e.title, created:e.created, updated:e.updated,
+      libs:rec.libs||[], messages:rec.messages||[],
+      files:Object.fromEntries(files.map(f=>[f.path,{content:f.content,updated:f.updated}]))});
+  }
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(out)],{type:"application/json"}));
+  a.download="opus-studio-workspace.json"; a.click();
+  toast("Exported "+out.chats.length+" chat(s)");
 };
 
 $("btnAddLib").onclick=()=>{ $("libMask").classList.add("on"); $("lName").focus(); };
@@ -2156,6 +2469,7 @@ $("btnSet").onclick=()=>{
   $("sTools").checked=!!S.tools; $("sWeb").checked=!!S.web;
   $("sTest").checked=!!S.test; $("sVision").checked=!!S.vision; $("sShotW").value=S.shotW;
   $("sAgents").checked=!!S.agents; $("sAgentModel").value=S.agentModel; $("sMaxAgents").value=S.maxAgents;
+  refreshQuota();
   $("setMask").classList.add("on");
 };
 $("setCancel").onclick=()=>$("setMask").classList.remove("on");
@@ -2171,14 +2485,25 @@ $("setSave").onclick=()=>{
   S.agents=$("sAgents").checked;
   S.agentModel=$("sAgentModel").value;
   S.maxAgents=Math.min(40,Math.max(1,Number($("sMaxAgents").value)||12));
-  save(); syncHeader(); checkEnv(); renderAgents(); $("setMask").classList.remove("on"); toast("Settings saved");
+  save(); saveNow(); syncHeader(); checkEnv(); renderAgents();
+  $("setMask").classList.remove("on"); toast("Settings saved");
 };
-$("btnWipe").onclick=()=>{
-  if(!confirm("Erase the entire disk, all libraries, and the chat history? This cannot be undone.")) return;
-  disk={files:{},libs:[]}; chat=[]; openTabs=[]; active=null; agents=[]; spawnedThisTurn=0; shots=[];
+$("btnPersist").onclick = async ()=>{
+  if(!navigator.storage || !navigator.storage.persist){ toast("This browser has no persistence API"); return; }
+  try{
+    persisted = await navigator.storage.persist();
+    toast(persisted ? "Persistent storage granted" : "Browser declined — it may still evict data under disk pressure");
+  }catch(e){ toast("Request failed: "+e.message); }
+  refreshQuota();
+};
+$("btnWipe").onclick=async()=>{
+  if(!confirm(`Delete ALL ${index.length} chat(s), every disk, and every transcript? This cannot be undone.`)) return;
   closeAllSessions();
-  save(); renderDisk(); renderTabs(); renderArtifact(); renderChat(); renderAgents(); renderShotStrip();
-  $("setMask").classList.remove("on"); toast("Wiped");
+  for(const e of index.slice()){ await dbDelFiles(e.id); await dbDel("chats", e.id); }
+  index = [];
+  await dbPut("meta", index, "index");
+  await createChat("New chat", true);
+  $("setMask").classList.remove("on"); toast("Everything deleted");
 };
 document.querySelectorAll(".mask").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("on"); }));
 document.addEventListener("keydown",e=>{
@@ -2186,23 +2511,85 @@ document.addEventListener("keydown",e=>{
     document.querySelectorAll(".mask.on").forEach(m=>m.classList.remove("on"));
     $("lightbox").classList.remove("on");
   }
+  /* Ctrl/Cmd+K cycles chats without touching the mouse. */
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
+    e.preventDefault();
+    const list = index.slice().sort((a,b)=>b.updated-a.updated);
+    if(list.length<2) return;
+    const at = list.findIndex(c=>c.id===curId);
+    switchChat(list[(at+1)%list.length].id);
+  }
+});
+window.addEventListener("beforeunload", e=>{
+  saveNow();
+  if(inflight.size || busy){ e.preventDefault(); e.returnValue = ""; }
 });
 
-/* boot */
-syncHeader(); renderDisk(); renderTabs(); renderArtifact(); renderChat(); renderAgents(); renderSessions(); renderShotStrip(); checkEnv();
-if(!chat.length){
-  $("msgs").innerHTML = `<div class="msg"><div class="who">Opus Studio</div><div class="bubble">
-  <p>Orchestrator <code>${esc(labelOf(S.model))}</code> · agents <code>${esc(labelOf(S.agentModel))}</code> · endpoint <code>${esc(S.base)}</code></p>
-  <ul>
-  <li><b>Playtest</b> — <code>playtest</code> drives your app with real clicks, typing, held keys, drags, and coordinate hits. Sessions stay live across calls; you can watch in the panel on the right.</li>
-  <li><b>See</b> — <code>screenshot</code> rasterizes the app and sends it to the model when vision is on; <code>inspect_dom</code> returns exact geometry, text, and overflow warnings and is always available.</li>
-  <li><b>Research</b> — TinyFish search and fetch, Wikipedia, npm.</li>
-  <li><b>Build</b> — disk read/write/patch/grep/move, npm installs, live preview.</li>
-  <li><b>Delegate</b> — up to ${AGENT.maxConcurrent} sub-agents in parallel, depth ${AGENT.maxDepth}.</li>
-  </ul>
-  <p>Try: <i>"Build a snake game with arrow-key controls, then playtest it: hold each arrow and confirm the snake turns"</i></p>
-  </div></div>`;
+/* ============================================================
+   Boot
+   ============================================================ */
+async function migrateLocalStorage(){
+  /* One-time lift of any v2/v3/v4 localStorage workspace into IndexedDB. */
+  for(const k of ["opusStudio.v4","opusStudio.v3","opusStudio.v2"]){
+    let raw;
+    try{ raw = JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ continue; }
+    if(!raw || !raw.settings) continue;
+    S = Object.assign({}, SDEF, raw.settings);
+    const files = (raw.disk && raw.disk.files) || {};
+    const paths = Object.keys(files);
+    const id = uid();
+    index.unshift({id, title:"Imported from "+k, created:Date.now(), updated:Date.now(),
+      files:paths.length, bytes:paths.reduce((n,p)=>n+String(files[p].content||"").length,0),
+      msgs:Array.isArray(raw.chat)?raw.chat.length:0});
+    await dbPut("chats", {id, messages:Array.isArray(raw.chat)?raw.chat:[], libs:(raw.disk&&raw.disk.libs)||[]});
+    for(const p of paths)
+      await dbPut("files", {key:fkey(id,p), chatId:id, path:p, content:String(files[p].content||""), updated:files[p].updated||Date.now()});
+    await dbPut("meta", S, "settings");
+    await dbPut("meta", index, "index");
+    try{ localStorage.removeItem(k); }catch(e){}
+    toast("Migrated your previous workspace ("+paths.length+" file(s)) to IndexedDB");
+    return id;
+  }
+  return null;
 }
+
+async function boot(){
+  try{ db = await idbOpen(); }
+  catch(e){ dbBroken = e.message||e; console.warn("IndexedDB unavailable:", dbBroken); }
+
+  if(navigator.storage && navigator.storage.persisted){
+    try{ persisted = await navigator.storage.persisted(); }catch(e){}
+    if(!persisted && navigator.storage.persist){
+      try{ persisted = await navigator.storage.persist(); }catch(e){}
+    }
+  }
+
+  const savedS = await dbGet("meta","settings");
+  if(savedS) S = Object.assign({}, SDEF, savedS);
+  index = (await dbGet("meta","index")) || [];
+
+  let migrated = null;
+  if(!index.length) migrated = await migrateLocalStorage();
+
+  /* Model ids drifted across versions; normalise dotted forms. */
+  if(/\./.test(S.model)) S.model = S.model.replace(/\./g,"-");
+  if(!MODELS.some(m=>m.id===S.model)) S.model = MODELS[0].id;
+  if(/\./.test(S.agentModel||"")) S.agentModel = S.agentModel.replace(/\./g,"-");
+  if(!MODELS.some(m=>m.id===S.agentModel)) S.agentModel = SDEF.agentModel;
+  if(PROXY_BASE && /(^|\.)tabitoken\.com/.test(hostOf(S.base))) S.base = defaultBase();
+
+  if(!index.length){ await createChat("New chat", false); }
+  const want = migrated || (await dbGet("meta","active"));
+  await switchChat(index.some(c=>c.id===want) ? want : index[0].id, true);
+  await refreshQuota();
+}
+boot().catch(e=>{
+  console.error(e);
+  document.body.insertAdjacentHTML("afterbegin",
+    `<div style="padding:14px;background:#2a1114;color:#f2a0a8;font:13px/1.6 system-ui">
+     <b>Startup failed:</b> ${esc(String(e.message||e))}<br>
+     Storage may be blocked. Try a normal (non-private) window, or clear this site's data.</div>`);
+});
 </script>
 </body>
 </html>
