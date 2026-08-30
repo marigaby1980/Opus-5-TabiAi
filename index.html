@@ -30,7 +30,7 @@ select{cursor:pointer}
 header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--line);flex:none}
 .brand{font-weight:700;letter-spacing:.3px}
 .brand span{color:var(--acc)}
-.pill{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:2px 9px;white-space:nowrap}
+.pill{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:2px 9px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
 header select{width:auto;min-width:180px}
 #reasonWrap{display:flex;gap:6px;align-items:center}
 #reasonWrap.hide{display:none}
@@ -38,6 +38,7 @@ header select{width:auto;min-width:180px}
 #banner{display:none;flex:none;align-items:center;gap:10px;padding:8px 14px;background:#2a1f10;border-bottom:1px solid #4a3a1c;color:#e8cf9a;font-size:13px}
 #banner.on{display:flex}
 #banner b{color:#f0dcae}
+#banner .mono{font-size:12px}
 
 main{flex:1;display:flex;min-height:0}
 .pane{display:flex;flex-direction:column;min-width:0;min-height:0}
@@ -189,13 +190,14 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
   <h3>Settings</h3>
   <div class="f"><label>Base URL</label><input id="sBase">
     <div class="sub">Requests go to <span class="mono">{base}/chat/completions</span>.
-    <b>tabitoken.com blocks direct browser POSTs</b>, so on a hosted page this must point at your own proxy,
+    <b>tabitoken.com refuses browser POSTs</b>, so on a hosted page this must be your Worker,
     e.g. <span class="mono">https://name.workers.dev/v1</span>.</div></div>
   <div class="f"><label>API key or app token</label><input id="sKey" type="password" autocomplete="off">
-    <div class="sub">Sent as <span class="mono">Authorization: Bearer …</span>. If your proxy holds the real
-    TaBiAI key, put your proxy password here instead. <b>Anything saved in this file is public once deployed.</b></div></div>
+    <div class="sub">Sent as <span class="mono">Authorization: Bearer …</span>. With a Worker this is your
+    <span class="mono">APP_TOKEN</span>, not the real TaBiAI key.
+    <b>Anything hardcoded in this file is public once deployed.</b></div></div>
   <div class="f"><label>URL-wrapping proxy (optional)</label><input id="sProxy" placeholder="https://proxy.example/?url=">
-    <div class="sub">Only for generic proxies that take the target as a query param. Leave blank when using a Worker as the base URL.</div></div>
+    <div class="sub">Only for generic proxies that take the target as a query param. Leave blank when using a Worker.</div></div>
   <div class="f"><label>System prompt</label><textarea id="sSys" rows="5" class="mono" style="font-size:12px"></textarea></div>
   <div class="f"><label>Max output tokens</label><input id="sMax" type="number" min="256" step="256"></div>
   <div class="f"><label><input type="checkbox" id="sTools" style="width:auto"> Enable disk / library tools</label></div>
@@ -216,8 +218,11 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
 <script>
 /* ============================================================
-   Models — wire IDs use dashes (claude-opus-4-8); dotted IDs 403.
+   ①  SET THIS to your Worker, including the /v1 suffix.
    ============================================================ */
+const PROXY_BASE = "";   // e.g. "https://opus-proxy.marigaby1980.workers.dev/v1"
+
+/* Wire IDs use dashes. Dotted forms (claude-opus-4.8) return 403. */
 const MODELS = [
   {id:"claude-opus-5-thinking",   label:"claude-opus-5-thinking"},
   {id:"claude-opus-5",            label:"claude-opus-5"},
@@ -248,18 +253,17 @@ Rules:
 - Keep code accessible (labels, roles, keyboard support, sufficient contrast) and avoid unsafe patterns.
 - After using tools, briefly tell the user what you changed. Don't re-dump entire file contents you just wrote.`;
 
-/* Base URL default: localhost gets the same-origin Node proxy; anything else
-   needs an explicit proxy, and the banner will say so. */
 function defaultBase(){
+  if(PROXY_BASE) return PROXY_BASE.replace(/\/+$/,"");
   const h = location.hostname;
   if(h==="localhost" || h==="127.0.0.1") return location.origin + "/api/v1";
   return "https://tabitoken.com/v1";
 }
 
-/* ⚠ Replace with key:"" before committing to a repo whose Pages site is public. */
+/* key stays empty: this file is public once deployed. Enter the APP_TOKEN in Settings. */
 const SDEF = {
   base: defaultBase(),
-  key: "sk-uc3KQXTrrfQsCWl0cdD6FmGJm3EtN2jKJQjqGyW8vZVNJyP8",
+  key: "",
   proxy:"", sys:DEFAULT_SYS, max:8192, tools:true,
   model:MODELS[0].id, reason:"medium"
 };
@@ -273,10 +277,12 @@ function load(){
   S    = Object.assign({}, SDEF, raw.settings||{});
   disk = Object.assign({files:{}, libs:[]}, raw.disk||{});
   chat = Array.isArray(raw.chat) ? raw.chat : [];
-  // migrate dotted model IDs saved by earlier versions
   if(/\./.test(S.model)) S.model = S.model.replace(/\./g,"-");
   if(!MODELS.some(m=>m.id===S.model)) S.model = MODELS[0].id;
+  // A stale saved base pointing at the gateway can never work in a browser.
+  if(PROXY_BASE && /(^|\.)tabitoken\.com/.test(hostOf(S.base))) S.base = defaultBase();
 }
+function hostOf(u){ try{ return new URL(u, location.href).hostname; }catch(e){ return ""; } }
 function save(){
   try{ localStorage.setItem(LS, JSON.stringify({settings:S, disk, chat})); }
   catch(e){ toast("Storage full — disk not saved"); }
@@ -296,15 +302,15 @@ function norm(p){ return String(p||"").replace(/^\.?\//,"").replace(/\/{2,}/g,"/
 /* ============================================================
    Environment banner
    ============================================================ */
-function directToGateway(){
-  try{ return new URL(S.base).hostname.endsWith("tabitoken.com"); }catch(e){ return false; }
-}
+function directToGateway(){ return /(^|\.)tabitoken\.com$/.test(hostOf(S.base)); }
 function checkEnv(){
   let msg = "";
   if(location.protocol === "file:"){
-    msg = "<b>Opened as a file://</b> — its origin is <span class='mono'>null</span>, which CORS always rejects. Serve this over http(s) instead.";
+    msg = "<b>Opened as file://</b> — its origin is <span class='mono'>null</span>, which CORS always rejects. Serve this over http(s).";
   } else if(directToGateway() && !S.proxy){
-    msg = "<b>No proxy configured.</b> tabitoken.com refuses POST requests from browsers, so chat will fail. Point the base URL at your own proxy.";
+    msg = "<b>No proxy configured.</b> tabitoken.com refuses POSTs from browsers, so chat will fail. Set the base URL to your Worker.";
+  } else if(!S.key){
+    msg = "<b>No token set.</b> Open Settings and enter your Worker's <span class='mono'>APP_TOKEN</span>.";
   }
   $("banner").classList.toggle("on", !!msg);
   $("bannerText").innerHTML = msg;
@@ -400,7 +406,7 @@ async function installLibrary(name, version, path){
 }
 
 /* ============================================================
-   Preview builder
+   Preview builder — relative refs become blob URLs
    ============================================================ */
 let blobUrls = [];
 function revokeBlobs(){ blobUrls.forEach(u=>URL.revokeObjectURL(u)); blobUrls=[]; }
@@ -666,8 +672,7 @@ function buildBody(withExtras){
     if(r.budget > 0){
       b.reasoning_effort = r.effort;
       b.thinking = {type:"enabled", budget_tokens: r.budget};
-      // Anthropic requires max_tokens > budget_tokens
-      b.max_tokens = Math.max(b.max_tokens, r.budget + 4096);
+      b.max_tokens = Math.max(b.max_tokens, r.budget + 4096);  // must exceed the budget
     } else {
       b.reasoning_effort = "none";
     }
@@ -687,8 +692,7 @@ async function streamOnce(withExtras, onDelta){
     });
   }catch(e){
     if(e.name === "AbortError") throw e;
-    const err = new Error("network");
-    err.network = true; err.detail = e.message;
+    const err = new Error("network"); err.network = true; err.detail = e.message;
     throw err;
   }
   if(!res.ok){
@@ -738,20 +742,34 @@ async function streamOnce(withExtras, onDelta){
   return {content, reasoning, calls: calls.filter(Boolean)};
 }
 
+/* Reports which layer rejected the request, and always shows the raw body. */
 function failureNote(e){
   if(e.network){
     return "**Request failed — could not reach the API.**\n\n"+
-      "The browser blocked it or the host refused the connection (`"+esc(e.detail||"")+"`).\n\n"+
+      "The browser blocked it or the host refused the connection (`"+String(e.detail||"")+"`).\n\n"+
       (location.protocol==="file:"
         ? "This page is on `file://`, whose origin is `null`. CORS rejects that unconditionally — serve it over http(s)."
         : directToGateway()
-          ? "The base URL points straight at `tabitoken.com`, which refuses browser POSTs. Set the base URL to your own proxy in Settings."
-          : "Check that your proxy is running and that it returns `Access-Control-Allow-Origin` for this origin.");
+          ? "The base URL points straight at `tabitoken.com`, which refuses browser POSTs. Set the base URL to your Worker."
+          : "Check that the Worker is deployed and that it returns `Access-Control-Allow-Origin` for `"+location.origin+"`.");
   }
   if(e.status===401 || e.status===403){
-    return "**Rejected — "+e.status+".**\n\nEither the key/token is wrong, or the model ID isn't available on this key. "+
-           "Note the wire IDs use dashes (`claude-opus-4-8`); dotted forms return 403.";
+    const raw = String(e.raw||"");
+    let cause;
+    if(/origin not allowed/i.test(raw))
+      cause = "Your **Worker** rejected this page's origin. `ALLOWED_ORIGIN` must be exactly `"+location.origin+"` — scheme and host only, no trailing slash and no repo path. Redeploy after changing it.";
+    else if(/bad app token/i.test(raw))
+      cause = "Your **Worker** rejected the token from Settings. It must match the `APP_TOKEN` secret exactly.";
+    else if(/TABI_KEY is not bound/i.test(raw))
+      cause = "The **Worker** has no `TABI_KEY` bound. Add the secret, then redeploy.";
+    else if(/invalid token|new_api_error/i.test(raw))
+      cause = "**TaBiAI** rejected the key the Worker forwarded — the key itself is wrong or out of credit.";
+    else
+      cause = "Unrecognized rejection — see the raw response below.";
+    return "**Rejected — HTTP "+e.status+".**\n\n"+cause+"\n\n```\n"+(raw.slice(0,600)||"(empty body)")+"\n```";
   }
+  if(e.status===429) return "**Rate limited (429).** Wait a moment and retry.\n\n```\n"+String(e.raw||"").slice(0,400)+"\n```";
+  if(e.status>=500) return "**Upstream error ("+e.status+").**\n\n```\n"+String(e.raw||"").slice(0,600)+"\n```";
   return "**Request failed** — "+String(e.message||e);
 }
 
@@ -759,7 +777,7 @@ async function send(){
   if(busy) return;
   const text = $("ta").value.trim();
   if(!text) return;
-  if(!S.key){ toast("Set an API key or app token in Settings"); return; }
+  if(!S.key){ toast("Set your app token in Settings"); $("btnSet").click(); return; }
 
   $("ta").value=""; $("ta").style.height="";
   chat.push({role:"user",content:text});
@@ -834,9 +852,7 @@ function syncHeader(){
   $("model").value = S.model;
   $("reason").value = S.reason;
   $("reasonWrap").classList.toggle("hide", !isThinkingModel(S.model));
-  let h = S.base;
-  try{ h = new URL(S.base, location.href).host; }catch(e){}
-  $("hostPill").textContent = h;
+  $("hostPill").textContent = hostOf(S.base) || S.base;
   $("hostPill").title = S.base;
 }
 $("model").onchange  = e => { S.model=e.target.value; save(); syncHeader(); };
