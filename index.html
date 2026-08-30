@@ -568,7 +568,7 @@ function buildPreview(entry){ revokeBlobs(); return blobFor(entry, composeHtml(e
    Playtest harness — injected into the app frame
    ============================================================ */
 function HARNESS(sid){
-return <script>
+return `<script>
 (function(){
 var SID=${JSON.stringify(sid)};
 var errors=[];
@@ -882,9 +882,10 @@ addEventListener("message",function(ev){
 });
 post({ready:true});
 })();
-</script>
-  ;
+<\/script>
+`;
 }
+
 /* ============================================================
    Playtest sessions
    ============================================================ */
