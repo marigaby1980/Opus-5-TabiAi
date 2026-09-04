@@ -27,12 +27,13 @@ select{cursor:pointer}
 .sp{flex:1}
 .mono{font-family:var(--mono)}
 
-header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--line);flex:none}
+header{display:flex;align-items:center;gap:9px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--line);flex:none}
 .brand{font-weight:700;letter-spacing:.3px}
 .brand span{color:var(--acc)}
 .pill{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:2px 9px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
-#chatPill{border-color:#33405a;color:#c3d3ee;max-width:230px}
-header select{width:auto;min-width:172px}
+#chatPill{border-color:#33405a;color:#c3d3ee;max-width:210px}
+#usePill{border-color:#2e4038;color:#a8d8c2;cursor:help}
+header select{width:auto;min-width:168px}
 #reasonWrap{display:flex;gap:6px;align-items:center}
 #reasonWrap.hide{display:none}
 
@@ -43,14 +44,13 @@ header select{width:auto;min-width:172px}
 
 main{flex:1;display:flex;min-height:0}
 .pane{display:flex;flex-direction:column;min-width:0;min-height:0}
-#left{width:288px;flex:none;background:var(--bg2);border-right:1px solid var(--line)}
-#center{flex:1}
+#left{width:290px;flex:none;background:var(--bg2);border-right:1px solid var(--line)}
+#center{flex:1;position:relative}
 #right{width:48%;flex:none;background:var(--bg2);border-left:1px solid var(--line)}
 #right.collapsed{display:none}
 .paneHead{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;flex:none}
-.paneHead.sub{border-top:1px solid var(--line)}
 .scroll{overflow:auto;flex:1;min-height:0}
-#chatWrap{flex:none;max-height:196px;overflow:auto;border-bottom:1px solid var(--line)}
+#chatWrap{flex:none;max-height:176px;overflow:auto;border-bottom:1px solid var(--line)}
 #quotaLine{flex:none;font-size:10.5px;color:var(--dim);padding:4px 10px 6px;font-family:var(--mono);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px}
 #quotaBar{flex:1;height:3px;background:#22282f;border-radius:2px;overflow:hidden}
 #quotaFill{height:100%;width:0;background:var(--ok)}
@@ -79,6 +79,14 @@ main{flex:1;display:flex;min-height:0}
 .lib b{color:var(--ok);font-weight:600}
 .empty{color:var(--dim);font-size:12px;padding:12px 10px;line-height:1.6}
 
+.todo{display:flex;gap:7px;align-items:flex-start;padding:4px 10px;font-size:12px;line-height:1.45}
+.todo .bx{flex:none;width:12px;text-align:center;font-family:var(--mono)}
+.todo.done{color:var(--dim)}
+.todo.done .tx{text-decoration:line-through}
+.todo.active{color:#cfe0f7}
+.todo.active .bx{color:var(--acc2)}
+.todo.blocked .bx{color:var(--bad)}
+
 .agent{display:flex;gap:7px;align-items:center;padding:5px 10px;font-size:12px;cursor:pointer}
 .agent:hover{background:var(--bg3)}
 .agent .dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--dim)}
@@ -92,8 +100,10 @@ main{flex:1;display:flex;min-height:0}
 @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
 
 #msgs{padding:18px 20px 8px}
-.msg{max-width:820px;margin:0 auto 18px}
-.who{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.msg{max-width:830px;margin:0 auto 18px;position:relative}
+.who{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.who .ck{opacity:0;font-size:10px;text-transform:none;letter-spacing:0;cursor:pointer;color:var(--acc2);background:none;border:0;padding:0}
+.msg:hover .who .ck{opacity:1}
 .msg.user .bubble{background:var(--bg3);border:1px solid var(--line);border-radius:10px;padding:10px 12px;white-space:pre-wrap}
 .bubble{word-wrap:break-word;overflow-wrap:anywhere}
 .bubble h1,.bubble h2,.bubble h3{margin:.9em 0 .4em;line-height:1.3}
@@ -113,14 +123,30 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 .tcall.agentcall{background:#141024;border-color:#332a5c;color:var(--vio)}
 .tcall.webcall{background:#101a26;border-color:#24405e;color:#9dc4ef}
 .tcall.testcall{background:#1a1526;border-color:#3d2f5e;color:#cbb6f5}
+.tcall.plancall{background:#1c1a10;border-color:#4a4320;color:#e6d69a}
 .tcall .arg{color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .shots{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-.shots img{max-width:190px;max-height:140px;border:1px solid var(--line);border-radius:7px;cursor:zoom-in;background:#fff}
+.shots figure{margin:0;text-align:center}
+.shots img{max-width:186px;max-height:140px;border:1px solid var(--line);border-radius:7px;cursor:zoom-in;background:#fff;display:block}
+.shots figcaption{font-size:10px;color:var(--dim);font-family:var(--mono);margin-top:2px}
 
-#composer{flex:none;border-top:1px solid var(--line);background:var(--bg2);padding:10px 20px 12px}
-#composerInner{max-width:820px;margin:0 auto}
+#composer{flex:none;border-top:1px solid var(--line);background:var(--bg2);padding:8px 20px 12px}
+#composerInner{max-width:830px;margin:0 auto}
 #ta{resize:none;min-height:52px;max-height:200px;background:var(--bg3)}
 .hint{font-size:11px;color:var(--dim);margin-top:5px}
+#tray{display:none;gap:6px;flex-wrap:wrap;margin-bottom:7px}
+#tray.on{display:flex}
+.chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:3px 6px;font-size:11.5px;max-width:250px}
+.chip img{width:30px;height:30px;object-fit:cover;border-radius:4px;background:#fff;cursor:zoom-in}
+.chip .ic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:#0b0d10;border-radius:4px;font-size:15px}
+.chip .meta{min-width:0}
+.chip .nm{font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.chip .sub{color:var(--dim);font-size:10px}
+.chip .rm{background:none;border:0;color:var(--dim);cursor:pointer;padding:0 2px}
+.chip .rm:hover{color:var(--bad)}
+.chip.busy{opacity:.6}
+#drop{position:absolute;inset:0;background:#0e1013e8;border:2px dashed var(--acc2);border-radius:10px;display:none;align-items:center;justify-content:center;z-index:30;font-size:15px;color:#cfe0f7;text-align:center;padding:30px}
+#drop.on{display:flex}
 
 .tabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid var(--line);flex:none;overflow:auto}
 .tab{font-size:12px;padding:4px 9px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--dim);white-space:nowrap;cursor:pointer;font-family:var(--mono)}
@@ -170,16 +196,17 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 <header>
   <div class="brand">Opus<span>Studio</span></div>
   <span class="pill" id="chatPill" title="Active chat">…</span>
+  <span class="pill" id="usePill" title="Estimated tokens and cost this chat">0 tok</span>
   <span class="pill" id="hostPill">…</span>
   <select id="model" title="Orchestrator model"></select>
   <div id="reasonWrap">
     <span style="font-size:12px;color:var(--dim)">Reasoning</span>
-    <select id="reason" style="min-width:118px"></select>
+    <select id="reason" style="min-width:112px"></select>
   </div>
   <div class="sp"></div>
-  <button class="ghost" id="btnArt" title="Toggle artifacts panel">▤ Artifacts</button>
-  <button class="ghost" id="btnSet" title="Settings">⚙ Settings</button>
-  <button class="ghost" id="btnNew" title="New chat (new disk)">✚ New chat</button>
+  <button class="ghost" id="btnArt" title="Toggle artifacts panel">▤</button>
+  <button class="ghost" id="btnSet" title="Settings">⚙</button>
+  <button class="ghost" id="btnNew" title="New chat (new disk)">✚ New</button>
 </header>
 
 <div id="banner">
@@ -197,10 +224,10 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
     </div>
     <div id="chatWrap"><div id="chatList"></div></div>
 
-    <div class="paneHead sub" style="border-top:0">Disk <span class="sp"></span>
+    <div class="paneHead">Disk <span class="sp"></span>
       <button class="ghost" id="btnNewFile" title="New file">＋</button>
       <button class="ghost" id="btnImport" title="Import files into this chat's disk">⭳</button>
-      <button class="ghost" id="btnExport" title="Export this chat (files, libraries, transcript)">⭱</button>
+      <button class="ghost" id="btnExport" title="Export this chat">⭱</button>
     </div>
     <div id="quotaLine" title="Browser storage used by all chats">
       <span id="quotaText">storage…</span><span id="quotaBar"><span id="quotaFill"></span></span>
@@ -208,6 +235,8 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
     <div class="scroll">
       <div id="fileList"></div>
+      <div class="secTitle">Plan <span class="sp"></span><span id="todoCount" style="text-transform:none;letter-spacing:0"></span></div>
+      <div id="todoList"></div>
       <div class="secTitle">Sub-agents <span class="sp"></span><span id="agentBudget" style="text-transform:none;letter-spacing:0"></span></div>
       <div id="agentList"></div>
       <div class="secTitle">Playtest sessions</div>
@@ -220,11 +249,15 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
 
   <section class="pane" id="center">
     <div class="scroll" id="msgs"></div>
+    <div id="drop">Drop images, GIFs, video, or files here<br><span style="font-size:12px;color:var(--dim)">images are sent to the model · video and GIF become keyframes · everything lands on this chat's disk</span></div>
     <div id="composer"><div id="composerInner">
-      <textarea id="ta" placeholder="Ask anything. Each chat has its own disk. The model can research, build, playtest with real input, and screenshot the result."></textarea>
+      <div id="tray"></div>
+      <textarea id="ta" placeholder="Ask anything. Drop or paste images, GIFs, video, and files. ⌘/Ctrl+Enter sends."></textarea>
       <div class="row" style="margin-top:7px">
+        <button class="ghost" id="btnAttach" title="Attach files">📎</button>
         <span class="hint" id="status">Ready</span>
         <div class="sp"></div>
+        <button id="btnCompact" title="Summarize older turns to free context">⤵ Compact</button>
         <button id="btnStop" style="display:none">■ Stop all</button>
         <button class="primary" id="btnSend">Send ↵</button>
       </div>
@@ -269,25 +302,36 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
     <div class="sub">Chat goes to <span class="mono">{base}/chat/completions</span>; web tools use the same host at
     <span class="mono">/tools/*</span>. <b>tabitoken.com refuses browser POSTs</b>, so this must be your Worker.</div></div>
   <div class="f"><label>API key or app token</label><input id="sKey" type="password" autocomplete="off">
-    <div class="sub">Sent as <span class="mono">Authorization: Bearer …</span>. With a Worker this is your
-    <span class="mono">APP_TOKEN</span>. <b>Anything hardcoded in this file is public once deployed.</b></div></div>
+    <div class="sub">Sent as <span class="mono">Authorization: Bearer …</span>. Either your Worker's
+    <span class="mono">APP_TOKEN</span>, or an <span class="mono">sk-…</span> key if the Worker allows passthrough.
+    <b>Never hardcode a key in this file — a Pages site is public.</b></div></div>
   <div class="f"><label>URL-wrapping proxy (optional)</label><input id="sProxy" placeholder="https://proxy.example/?url="></div>
-  <div class="f"><label>System prompt (orchestrator)</label><textarea id="sSys" rows="5" class="mono" style="font-size:12px"></textarea></div>
+  <div class="f"><label>Models</label>
+    <div class="sub" id="modelInfo" style="margin-top:0"></div>
+    <div class="row" style="margin-top:8px"><button id="btnRefreshModels">Re-check available models</button></div></div>
+  <div class="f"><label>System prompt (orchestrator)</label><textarea id="sSys" rows="5" class="mono" style="font-size:12px"></textarea>
+    <div class="sub"><button id="btnResetSys" style="padding:2px 8px;font-size:11px">Reset to default</button></div></div>
   <div class="f"><label>Max output tokens</label><input id="sMax" type="number" min="256" step="256"></div>
   <div class="f"><label><input type="checkbox" id="sTools" style="width:auto"> Disk, library, and sandbox tools</label></div>
   <div class="f"><label><input type="checkbox" id="sWeb" style="width:auto"> Web tools (TinyFish search &amp; fetch, Wikipedia, npm)</label>
     <div class="sub">Needs a <span class="mono">TINYFISH_KEY</span> secret on your Worker. Free; 30 searches/min, 150 URLs/min.</div></div>
-  <div class="f"><label><input type="checkbox" id="sTest" style="width:auto"> Playtest tools (keyboard, mouse, DOM inspection)</label>
-    <div class="sub">Runs your app in a visible frame the model drives. Watch it in the Artifacts panel.</div></div>
-  <div class="f"><label><input type="checkbox" id="sVision" style="width:auto"> Send screenshots to the model (vision)</label>
-    <div class="sub">Roughly 1–2k input tokens per image. <b>Requires a funded balance</b> — image requests hold more credit
-    than text. If the gateway rejects images this turns itself off and the model falls back to <span class="mono">inspect_dom</span>.</div></div>
-  <div class="f"><label>Screenshot width (px, downscaled before sending)</label><input id="sShotW" type="number" min="320" max="1600" step="32"></div>
+  <div class="f"><label><input type="checkbox" id="sTest" style="width:auto"> Playtest tools (keyboard, mouse, DOM inspection)</label></div>
+  <div class="f"><label><input type="checkbox" id="sVision" style="width:auto"> Send images to the model (vision)</label>
+    <div class="sub">Verified working on this gateway with JPEG, PNG, WebP, and GIF via <span class="mono">image_url</span>.
+    Roughly 1–2k input tokens per image.</div></div>
+  <div class="f"><label>Image width sent to the model (px)</label><input id="sShotW" type="number" min="320" max="1600" step="32">
+    <div class="sub">Screenshots and uploads are downscaled to this width. Larger costs more tokens.</div></div>
+  <div class="f"><label>Keyframes per video / GIF</label><input id="sFrames" type="number" min="1" max="16" step="1">
+    <div class="sub">Video and animated GIF are decoded in your browser into this many stills — the gateway silently
+    discards native video blocks, so frames are the only thing that actually reaches the model.</div></div>
   <div class="f"><label><input type="checkbox" id="sAgents" style="width:auto"> Sub-agents</label>
     <div class="sub">Each step is a full billed request carrying the gateway's ~6.5k-token prompt floor.
     <b>One message can fan out to dozens.</b> Ceilings: depth <span id="limTxt"></span>.</div></div>
   <div class="f"><label>Default sub-agent model</label><select id="sAgentModel"></select></div>
   <div class="f"><label>Max sub-agents per message</label><input id="sMaxAgents" type="number" min="1" max="40" step="1"></div>
+  <div class="f"><label><input type="checkbox" id="sConfirmDel" style="width:auto"> Ask me before the model deletes or overwrites many files</label></div>
+  <div class="f"><label><input type="checkbox" id="sAutoCompact" style="width:auto"> Auto-compact when the transcript gets long</label>
+    <div class="sub">Summarizes older turns with the cheap model so long sessions keep working. Costs one extra request.</div></div>
   <div class="row"><button class="ghost" id="btnWipe">Delete every chat</button><div class="sp"></div>
     <button id="setCancel">Cancel</button><button class="primary" id="setSave">Save</button></div>
 </div></div>
@@ -307,7 +351,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
   <div class="row" style="margin-top:12px"><div class="sp"></div><button id="agClose">Close</button></div>
 </div></div>
 
-<div id="lightbox"><img id="lightboxImg" alt="Screenshot"></div>
+<div id="lightbox"><img id="lightboxImg" alt="Preview"></div>
 <iframe id="sandbox" sandbox="allow-scripts"></iframe>
 <div id="hidden"></div>
 <div id="toast"></div>
@@ -318,14 +362,23 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
    ============================================================ */
 const PROXY_BASE = "";   // e.g. "https://opus-proxy.marigaby1980.workers.dev/v1"
 
+/* Known models. Availability is re-checked against /v1/models at boot,
+   because a given key may only have a subset provisioned. */
 const MODELS = [
   {id:"claude-opus-5-thinking",   label:"claude-opus-5-thinking"},
   {id:"claude-opus-5",            label:"claude-opus-5"},
   {id:"claude-opus-4-8-thinking", label:"claude-opus-4.8-thinking"},
   {id:"claude-opus-4-8",          label:"claude-opus-4.8"}
 ];
+/* USD per 1M tokens — published rates, used for estimates only. */
+const PRICES = {
+  "claude-opus-5":{in:3,out:3}, "claude-opus-5-thinking":{in:3,out:3},
+  "claude-opus-4-8":{in:1,out:5}, "claude-opus-4-8-thinking":{in:1,out:5}
+};
+let available = null;            // Set of ids the key can reach, or null until checked
 const labelOf = id => (MODELS.find(m=>m.id===id)||{}).label || id;
 const isThinkingModel = m => /-thinking$/.test(m);
+const canUse = id => !available || available.has(id);
 
 const REASONING = {
   off:    {label:"Off",     effort:null,     budget:0},
@@ -335,60 +388,67 @@ const REASONING = {
   max:    {label:"Maximum", effort:"high",   budget:60000}
 };
 
-const AGENT = { maxDepth:2, maxConcurrent:3, maxSteps:12, maxPerCall:6 };
-const H2C = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+const AGENT = { maxDepth:2, maxConcurrent:3, maxSteps:14, maxPerCall:6 };
+const H2C   = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs";
+const PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs";
+const HISTORY_DEPTH = 12;        // versions kept per file for revert
 
 const DEFAULT_SYS =
-`You are the orchestrator in Opus Studio, a browser IDE. You have a virtual disk, npm library installation, web research, a JavaScript sandbox, a playtest harness that drives real input into your apps, and a team of sub-agents.
+`You are the orchestrator in Opus Studio, a browser IDE. You have a virtual disk, npm library installation, web research, a JavaScript sandbox, a playtest harness that drives real input into your apps, a plan tracker, and a team of sub-agents.
 
-The disk belongs to the current chat. Other chats have their own separate disks that you cannot see. Never assume a file exists because it was mentioned in a different conversation — check with disk_tree or disk_list.
+The disk belongs to the current chat. Other chats have separate disks you cannot see. Never assume a file exists because it was mentioned elsewhere — check with disk_tree or disk_glob.
 
-Disk and build rules:
-- When asked to build anything, WRITE IT TO THE DISK with disk_write instead of only pasting it in chat. Files become live artifacts the user can preview and edit.
-- Web apps: the entry point must be an .html file. Reference sibling files with plain relative paths ("app.js", "styles.css") — the preview resolves them.
-- Installed libraries are auto-injected into every previewed HTML file. Never add your own CDN <script> tag for something you installed with install_library.
-- Read a file before editing it. Prefer disk_edit over rewriting a whole file. Use disk_grep to locate code instead of reading every file. For very large files, a line range keeps your context smaller.
+## Working method
+- For anything requiring more than about three steps, call todo_write first with a short plan, then keep it current: exactly one item "active" at a time, mark items "done" as you finish them. The user watches this list. Do not narrate the plan in prose as well.
+- Investigate before you edit. disk_glob to find files, disk_grep to locate code, disk_read to confirm. Never edit a file you have not read in this session.
+- Prefer disk_edit over disk_write for existing files: it patches exact substrings and takes a batch of edits in one call. disk_write replaces the whole file and loses anything you did not include.
+- Every write is versioned. If you break something, disk_revert restores the previous content — say so rather than trying to reconstruct it from memory.
+- After changing a web app, verify it: playtest for behaviour, check_app for a quick boot check, inspect_dom for layout. Fix what they report, then re-run. Do not claim something works because the code looks right.
+- Keep going until the task is actually finished. If you hit a wall twice, stop patching and say what you tried, what failed, and what you propose instead.
 
-Playtesting — you are expected to actually test what you build, not just claim it works:
-- playtest opens the app in a real frame and runs a list of steps: click, click_at, type, key, keys, hold, hover, scroll, drag, set, wait, wait_for, assert, eval, and screenshot. You have the whole keyboard, including arrows, Enter, Escape, Tab, modifiers, and held keys for games.
-- Pass keep_open:true and reuse the returned session id to keep driving the same live instance across several calls. State persists between calls; a fresh path always starts clean.
-- Every playtest reports runtime errors, console errors, and failed assertions. Fix what it finds, then re-run before reporting success.
-- For games and canvas apps, drive with hold (e.g. hold ArrowRight for 400ms) and click_at coordinates, then screenshot to confirm something actually moved.
-- After a UI change, take a screenshot and look at it. If vision is unavailable the tool will say so — use inspect_dom instead, which gives exact geometry, text, colours, and overflow, and is cheaper than an image.
-- Use inspect_dom rather than a screenshot when the question is "is this laid out correctly", "is this element visible", or "what does this element contain".
-- Close sessions with session_close when finished.
+## Building
+- Write files to the disk with disk_write; do not paste finished code into chat as the deliverable. Files become live artifacts the user can preview and edit.
+- Web apps: the entry point must be an .html file. Reference siblings with plain relative paths ("app.js", "styles.css") — the preview resolves them.
+- Libraries installed with install_library are auto-injected into previewed HTML. Never add your own CDN script tag for one.
+- Match the conventions already in the file you are editing rather than importing your own style.
 
-Research rules:
-- Search when the answer depends on current facts, versions, or prices. Don't guess at API details you can verify.
-- web_search returns snippets only — previews, not evidence. Call web_fetch before asserting a fact from them.
-- web_fetch takes up to 10 URLs at once; batch them into one call rather than one per step.
-- Pass a "purpose" to search and fetch describing the task behind the request; it improves result quality.
-- Cite the URLs you actually read.
+## Seeing
+- You can see images the user uploads and screenshots you take. Describe what is actually there; do not guess at content you were not shown.
+- Video and animated GIF arrive as labelled keyframes with timestamps, not as motion. Reason about the sequence, and say so if a question needs motion you cannot observe.
+- inspect_dom is exact and cheaper than a screenshot for "is this laid out right", "is this visible", "what does this contain".
 
-Compute rules:
-- Use run_js for arithmetic, data transforms, and parsing. Don't do multi-step math in your head. It has no disk or network access.
+## Research
+- Search when the answer depends on current facts, versions, or prices. Do not guess at API details you can verify.
+- web_search returns snippets — previews, not evidence. web_fetch takes up to 10 URLs at once; batch them into one call.
+- Pass a "purpose" to search and fetch describing the underlying task; it improves result quality. Cite the URLs you actually read.
 
-Delegation policy — sub-agents cost real money, so delegate deliberately:
-- Delegate when work fans out across independent pieces, or when a subtask needs a lot of reading whose details you don't need. Research parallelizes well; so does building several independent files.
-- Do NOT delegate what you can finish in one or two tool calls.
-- Send independent agents in ONE spawn_agents call so they run in parallel.
-- Each agent starts blank: it cannot see this conversation or ask the user anything. Its task must be self-contained — goal, exact file paths, conventions, and what to report.
-- Give each agent a disjoint set of files. Two agents writing the same path will clobber each other.
-- Verify agent work with disk_read or playtest when it matters, then summarize for the user yourself.`;
+## Compute
+- Use run_js for arithmetic, data transforms, and parsing rather than doing multi-step math in your head. It has no disk or network access.
+
+## Delegation
+- Sub-agents cost real money per step. Delegate when work fans out across independent pieces, or when a subtask needs a lot of reading whose details you do not need. Do not delegate what you can finish in one or two calls.
+- Put independent agents in ONE spawn_agents call so they run in parallel.
+- Each agent starts blank: it cannot see this conversation or ask questions. Its task must be self-contained — goal, exact file paths, conventions, and what to report. Give each a disjoint set of files; two agents writing one path will clobber each other.
+- Verify agent work yourself when it matters, then summarize for the user.
+
+## Reporting
+- Lead with the outcome. Name the files you changed. Mention what you verified and what you could not. Skip preamble and self-congratulation.`;
 
 const AGENT_SYS = rec =>
 `You are "${rec.name}", an autonomous sub-agent in Opus Studio, at depth ${rec.depth} of ${AGENT.maxDepth}.
 
 You share one virtual disk with the orchestrator and your siblings. You have the same tools: files, npm libraries, web search and fetch, a JS sandbox, and the playtest harness.
 
-Operating rules:
-- You cannot talk to the user and cannot ask questions. If something is ambiguous, pick the most reasonable reading, proceed, and note the assumption in your report.
+Rules:
+- You cannot talk to the user and cannot ask questions. If something is ambiguous, choose the most reasonable reading, proceed, and record the assumption in your report.
 - Do the work with tools. Code written into your reply instead of onto the disk did not happen.
 - Stay inside your assigned scope. Do not touch files outside it — a sibling is probably editing them right now.
-- If you build UI, playtest it and fix what the harness reports before finishing.
+- Read before editing. Prefer disk_edit with a batch of edits over rewriting whole files.
+- If you build or change UI, playtest it and fix what the harness reports before finishing.
 - Batch URLs into one web_fetch call and verify before asserting facts.
-- You have at most ${AGENT.maxSteps} steps. Don't re-read files you already read.
-- Finish with a final message containing no tool calls: what you did, paths written, URLs used, test results, anything incomplete, and any assumption made. That report is all your caller sees.`;
+- You have at most ${AGENT.maxSteps} steps. Do not re-read files you already read.
+- Finish with a final message containing no tool calls: what you did, paths written, URLs used, verification results, anything incomplete, and every assumption you made. That report is all your caller sees.`;
 
 function defaultBase(){
   if(PROXY_BASE) return PROXY_BASE.replace(/\/+$/,"");
@@ -400,17 +460,20 @@ function defaultBase(){
 const SDEF = {
   base: defaultBase(), key:"", proxy:"",
   sys:DEFAULT_SYS, max:8192,
-  tools:true, web:true, test:true, vision:true, visionStyle:"openai", shotW:900,
+  tools:true, web:true, test:true, vision:true, shotW:900, frames:6,
   model:MODELS[0].id, reason:"medium",
-  agents:true, agentModel:"claude-opus-4-8", maxAgents:12
+  agents:true, agentModel:"claude-opus-5", maxAgents:12,
+  confirmDel:true, autoCompact:true
 };
 
-/* Synchronous defaults so nothing is undefined before boot() finishes. */
 let S = Object.assign({}, SDEF);
-let index = [];                       // chat summaries: {id,title,created,updated,files,bytes,msgs}
-let curId = null;                     // active chat id
+let index = [];                       // chat summaries
+let curId = null;
 let chat = [];                        // active transcript
 let disk = {files:{}, libs:[]};       // active chat's resident disk
+let todos = [];                       // plan items for the active chat
+let history = {};                     // path -> [{content,at}] newest first
+let usage = {in:0, out:0, calls:0};   // this chat, this session
 
 /* ============================================================
    Helpers
@@ -419,7 +482,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ext = p => (p.split(".").pop()||"").toLowerCase();
 let toastT;
-function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),3200); }
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),3400); }
 function norm(p){ return String(p||"").replace(/^\.?\//,"").replace(/\/{2,}/g,"/").trim(); }
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
@@ -438,6 +501,9 @@ function fmtWhen(t){
   if(d < 604800000) return Math.floor(d/86400000)+"d ago";
   return new Date(t).toLocaleDateString();
 }
+function hostOf(u){ try{ return new URL(u, location.href).hostname; }catch(e){ return ""; } }
+/* Rough token estimate: ~3.7 chars/token for code-heavy English. */
+const estTok = s => Math.ceil(String(s||"").length / 3.7);
 
 /* ============================================================
    Storage — IndexedDB, with an in-memory fallback
@@ -495,25 +561,23 @@ async function dbDelFiles(chatId){
   await Promise.all(rows.map(k=>wrap(s.delete(k))));
 }
 
-/* Pending-write tracking, so a chat switch or unload never loses data. */
 const inflight = new Set();
 function track(p){
   inflight.add(p);
   p.catch(e=>console.warn("storage write failed:",e)).finally(()=>inflight.delete(p));
   return p;
 }
-async function flushAll(){
-  saveNow();
-  await Promise.allSettled([...inflight]);
-}
+async function flushAll(){ saveNow(); await Promise.allSettled([...inflight]); }
 
 /* Images are stripped before persisting — base64 would bloat every transcript. */
 function storableChat(){
   return chat.map(m=>{
-    if(Array.isArray(m.content))
-      return {...m, content:m.content.map(b =>
-        (b.type==="image_url"||b.type==="image") ? {type:"text",text:"[screenshot — not persisted]"} : b)};
-    return m;
+    const o = {...m};
+    delete o.ckpt;                                     // checkpoints are memory-only
+    if(Array.isArray(o.content))
+      o.content = o.content.map(b =>
+        b.type==="image_url" ? {type:"text",text:"["+(b.__label||"image")+" — not persisted]"} : b);
+    return o;
   });
 }
 
@@ -527,7 +591,7 @@ function saveNow(){
   if(!curId) return;
   const e = index.find(c=>c.id===curId);
   if(e){ e.updated = Date.now(); e.msgs = chat.filter(m=>m.role==="user"||m.role==="assistant").length; }
-  track(dbPut("chats", {id:curId, messages:storableChat(), libs:disk.libs}));
+  track(dbPut("chats", {id:curId, messages:storableChat(), libs:disk.libs, todos, usage}));
   track(dbPut("meta", index, "index"));
   renderChatList();
 }
@@ -538,8 +602,7 @@ function sumCur(){
   e.files = paths.length;
   e.bytes = paths.reduce((n,p)=>n+disk.files[p].content.length, 0);
   e.updated = Date.now();
-  renderChatList();
-  scheduleQuota();
+  renderChatList(); scheduleQuota();
 }
 
 /* ============================================================
@@ -548,13 +611,11 @@ function sumCur(){
 async function createChat(title, activate){
   const rec = {id:uid(), title:title||"New chat", created:Date.now(), updated:Date.now(), files:0, bytes:0, msgs:0};
   index.unshift(rec);
-  await dbPut("chats", {id:rec.id, messages:[], libs:[]});
+  await dbPut("chats", {id:rec.id, messages:[], libs:[], todos:[], usage:{in:0,out:0,calls:0}});
   await dbPut("meta", index, "index");
-  if(activate) await switchChat(rec.id, true);
-  else renderChatList();
+  if(activate) await switchChat(rec.id, true); else renderChatList();
   return rec.id;
 }
-
 async function switchChat(id, force){
   if(id === curId && !force) return;
   if(busy && !force){ toast("Finish or stop the current run before switching chats"); return; }
@@ -564,27 +625,27 @@ async function switchChat(id, force){
 
   curId = id;
   const rec = (await dbGet("chats", id)) || {id, messages:[], libs:[]};
-  chat = Array.isArray(rec.messages) ? rec.messages : [];
-  disk = {files:{}, libs:Array.isArray(rec.libs) ? rec.libs : []};
+  chat  = Array.isArray(rec.messages) ? rec.messages : [];
+  disk  = {files:{}, libs:Array.isArray(rec.libs) ? rec.libs : []};
+  todos = Array.isArray(rec.todos) ? rec.todos : [];
+  usage = Object.assign({in:0,out:0,calls:0}, rec.usage||{});
+  history = {};
   (await dbFiles(id)).forEach(r=>{ disk.files[r.path] = {content:r.content, updated:r.updated}; });
 
   openTabs = []; active = null; mode = "code";
   shots = []; agents = []; spawnedThisTurn = 0; pendingVision = [];
+  clearTray();
   await dbPut("meta", id, "active");
-  sumCur();
-  renderAll();
+  sumCur(); renderAll();
 }
-
 async function renameChat(id){
   const e = index.find(c=>c.id===id); if(!e) return;
   const t = prompt("Chat name:", e.title);
   if(t === null) return;
-  e.title = t.trim() || e.title;
-  e.updated = Date.now();
+  e.title = t.trim() || e.title; e.updated = Date.now();
   await dbPut("meta", index, "index");
   renderChatList(); syncHeader();
 }
-
 async function duplicateChat(id){
   const src = index.find(c=>c.id===id); if(!src) return;
   const rec = (await dbGet("chats", id)) || {messages:[], libs:[]};
@@ -592,28 +653,24 @@ async function duplicateChat(id){
   const nid = uid();
   index.unshift({id:nid, title:src.title+" (copy)", created:Date.now(), updated:Date.now(),
                  files:files.length, bytes:files.reduce((n,f)=>n+f.content.length,0), msgs:src.msgs});
-  await dbPut("chats", {id:nid, messages:rec.messages||[], libs:rec.libs||[]});
+  await dbPut("chats", {id:nid, messages:rec.messages||[], libs:rec.libs||[], todos:rec.todos||[], usage:{in:0,out:0,calls:0}});
   for(const f of files) await dbPut("files", {key:fkey(nid,f.path), chatId:nid, path:f.path, content:f.content, updated:f.updated});
   await dbPut("meta", index, "index");
   renderChatList();
   toast("Duplicated "+files.length+" file(s) into a new chat");
   return nid;
 }
-
 async function deleteChat(id){
   const e = index.find(c=>c.id===id); if(!e) return;
   if(!confirm(`Delete "${e.title}" and its ${e.files} file(s)? This cannot be undone.`)) return;
   index = index.filter(c=>c.id!==id);
-  await dbDelFiles(id);
-  await dbDel("chats", id);
-  await dbPut("meta", index, "index");
+  await dbDelFiles(id); await dbDel("chats", id); await dbPut("meta", index, "index");
   if(id === curId){
     if(!index.length) await createChat("New chat", true);
     else await switchChat(index[0].id, true);
   } else renderChatList();
   scheduleQuota();
 }
-
 function renderChatList(){
   const c = $("chatList");
   const list = index.slice().sort((a,b)=>b.updated-a.updated);
@@ -624,11 +681,7 @@ function renderChatList(){
     d.innerHTML =
       `<div class="ci"><div class="ct">${esc(e.title)}</div>
        <div class="cm">${e.files||0} file${e.files===1?"":"s"} · ${fmtBytes(e.bytes||0)} · ${esc(fmtWhen(e.updated))}</div></div>
-       <div class="acts">
-         <button title="Rename">✎</button>
-         <button title="Duplicate">⧉</button>
-         <button title="Delete">✕</button>
-       </div>`;
+       <div class="acts"><button title="Rename">✎</button><button title="Duplicate">⧉</button><button title="Delete">✕</button></div>`;
     const [bR,bD,bX] = d.querySelectorAll(".acts button");
     bR.onclick = ev => { ev.stopPropagation(); renameChat(e.id); };
     bD.onclick = ev => { ev.stopPropagation(); duplicateChat(e.id); };
@@ -639,7 +692,7 @@ function renderChatList(){
 }
 
 /* ============================================================
-   Quota reporting
+   Quota
    ============================================================ */
 let quotaT = null, persisted = false;
 function scheduleQuota(){ clearTimeout(quotaT); quotaT = setTimeout(refreshQuota, 700); }
@@ -649,9 +702,9 @@ async function refreshQuota(){
   let txt, pct = 0;
   if(navigator.storage && navigator.storage.estimate){
     try{
-      const {usage=0, quota=0} = await navigator.storage.estimate();
-      pct = quota ? Math.min(100, usage/quota*100) : 0;
-      txt = `${fmtBytes(usage)} / ${fmtBytes(quota)}`;
+      const {usage:u=0, quota=0} = await navigator.storage.estimate();
+      pct = quota ? Math.min(100, u/quota*100) : 0;
+      txt = `${fmtBytes(u)} / ${fmtBytes(quota)}`;
     }catch(e){ txt = fmtBytes(localBytes)+" in "+totalChats+" chat(s)"; }
   } else txt = fmtBytes(localBytes)+" in "+totalChats+" chat(s)";
   if(!db) txt = "MEMORY ONLY — nothing persists";
@@ -671,8 +724,7 @@ async function refreshQuota(){
     info.innerHTML = db
       ? `Backend <b style="color:var(--ok)">IndexedDB</b> — ${esc(est)}.<br>
          ${totalChats} chat(s), ${fmtBytes(localBytes)} of file content.
-         Persistence: <b style="color:${persisted?"var(--ok)":"var(--warn)"}">${persisted?"granted":"not granted"}</b>.
-         Without it a browser under disk pressure may clear this data.`
+         Persistence: <b style="color:${persisted?"var(--ok)":"var(--warn)"}">${persisted?"granted":"not granted"}</b>.`
       : `<b>IndexedDB is unavailable</b> (${esc(String(dbBroken||"unknown"))}). Running in memory only —
          everything is lost on reload. Private/incognito windows commonly cause this.`;
   }
@@ -682,7 +734,6 @@ async function refreshQuota(){
    Environment banner
    ============================================================ */
 function directToGateway(){ return /(^|\.)tabitoken\.com$/.test(hostOf(S.base)); }
-function hostOf(u){ try{ return new URL(u, location.href).hostname; }catch(e){ return ""; } }
 function checkEnv(){
   let msg = "";
   if(!db)
@@ -692,7 +743,11 @@ function checkEnv(){
   else if(directToGateway() && !S.proxy)
     msg = "<b>No proxy configured.</b> tabitoken.com refuses POSTs from browsers, so chat will fail. Set the base URL to your Worker.";
   else if(!S.key)
-    msg = "<b>No token set.</b> Open Settings and enter your Worker's <span class='mono'>APP_TOKEN</span>.";
+    msg = "<b>No token set.</b> Open Settings and enter your Worker's <span class='mono'>APP_TOKEN</span> or an sk-… key.";
+  else if(available && !available.size)
+    msg = "<b>No models reachable</b> with this key — every request will fail. Check the key and its group in the TaBiAI console.";
+  else if(available && !canUse(S.model))
+    msg = "<b>"+esc(labelOf(S.model))+" is not available on this key.</b> Pick another model in the header.";
   $("banner").classList.toggle("on", !!msg);
   $("bannerText").innerHTML = msg;
 }
@@ -703,12 +758,20 @@ $("lightbox").onclick = ()=>$("lightbox").classList.remove("on");
 function zoom(src){ $("lightboxImg").src = src; $("lightbox").classList.add("on"); }
 
 /* ============================================================
-   Disk (active chat)
+   Disk + version history
    ============================================================ */
-function writeFile(path, content){
+function pushHistory(path, prev){
+  if(prev === undefined) return;
+  const h = history[path] || (history[path] = []);
+  h.unshift({content:prev, at:Date.now()});
+  if(h.length > HISTORY_DEPTH) h.length = HISTORY_DEPTH;
+}
+function writeFile(path, content, opts){
   path = norm(path);
   if(!path) throw new Error("Empty path");
   const c = String(content ?? ""), now = Date.now();
+  if(!(opts && opts.noHistory) && disk.files[path] && disk.files[path].content !== c)
+    pushHistory(path, disk.files[path].content);
   disk.files[path] = {content:c, updated:now};
   track(dbPut("files", {key:fkey(curId,path), chatId:curId, path, content:c, updated:now}));
   sumCur(); renderDisk(); renderTabs();
@@ -722,6 +785,7 @@ function readFile(path){
 function deleteFile(path){
   path = norm(path);
   if(!disk.files[path]) throw new Error("No such file: "+path);
+  pushHistory(path, disk.files[path].content);
   delete disk.files[path];
   track(dbDel("files", fkey(curId,path)));
   openTabs = openTabs.filter(t=>t!==path);
@@ -735,15 +799,17 @@ function icon(p){
   if(e==="css") return "🎨";
   if(e==="json") return "🔧";
   if(e==="md") return "📝";
-  if(["png","jpg","jpeg","gif","svg","webp","ico","avif"].includes(e)) return "🖼";
-  if(["mp3","wav","ogg","m4a"].includes(e)) return "🔊";
+  if(["png","jpg","jpeg","gif","svg","webp","ico","avif","bmp"].includes(e)) return "🖼";
+  if(["mp4","webm","mov","mkv","avi"].includes(e)) return "🎞";
+  if(["mp3","wav","ogg","m4a","flac"].includes(e)) return "🔊";
+  if(e==="pdf") return "📕";
   return "📄";
 }
 function renderDisk(){
   const paths = Object.keys(disk.files).sort();
   const fl = $("fileList");
   fl.innerHTML = paths.length ? "" :
-    '<div class="empty">This chat\'s disk is empty.<br>Create a file, or ask the model to build something.</div>';
+    '<div class="empty">This chat\'s disk is empty.<br>Create a file, drop one in, or ask the model to build something.</div>';
   paths.forEach(p=>{
     const d=document.createElement("div");
     d.className="diskItem"+(p===active?" active":"");
@@ -767,7 +833,6 @@ function renderDisk(){
     ll.appendChild(d);
   });
 }
-
 async function installLibrary(name, version, path){
   name = String(name||"").trim();
   if(!name) throw new Error("Library name required");
@@ -791,13 +856,31 @@ async function installLibrary(name, version, path){
 }
 
 /* ============================================================
+   Plan / todos
+   ============================================================ */
+const TODO_MARK = {pending:"○", active:"◐", done:"●", blocked:"✕"};
+function renderTodos(){
+  const c = $("todoList");
+  const done = todos.filter(t=>t.status==="done").length;
+  $("todoCount").textContent = todos.length ? `${done}/${todos.length}` : "";
+  if(!todos.length){ c.innerHTML = '<div class="empty">No plan yet. The model writes one for multi-step work.</div>'; return; }
+  c.innerHTML = "";
+  todos.forEach(t=>{
+    const d = document.createElement("div");
+    d.className = "todo "+(t.status||"pending");
+    d.innerHTML = `<span class="bx">${TODO_MARK[t.status]||"○"}</span><span class="tx">${esc(t.text)}</span>`;
+    c.appendChild(d);
+  });
+}
+
+/* ============================================================
    Composition — relative refs become blob URLs; data: URIs pass through
    ============================================================ */
 let blobUrls = [];
 function revokeBlobs(){ blobUrls.forEach(u=>URL.revokeObjectURL(u)); blobUrls=[]; }
 function mime(p){
   return {html:"text/html",htm:"text/html",js:"text/javascript",mjs:"text/javascript",
-    css:"text/css",json:"application/json",svg:"image/svg+xml",txt:"text/plain"}[ext(p)] || "text/plain";
+    css:"text/css",json:"application/json",svg:"image/svg+xml",txt:"text/plain",md:"text/markdown"}[ext(p)] || "text/plain";
 }
 function blobFor(path, content){
   const u = URL.createObjectURL(new Blob([content], {type:mime(path)}));
@@ -838,6 +921,291 @@ function composeHtml(entry, shim){
     : injected + html;
 }
 function buildPreview(entry){ revokeBlobs(); return blobFor(entry, composeHtml(entry)); }
+
+/* ============================================================
+   Media decoding — the gateway takes images only, so video and
+   GIF are turned into keyframes here, and PDFs into text.
+   ============================================================ */
+function downscale(srcCanvasOrImg, maxW, quality){
+  const sw = srcCanvasOrImg.width || srcCanvasOrImg.videoWidth || srcCanvasOrImg.naturalWidth || 1;
+  const sh = srcCanvasOrImg.height || srcCanvasOrImg.videoHeight || srcCanvasOrImg.naturalHeight || 1;
+  const scale = Math.min(1, maxW / sw);
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(sw*scale));
+  c.height = Math.max(1, Math.round(sh*scale));
+  const x = c.getContext("2d");
+  x.fillStyle = "#fff"; x.fillRect(0,0,c.width,c.height);   // flatten alpha; JPEG has none
+  x.drawImage(srcCanvasOrImg, 0, 0, c.width, c.height);
+  return {dataUrl:c.toDataURL("image/jpeg", quality||0.78), w:c.width, h:c.height};
+}
+function loadImg(src){
+  return new Promise((res,rej)=>{
+    const i = new Image();
+    i.onload = ()=>res(i);
+    i.onerror = ()=>rej(new Error("could not decode image"));
+    i.src = src;
+  });
+}
+function pickIndexes(total, n){
+  if(total <= n) return Array.from({length:total},(_,i)=>i);
+  return Array.from({length:n},(_,i)=>Math.round(i*(total-1)/(n-1)));
+}
+
+async function videoFrames(file, count, maxW){
+  const url = URL.createObjectURL(file);
+  const v = document.createElement("video");
+  v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
+  $("hidden").appendChild(v);
+  try{
+    await new Promise((res,rej)=>{
+      v.onloadeddata = ()=>res();
+      v.onerror = ()=>rej(new Error("this browser cannot decode that video (codec unsupported)"));
+      setTimeout(()=>rej(new Error("video metadata timed out")), 20000);
+    });
+    const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+    const times = dur
+      ? Array.from({length:count},(_,i)=>Math.min(Math.max(0.02, dur*(i+0.5)/count), dur-0.02))
+      : [0];
+    const frames = [];
+    for(const t of times){
+      await new Promise(res=>{
+        let settled = false;
+        const done = ()=>{ if(settled) return; settled=true; v.removeEventListener("seeked",done); res(); };
+        v.addEventListener("seeked", done);
+        try{ v.currentTime = t; }catch(e){ done(); }
+        setTimeout(done, 5000);                       // some containers never fire seeked
+      });
+      const shot = downscale(v, maxW, 0.72);
+      frames.push({label:dur?`t=${t.toFixed(2)}s`:"frame", ...shot});
+    }
+    return {frames, duration:dur, w:v.videoWidth, h:v.videoHeight};
+  } finally { v.remove(); URL.revokeObjectURL(url); }
+}
+
+async function animatedFrames(file, count, maxW){
+  /* ImageDecoder gives true frame access for GIF/animated WebP where supported. */
+  if("ImageDecoder" in window){
+    try{
+      const buf = await file.arrayBuffer();
+      const dec = new ImageDecoder({data:buf, type:file.type || "image/gif"});
+      await dec.tracks.ready;
+      const track = dec.tracks.selectedTrack;
+      const total = Math.max(1, track?.frameCount || 1);
+      const frames = [];
+      for(const i of pickIndexes(total, count)){
+        const {image} = await dec.decode({frameIndex:i});
+        const c = document.createElement("canvas");
+        c.width = image.displayWidth; c.height = image.displayHeight;
+        c.getContext("2d").drawImage(image, 0, 0);
+        frames.push({label:`frame ${i+1}/${total}`, ...downscale(c, maxW, 0.72)});
+        image.close && image.close();
+      }
+      dec.close && dec.close();
+      if(frames.length) return {frames, total, method:"ImageDecoder"};
+    }catch(e){ /* fall through to sampling */ }
+  }
+  /* Fallback: an <img> animates on its own, so sample it over time. */
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await loadImg(url);
+    $("hidden").appendChild(img);
+    const frames = [];
+    for(let i=0;i<count;i++){
+      frames.push({label:`sample ${i+1}`, ...downscale(img, maxW, 0.72)});
+      await sleep(160);
+    }
+    img.remove();
+    return {frames, total:null, method:"timed sampling (frames may repeat)"};
+  } finally { URL.revokeObjectURL(url); }
+}
+
+let pdfLib = null;
+async function pdfText(file, maxPages){
+  if(!pdfLib){
+    pdfLib = await import(PDFJS);
+    pdfLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+  }
+  const buf = new Uint8Array(await file.arrayBuffer());
+  const doc = await pdfLib.getDocument({data:buf}).promise;
+  const n = Math.min(doc.numPages, maxPages || 40);
+  let out = "";
+  for(let p=1; p<=n; p++){
+    const page = await doc.getPage(p);
+    const tc = await page.getTextContent();
+    out += `\n--- page ${p} ---\n` + tc.items.map(i=>i.str).join(" ").replace(/\s+/g," ").trim() + "\n";
+  }
+  return {text:out.trim(), pages:doc.numPages, extracted:n};
+}
+
+/* ============================================================
+   Attachment tray
+   ============================================================ */
+let attach = [], attSeq = 0;
+const TEXTY = /\.(html?|css|js|mjs|cjs|jsx|ts|tsx|json|jsonc|md|markdown|txt|csv|tsv|xml|svg|yml|yaml|toml|ini|cfg|conf|sh|bash|zsh|py|rb|go|rs|java|kt|c|h|cpp|hpp|cs|php|sql|graphql|env|gitignore|log|diff|patch)$/i;
+const IMG_MIME = /^image\/(png|jpe?g|webp|gif|bmp|avif|x-icon|vnd\.microsoft\.icon)$/i;
+
+function clearTray(){ attach = []; renderTray(); }
+function renderTray(){
+  const t = $("tray");
+  t.classList.toggle("on", attach.length>0);
+  t.innerHTML = "";
+  attach.forEach(a=>{
+    const d = document.createElement("div");
+    d.className = "chip"+(a.busy?" busy":"");
+    const thumb = a.thumb
+      ? `<img src="${a.thumb}" alt="">`
+      : `<span class="ic">${a.busy?"⏳":icon(a.name)}</span>`;
+    d.innerHTML = `${thumb}<div class="meta"><div class="nm" title="${esc(a.name)}">${esc(a.name)}</div>
+      <div class="sub">${esc(a.sub||"")}</div></div><button class="rm" title="Remove">✕</button>`;
+    const img = d.querySelector("img");
+    if(img) img.onclick = ()=>zoom(a.full || a.thumb);
+    d.querySelector(".rm").onclick = ()=>{ attach = attach.filter(x=>x.id!==a.id); renderTray(); };
+    t.appendChild(d);
+  });
+}
+
+/* Build an attachment record. Images become vision blocks; video/GIF
+   become keyframes; text and PDFs become inline text. Everything is
+   also written to the chat's disk so tools can reach it. */
+async function addFiles(files){
+  for(const file of files){
+    const rec = {id:"at"+(++attSeq), name:file.name || ("pasted-"+Date.now()), busy:true,
+                 sub:fmtBytes(file.size), mime:file.type||""};
+    attach.push(rec); renderTray();
+    try{
+      const isImg  = IMG_MIME.test(file.type) || /\.(png|jpe?g|webp|gif|bmp|avif|ico)$/i.test(rec.name);
+      const isAnim = /gif|webp/i.test(file.type) || /\.(gif|webp)$/i.test(rec.name);
+      const isVid  = /^video\//i.test(file.type) || /\.(mp4|webm|mov|mkv|avi|m4v)$/i.test(rec.name);
+      const isPdf  = /pdf/i.test(file.type) || /\.pdf$/i.test(rec.name);
+      const isTxt  = TEXTY.test(rec.name) || /^text\//i.test(file.type) || /json|xml|javascript/i.test(file.type);
+
+      if(isVid){
+        rec.kind = "frames";
+        const {frames, duration, w, h} = await videoFrames(file, Math.max(1,Number(S.frames)||6), Number(S.shotW)||900);
+        rec.frames = frames;
+        rec.thumb = frames[0]?.dataUrl; rec.full = frames[0]?.dataUrl;
+        rec.sub = `video · ${duration?duration.toFixed(1)+"s":"?"} · ${w}×${h} · ${frames.length} frames`;
+        rec.note = `Video "${rec.name}": ${duration?duration.toFixed(1)+"s":"unknown length"}, ${w}×${h}, sampled into ${frames.length} keyframes.`;
+        rec.diskPath = await saveAttachToDisk(file, rec.name, true);
+      } else if(isImg && isAnim){
+        rec.kind = "frames";
+        const {frames, total, method} = await animatedFrames(file, Math.max(1,Number(S.frames)||6), Number(S.shotW)||900);
+        rec.frames = frames;
+        rec.thumb = frames[0]?.dataUrl; rec.full = frames[0]?.dataUrl;
+        rec.sub = `animated · ${total?total+" frames":"?"} → ${frames.length} sampled`;
+        rec.note = `Animated image "${rec.name}": ${total?total+" frames":"frame count unknown"}, sampled into ${frames.length} stills via ${method}.`;
+        rec.diskPath = await saveAttachToDisk(file, rec.name, true);
+      } else if(isImg){
+        rec.kind = "image";
+        const dataUrl = await new Promise((res,rej)=>{
+          const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file);
+        });
+        const img = await loadImg(dataUrl);
+        const shot = downscale(img, Number(S.shotW)||900, 0.82);
+        rec.dataUrl = shot.dataUrl; rec.thumb = shot.dataUrl; rec.full = dataUrl;
+        rec.sub = `image · ${img.naturalWidth}×${img.naturalHeight} → ${shot.w}×${shot.h}`;
+        rec.diskPath = await saveAttachToDisk(file, rec.name, true, dataUrl);
+      } else if(isPdf){
+        rec.kind = "text";
+        try{
+          const {text, pages, extracted} = await pdfText(file, 40);
+          rec.text = text;
+          rec.sub = `pdf · ${pages} page(s), text of ${extracted} extracted`;
+          rec.note = `PDF "${rec.name}" — ${pages} page(s). The gateway silently discards PDF blocks, so the text was extracted in-browser.`;
+        }catch(e){
+          rec.kind = "note";
+          rec.sub = "pdf · text extraction failed";
+          rec.note = `PDF "${rec.name}" could not be text-extracted (${e.message}). It is on the disk but its contents are not readable.`;
+        }
+        rec.diskPath = await saveAttachToDisk(file, rec.name, true);
+      } else if(isTxt){
+        rec.kind = "text";
+        rec.text = await file.text();
+        rec.sub = `text · ${fmtBytes(rec.text.length)} · ${rec.text.split("\n").length} lines`;
+        rec.diskPath = writeFile(rec.name, rec.text);
+      } else {
+        rec.kind = "note";
+        rec.sub = `${file.type||"binary"} · stored on disk`;
+        rec.diskPath = await saveAttachToDisk(file, rec.name, true);
+        rec.note = `File "${rec.name}" (${file.type||"unknown type"}, ${fmtBytes(file.size)}) is on the disk at ${rec.diskPath} as a data URI. Its bytes are not readable as text.`;
+      }
+    }catch(e){
+      rec.kind = "note";
+      rec.sub = "failed: "+String(e.message||e).slice(0,60);
+      rec.note = `Attachment "${rec.name}" failed to process: ${e.message}`;
+    }
+    rec.busy = false; renderTray();
+  }
+  save();
+}
+async function saveAttachToDisk(file, name, asDataUri, known){
+  try{
+    const data = known || await new Promise((res,rej)=>{
+      const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file);
+    });
+    return writeFile("uploads/"+norm(name), data);
+  }catch(e){ return null; }
+}
+
+/* Turn the tray into message content. Only image_url blocks reach the
+   model — verified; Anthropic-style source blocks are silently dropped. */
+function buildUserContent(text){
+  const notes = [], blocks = [];
+  attach.forEach(a=>{
+    if(a.diskPath) notes.push(`• ${a.name} → saved on disk at \`${a.diskPath}\``);
+    if(a.note) notes.push("• "+a.note);
+    if(a.kind === "text" && a.text != null){
+      const lang = ext(a.name).replace(/^(mjs|cjs|jsx)$/,"js");
+      notes.push(`\n--- contents of ${a.name} ---\n\`\`\`${lang}\n${a.text.slice(0,120000)}\n\`\`\``);
+    }
+    if(!S.vision) return;
+    if(a.kind === "image" && a.dataUrl)
+      blocks.push({type:"image_url", image_url:{url:a.dataUrl}, __label:a.name});
+    if(a.kind === "frames")
+      (a.frames||[]).forEach(f=>blocks.push({type:"image_url", image_url:{url:f.dataUrl}, __label:a.name+" "+f.label}));
+  });
+
+  let head = text;
+  if(notes.length){
+    head += (head?"\n\n":"") + "Attachments:\n" + notes.join("\n");
+    if(blocks.length) head += `\n\n${blocks.length} image${blocks.length>1?"s":""} follow${blocks.length>1?"":"s"}, in the order listed above.`;
+    else if(attach.length && !S.vision) head += "\n\n(Vision is off, so no images were sent — only the disk paths above.)";
+  }
+  return blocks.length ? [{type:"text", text:head}, ...blocks] : head;
+}
+
+/* composer input paths: picker, drag-drop, paste */
+$("btnAttach").onclick = ()=>{
+  const i = document.createElement("input");
+  i.type="file"; i.multiple=true;
+  i.onchange = ()=>{ if(i.files.length) addFiles([...i.files]); };
+  i.click();
+};
+let dragDepth = 0;
+["dragenter","dragover"].forEach(ev=>document.addEventListener(ev, e=>{
+  if(!e.dataTransfer || ![...e.dataTransfer.types].includes("Files")) return;
+  e.preventDefault();
+  if(ev==="dragenter") dragDepth++;
+  $("drop").classList.add("on");
+}));
+["dragleave","dragend"].forEach(ev=>document.addEventListener(ev, e=>{
+  if(ev==="dragleave" && --dragDepth > 0) return;
+  dragDepth = 0; $("drop").classList.remove("on");
+}));
+document.addEventListener("drop", e=>{
+  if(!e.dataTransfer) return;
+  e.preventDefault(); dragDepth=0; $("drop").classList.remove("on");
+  const fs = [...(e.dataTransfer.files||[])];
+  if(fs.length) addFiles(fs);
+});
+$("ta").addEventListener("paste", e=>{
+  const items = [...(e.clipboardData?.items||[])];
+  const files = items.filter(i=>i.kind==="file").map(i=>i.getAsFile()).filter(Boolean);
+  if(files.length){
+    e.preventDefault();
+    addFiles(files.map((f,i)=>f.name ? f : new File([f], `pasted-${Date.now()}-${i}.${(f.type.split("/")[1]||"png")}`, {type:f.type})));
+  }
+});
 
 /* ============================================================
    Playtest harness — injected into the app frame
@@ -913,7 +1281,7 @@ function keyEv(el,type,k,m){ el.dispatchEvent(new KeyboardEvent(type,kInit(k,m))
 function setVal(el,v){
   var proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
   var d = Object.getOwnPropertyDescriptor(proto,"value");
-  if(d&&d.set) d.set.call(el,v); else el.value=v;   // native setter: frameworks notice
+  if(d&&d.set) d.set.call(el,v); else el.value=v;
 }
 function mouse(el,type,pt,btn){
   var p = pt || center(el);
@@ -1184,12 +1552,11 @@ class Session {
     stageMount(this);
     const ready = new Promise((res,rej)=>{
       this._onReady = res;
-      setTimeout(()=>rej(new Error("app frame never signalled ready — it may have failed to parse")), 8000);
+      setTimeout(()=>rej(new Error("app frame never signalled ready — it may have failed to parse")), 9000);
     });
     f.src = blobFor(this.path, html);
     await ready;
-    this.ready = true;
-    renderSessions();
+    this.ready = true; renderSessions();
     return this;
   }
   send(cmd, extra, timeoutMs){
@@ -1209,15 +1576,12 @@ class Session {
     renderSessions();
   }
 }
-
 window.addEventListener("message", e=>{
   const d = e.data;
   if(!d || !d.__pt) return;
-  const s = sessions.get(d.__pt);
-  if(!s) return;
+  const s = sessions.get(d.__pt); if(!s) return;
   if(d.ready){ s._onReady && s._onReady(); return; }
-  const p = s.pending.get(d.id);
-  if(!p) return;
+  const p = s.pending.get(d.id); if(!p) return;
   clearTimeout(p.t); s.pending.delete(d.id);
   d.ok ? p.res(d) : p.rej(Object.assign(new Error(d.error||"harness error"), {errors:d.errors}));
 });
@@ -1226,8 +1590,7 @@ let stageOwner = null;
 function stageMount(sess){
   const inner = $("stageInner");
   inner.querySelectorAll("iframe").forEach(f=>f.remove());
-  inner.style.width = sess.w+"px";
-  inner.style.height = sess.h+"px";
+  inner.style.width = sess.w+"px"; inner.style.height = sess.h+"px";
   inner.appendChild(sess.frame);
   stageOwner = sess.id;
   $("right").classList.remove("collapsed");
@@ -1291,24 +1654,10 @@ function renderShotStrip(){
 let pendingVision = [];
 function queueVision(rec){ if(!S.vision) return false; pendingVision.push(rec); return true; }
 function visionMessage(list){
-  const content = [{type:"text", text:"Screenshot"+(list.length>1?"s":"")+": "+
-    list.map(s=>`${s.label} (${s.w}×${s.h})`).join(", ")+". Look at "+(list.length>1?"them":"it")+" and judge the actual visual result."}];
-  list.forEach(s=>{
-    const b64 = s.dataUrl.split(",")[1];
-    if(S.visionStyle === "anthropic")
-      content.push({type:"image", source:{type:"base64", media_type:"image/jpeg", data:b64}});
-    else
-      content.push({type:"image_url", image_url:{url:s.dataUrl}});
-  });
+  const content = [{type:"text", text:"Image"+(list.length>1?"s":"")+": "+
+    list.map(s=>`${s.label} (${s.w}×${s.h})`).join(", ")+". Look and judge the actual visual result."}];
+  list.forEach(s=>content.push({type:"image_url", image_url:{url:s.dataUrl}, __label:s.label}));
   return {role:"user", content};
-}
-function stripImages(messages){
-  return messages.map(m=>{
-    if(!Array.isArray(m.content)) return m;
-    const txt = m.content.filter(b=>b.type==="text").map(b=>b.text).join("\n");
-    return {...m, content:(txt||"[screenshot omitted — vision unavailable]")+
-      "\n\n(Screenshots could not be delivered to this model. Use inspect_dom for layout and content instead.)"};
-  });
 }
 
 /* ============================================================
@@ -1318,7 +1667,7 @@ let jsSeq = 0;
 function runJs(code, timeoutMs){
   return new Promise(resolve=>{
     const id = "js"+(++jsSeq);
-    const ms = Math.min(10000, Math.max(100, Number(timeoutMs)||3000));
+    const ms = Math.min(15000, Math.max(100, Number(timeoutMs)||3000));
     const frame = $("sandbox");
     let done = false;
     const onMsg = e => { if(e.data && e.data.__id === id) finish({logs:e.data.logs, result:e.data.result, error:e.data.error}); };
@@ -1420,7 +1769,7 @@ $("editor").addEventListener("input", ()=>{
     writeFile(active, $("editor").value);
     $("savedFlag").textContent="saved";
     setTimeout(()=>$("savedFlag").textContent="", 1200);
-  }, 400);
+  }, 450);
 });
 $("editor").addEventListener("keydown", e=>{
   if(e.key==="Tab"){ e.preventDefault();
@@ -1491,86 +1840,87 @@ async function workerTool(path, body){
    Tool schemas
    ============================================================ */
 const DISK_TOOLS = [
-  {type:"function",function:{name:"disk_list",description:"List every file on this chat's disk with size and last-modified time, plus installed libraries.",parameters:{type:"object",properties:{}}}},
-  {type:"function",function:{name:"disk_tree",description:"Compact indented tree of the disk. Cheaper than disk_list for getting oriented.",parameters:{type:"object",properties:{}}}},
-  {type:"function",function:{name:"disk_read",description:"Read one file in full. Pass start_line/end_line to read only a range, which is cheaper for large files.",parameters:{type:"object",properties:{path:{type:"string"},start_line:{type:"integer"},end_line:{type:"integer"}},required:["path"]}}},
-  {type:"function",function:{name:"disk_write",description:"Create or overwrite a file. Creates an artifact; .html files get a live preview.",parameters:{type:"object",properties:{path:{type:"string"},content:{type:"string"}},required:["path","content"]}}},
-  {type:"function",function:{name:"disk_edit",description:"Replace an exact substring in a file. Fails if old_text is absent or ambiguous.",parameters:{type:"object",properties:{path:{type:"string"},old_text:{type:"string"},new_text:{type:"string"}},required:["path","old_text","new_text"]}}},
-  {type:"function",function:{name:"disk_grep",description:"Search file contents across the disk, returning matching lines with numbers.",parameters:{type:"object",properties:{pattern:{type:"string"},is_regex:{type:"boolean"},path_filter:{type:"string"},max_results:{type:"integer"}},required:["pattern"]}}},
+  {type:"function",function:{name:"disk_tree",description:"Compact indented tree of this chat's disk with sizes. The cheapest way to get oriented.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"disk_list",description:"Flat file list with byte sizes and modified times, plus installed libraries.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"disk_glob",description:"Find files by glob pattern (* ? ** supported), e.g. 'src/**/*.js' or '*.html'.",parameters:{type:"object",properties:{pattern:{type:"string"}},required:["pattern"]}}},
+  {type:"function",function:{name:"disk_read",description:"Read one file in full. Pass start_line/end_line for a range, which is cheaper on large files.",parameters:{type:"object",properties:{path:{type:"string"},start_line:{type:"integer"},end_line:{type:"integer"}},required:["path"]}}},
+  {type:"function",function:{name:"disk_read_many",description:"Read several files in one call. Cheaper than one call per file when you need an overview.",parameters:{type:"object",properties:{paths:{type:"array",items:{type:"string"}},max_bytes_each:{type:"integer",description:"Truncate each file at this many bytes. Default 20000."}},required:["paths"]}}},
+  {type:"function",function:{name:"disk_write",description:"Create or replace a whole file. The previous content is kept in history and can be restored with disk_revert. For edits to an existing file prefer disk_edit.",parameters:{type:"object",properties:{path:{type:"string"},content:{type:"string"}},required:["path","content"]}}},
+  {type:"function",function:{name:"disk_edit",description:"Patch a file by exact substring replacement. Pass a batch of edits and they apply in order, atomically — if any fails, none are written. Each old_text must appear exactly once unless replace_all is set.",parameters:{type:"object",properties:{
+    path:{type:"string"},
+    edits:{type:"array",description:"Preferred form: a list of {old_text,new_text,replace_all}.",items:{type:"object",properties:{old_text:{type:"string"},new_text:{type:"string"},replace_all:{type:"boolean"}},required:["old_text","new_text"]}},
+    old_text:{type:"string",description:"Single-edit shorthand."}, new_text:{type:"string"}, replace_all:{type:"boolean"}
+  },required:["path"]}}},
+  {type:"function",function:{name:"disk_grep",description:"Search file contents and get matching lines with numbers and optional surrounding context.",parameters:{type:"object",properties:{pattern:{type:"string"},is_regex:{type:"boolean"},path_filter:{type:"string",description:"Only paths containing this substring, or a glob."},context:{type:"integer",description:"Lines of context around each hit, 0-5."},max_results:{type:"integer"}},required:["pattern"]}}},
   {type:"function",function:{name:"disk_move",description:"Rename or move a file.",parameters:{type:"object",properties:{from:{type:"string"},to:{type:"string"},overwrite:{type:"boolean"}},required:["from","to"]}}},
-  {type:"function",function:{name:"disk_delete",description:"Delete a file.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
-  {type:"function",function:{name:"disk_stats",description:"Total file count and byte size of this chat's disk, plus browser storage usage and quota.",parameters:{type:"object",properties:{}}}},
+  {type:"function",function:{name:"disk_copy",description:"Copy a file to a new path.",parameters:{type:"object",properties:{from:{type:"string"},to:{type:"string"},overwrite:{type:"boolean"}},required:["from","to"]}}},
+  {type:"function",function:{name:"disk_delete",description:"Delete one or more files. Contents are recoverable with disk_revert during this session.",parameters:{type:"object",properties:{path:{type:"string"},paths:{type:"array",items:{type:"string"}}}}}},
+  {type:"function",function:{name:"disk_history",description:"List saved previous versions of a file, newest first, with ages and sizes.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
+  {type:"function",function:{name:"disk_revert",description:"Restore a file to a previous version from history. steps:1 undoes the most recent change.",parameters:{type:"object",properties:{path:{type:"string"},steps:{type:"integer",description:"How many versions back. Default 1."}},required:["path"]}}},
+  {type:"function",function:{name:"disk_stats",description:"File count and byte size of this chat's disk, plus browser storage usage and quota.",parameters:{type:"object",properties:{}}}},
   {type:"function",function:{name:"install_library",description:"Install an npm package from jsDelivr into this chat. Auto-injected into all previewed HTML.",parameters:{type:"object",properties:{name:{type:"string"},version:{type:"string"},path:{type:"string",description:"File inside the package, e.g. dist/chart.min.js"}},required:["name"]}}},
   {type:"function",function:{name:"list_libraries",description:"List installed libraries and their resolved CDN URLs.",parameters:{type:"object",properties:{}}}},
   {type:"function",function:{name:"preview",description:"Open a file in the user's artifact panel.",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]}}},
-  {type:"function",function:{name:"run_js",description:"Execute JavaScript in an isolated sandbox; returns the value plus console output. No disk or app access.",parameters:{type:"object",properties:{code:{type:"string"},timeout_ms:{type:"integer"}},required:["code"]}}}
+  {type:"function",function:{name:"run_js",description:"Execute JavaScript in an isolated sandbox; returns the final value plus console output. No disk or network access.",parameters:{type:"object",properties:{code:{type:"string"},timeout_ms:{type:"integer"}},required:["code"]}}}
+];
+
+const PLAN_TOOLS = [
+  {type:"function",function:{name:"todo_write",description:"Create or replace the visible plan for this task. Keep exactly one item 'active'; mark items 'done' as you complete them. Call this again to update status — it is cheap and the user relies on it.",parameters:{type:"object",properties:{
+    items:{type:"array",items:{type:"object",properties:{
+      text:{type:"string",description:"Short imperative description, e.g. 'Wire up the score display'."},
+      status:{type:"string",enum:["pending","active","done","blocked"]}
+    },required:["text"]}}
+  },required:["items"]}}},
+  {type:"function",function:{name:"todo_read",description:"Read the current plan back, with statuses.",parameters:{type:"object",properties:{}}}}
 ];
 
 const TEST_TOOLS = [
   {type:"function",function:{
     name:"playtest",
-    description:"Open a web app in a real frame and drive it with actual input events, then report what happened. Pass keep_open:true and reuse the returned session id to keep driving the same live instance across calls (state persists). Always reports runtime errors, console errors, and failed assertions.",
+    description:"Open a web app in a real frame and drive it with actual input events, then report what happened. Pass keep_open:true and reuse the returned session id to keep driving the same live instance (state persists). Reports runtime errors, console errors, and failed assertions.",
     parameters:{type:"object",properties:{
       path:{type:"string",description:"Entry .html to open in a NEW session."},
       session:{type:"string",description:"Existing session id to continue driving. Omit path when using this."},
-      keep_open:{type:"boolean",description:"Keep the session alive after these steps."},
-      width:{type:"integer",description:"Viewport width, default 900."},
-      height:{type:"integer",description:"Viewport height, default 620."},
+      keep_open:{type:"boolean"}, width:{type:"integer"}, height:{type:"integer"},
       settle_ms:{type:"integer",description:"Wait after load before the first step. Default 500."},
-      screenshot_at_end:{type:"boolean",description:"Capture a screenshot after the last step. Default true."},
+      screenshot_at_end:{type:"boolean",description:"Default true."},
       steps:{type:"array",description:"Actions run in order.",items:{type:"object",properties:{
         action:{type:"string",enum:["click","dblclick","rightclick","click_at","move_to","drag","hover","focus","blur","type","set","check","key","keys","hold","scroll","wait","wait_for","assert","eval","screenshot"]},
-        selector:{type:"string",description:"CSS selector for the target."},
-        text:{type:"string",description:"For click/hover: match a visible element by text. For type: the text to type. For assert: text to find on the page."},
-        exact:{type:"boolean"},
-        value:{type:"string",description:"For set/check: the value to apply."},
-        clear:{type:"boolean",description:"For type: clear first. Default true."},
-        delay:{type:"integer",description:"For type: ms between keystrokes."},
-        key:{type:"string",description:"For key/hold: Enter, Escape, Tab, ArrowLeft, a, 1, F2, Space…"},
-        sequence:{type:"array",items:{type:"string"},description:"For keys: keys pressed in order."},
-        repeat:{type:"integer",description:"For key: press this many times."},
-        ms:{type:"integer",description:"For hold: how long to hold. For wait: how long to wait."},
+        selector:{type:"string"}, text:{type:"string"}, exact:{type:"boolean"}, value:{type:"string"},
+        clear:{type:"boolean"}, delay:{type:"integer"},
+        key:{type:"string",description:"Enter, Escape, Tab, ArrowLeft, a, 1, F2, Space…"},
+        sequence:{type:"array",items:{type:"string"}}, repeat:{type:"integer"}, ms:{type:"integer"},
         ctrl:{type:"boolean"},shift:{type:"boolean"},alt:{type:"boolean"},meta:{type:"boolean"},
-        x:{type:"number",description:"Viewport coordinate."}, y:{type:"number"},
-        from:{type:"object",description:"For drag: {x,y} start."}, to:{type:"object",description:"For drag: {x,y} end."},
+        x:{type:"number"}, y:{type:"number"}, from:{type:"object"}, to:{type:"object"},
         timeout_ms:{type:"integer"}, absent:{type:"boolean"}, visible:{type:"boolean"},
         code:{type:"string",description:"For eval: JS run inside the app with access to its globals."},
         label:{type:"string"}, full_page:{type:"boolean"}
       },required:["action"]}}
     }}}},
-  {type:"function",function:{
-    name:"screenshot",
-    description:"Render an app to an image and, if vision is available, look at it. Prefer inspect_dom for layout questions — exact and cheaper. Each image costs roughly 1-2k input tokens.",
-    parameters:{type:"object",properties:{
-      path:{type:"string"}, session:{type:"string"}, selector:{type:"string"},
-      full_page:{type:"boolean"}, width:{type:"integer"}, height:{type:"integer"},
-      settle_ms:{type:"integer"}, label:{type:"string"}
-    }}}},
-  {type:"function",function:{
-    name:"inspect_dom",
-    description:"Structured snapshot of a running app: element tree with exact pixel geometry, text, values, roles, broken images, canvas sizes, overflow warnings, focus, scroll position, and all visible text.",
-    parameters:{type:"object",properties:{
-      path:{type:"string"}, session:{type:"string"}, selector:{type:"string"},
-      max_nodes:{type:"integer"}, include_styles:{type:"boolean"}, settle_ms:{type:"integer"}
-    }}}},
+  {type:"function",function:{name:"screenshot",description:"Render an app to an image and look at it. Prefer inspect_dom for layout questions — exact and cheaper. Roughly 1-2k input tokens per image.",parameters:{type:"object",properties:{
+    path:{type:"string"}, session:{type:"string"}, selector:{type:"string"}, full_page:{type:"boolean"},
+    width:{type:"integer"}, height:{type:"integer"}, settle_ms:{type:"integer"}, label:{type:"string"}
+  }}}},
+  {type:"function",function:{name:"inspect_dom",description:"Structured snapshot of a running app: element tree with exact pixel geometry, text, values, roles, broken images, canvas sizes, overflow warnings, focus, scroll, and visible text.",parameters:{type:"object",properties:{
+    path:{type:"string"}, session:{type:"string"}, selector:{type:"string"},
+    max_nodes:{type:"integer"}, include_styles:{type:"boolean"}, settle_ms:{type:"integer"}
+  }}}},
   {type:"function",function:{name:"session_close",description:"Close a playtest session and free its frame.",parameters:{type:"object",properties:{session:{type:"string",description:"Session id, or 'all'."}},required:["session"]}}},
-  {type:"function",function:{name:"check_app",description:"Quick load check: open an app, wait, and report runtime errors, console errors, and visible text. Cheaper than a full playtest.",parameters:{type:"object",properties:{path:{type:"string"},wait_ms:{type:"integer"}},required:["path"]}}}
+  {type:"function",function:{name:"check_app",description:"Quick boot check: open an app, wait, report runtime errors, console errors, and visible text. Cheaper than a full playtest.",parameters:{type:"object",properties:{path:{type:"string"},wait_ms:{type:"integer"}},required:["path"]}}}
 ];
 
 const WEB_TOOLS = [
   {type:"function",function:{name:"web_search",description:"Search the web (TinyFish) for ranked results with titles, URLs, snippets, and dates. Snippets are previews — follow up with web_fetch before asserting a fact. 30 searches/minute.",parameters:{type:"object",properties:{
     query:{type:"string"}, purpose:{type:"string",description:"Why you're searching — improves ranking."},
-    count:{type:"integer",description:"1-10, default 6"},
-    domain_type:{type:"string",enum:["web","news","research_paper"]},
+    count:{type:"integer"}, domain_type:{type:"string",enum:["web","news","research_paper"]},
     include_domains:{type:"string"}, exclude_domains:{type:"string"},
     recency_minutes:{type:"integer"}, after_date:{type:"string"}, before_date:{type:"string"},
     location:{type:"string"}, language:{type:"string"}
   },required:["query"]}}},
   {type:"function",function:{name:"web_fetch",description:"Fetch up to 10 URLs (TinyFish) as clean markdown with nav and ads stripped. Handles PDFs. Batch related URLs into ONE call. 150 URLs/minute.",parameters:{type:"object",properties:{
-    urls:{type:"array",items:{type:"string"}}, url:{type:"string"},
-    purpose:{type:"string"}, format:{type:"string",enum:["markdown","html","json"]},
-    max_chars:{type:"integer"}, include_selectors:{type:"array",items:{type:"string"}},
-    exclude_selectors:{type:"array",items:{type:"string"}}, links:{type:"boolean"}
+    urls:{type:"array",items:{type:"string"}}, url:{type:"string"}, purpose:{type:"string"},
+    format:{type:"string",enum:["markdown","html","json"]}, max_chars:{type:"integer"},
+    include_selectors:{type:"array",items:{type:"string"}}, exclude_selectors:{type:"array",items:{type:"string"}}, links:{type:"boolean"}
   }}}},
   {type:"function",function:{name:"wikipedia",description:"Search Wikipedia, or fetch one article's plain-text extract.",parameters:{type:"object",properties:{query:{type:"string"},mode:{type:"string",enum:["search","page"]},lang:{type:"string"}},required:["query"]}}},
   {type:"function",function:{name:"npm_search",description:"Search the npm registry: version, description, weekly downloads. Use before install_library.",parameters:{type:"object",properties:{query:{type:"string"},count:{type:"integer"}},required:["query"]}}}
@@ -1585,7 +1935,7 @@ const SPAWN_TOOL = {type:"function",function:{
         name:{type:"string",description:"Short kebab-case id, e.g. build-ui."},
         task:{type:"string",description:"Self-contained instructions: goal, exact file paths, conventions, what to report."},
         context:{type:"string",description:"Shared background: decisions made, file names, API shapes, style rules."},
-        model:{type:"string",description:"Optional override. One of: "+MODELS.map(m=>m.id).join(", ")},
+        model:{type:"string",description:"Optional override."},
         reasoning:{type:"string",enum:Object.keys(REASONING)}
       },required:["name","task"]}}
   },required:["agents"]}
@@ -1594,32 +1944,72 @@ const SPAWN_TOOL = {type:"function",function:{
 function toolsFor(depth){
   let t = [];
   if(S.tools) t = t.concat(DISK_TOOLS);
+  if(depth===0) t = t.concat(PLAN_TOOLS);      // only the orchestrator owns the plan
   if(S.test)  t = t.concat(TEST_TOOLS);
   if(S.web)   t = t.concat(WEB_TOOLS);
   if(S.agents && depth < AGENT.maxDepth) t.push(SPAWN_TOOL);
   return t;
 }
 
+/* glob → RegExp; ** crosses directories, * does not */
+function globRe(pat){
+  let re = "";
+  const s = String(pat||"");
+  for(let i=0;i<s.length;i++){
+    const c = s[i];
+    if(c === "*"){
+      if(s[i+1] === "*"){ re += ".*"; i++; if(s[i+1]==="/") i++; }
+      else re += "[^/]*";
+    }
+    else if(c === "?") re += "[^/]";
+    else if("\\^$.|+()[]{}".includes(c)) re += "\\"+c;
+    else re += c;
+  }
+  return new RegExp("^"+re+"$", "i");
+}
+
 /* ============================================================
    Tool execution
    ============================================================ */
 async function execTool(name, args, ctx){
+  const atDepth0 = ctx.depth === 0;
   switch(name){
+    /* ---- plan ---- */
+    case "todo_write": {
+      const items = (Array.isArray(args.items)?args.items:[]).slice(0,40)
+        .map(i=>({text:String(i.text||"").slice(0,160), status:["pending","active","done","blocked"].includes(i.status)?i.status:"pending"}))
+        .filter(i=>i.text);
+      todos = items; renderTodos(); save();
+      const act = items.filter(i=>i.status==="active").length;
+      return {ok:true, count:items.length, done:items.filter(i=>i.status==="done").length,
+        ...(act>1?{warning:"More than one item is marked active — keep exactly one."}:{})};
+    }
+    case "todo_read": return {items:todos};
+
+    /* ---- disk ---- */
+    case "disk_tree": {
+      const paths = Object.keys(disk.files).sort();
+      if(!paths.length) return {tree:"(empty disk)", files:0};
+      return {files:paths.length, bytes:paths.reduce((n,p)=>n+disk.files[p].content.length,0),
+        tree:paths.map(p=>{
+          const d = p.split("/").length - 1;
+          return "  ".repeat(d)+p.split("/").pop()+"  ("+fmtBytes(disk.files[p].content.length)+")"+(d?"   ["+p+"]":"");
+        }).join("\n")};
+    }
     case "disk_list": return {
       chat: index.find(c=>c.id===curId)?.title,
       files: Object.entries(disk.files).map(([p,f])=>({path:p, bytes:f.content.length, modified:new Date(f.updated).toISOString()})),
       libraries: disk.libs.map(l=>({name:l.name, version:l.version, type:l.type}))
     };
-    case "disk_tree": {
-      const paths = Object.keys(disk.files).sort();
-      if(!paths.length) return {tree:"(empty disk)"};
-      return {files:paths.length, tree:paths.map(p=>{
-        const d = p.split("/").length - 1;
-        return "  ".repeat(d)+p.split("/").pop()+"  ("+fmtBytes(disk.files[p].content.length)+")"+(d?"   ["+p+"]":"");
-      }).join("\n")};
+    case "disk_glob": {
+      const re = globRe(args.pattern);
+      const hits = Object.keys(disk.files).filter(p=>re.test(p) || re.test(p.split("/").pop())).sort();
+      return {pattern:args.pattern, count:hits.length,
+              matches:hits.map(p=>({path:p, bytes:disk.files[p].content.length}))};
     }
     case "disk_read": {
       const p = norm(args.path), content = readFile(p);
+      ctx.read && ctx.read.add(p);
       const all = content.split("\n");
       if(args.start_line || args.end_line){
         const s = Math.max(1, Number(args.start_line)||1);
@@ -1629,22 +2019,58 @@ async function execTool(name, args, ctx){
       }
       return {path:p, lines:all.length, bytes:content.length, content};
     }
+    case "disk_read_many": {
+      const cap = Math.min(200000, Math.max(500, Number(args.max_bytes_each)||20000));
+      const files = (Array.isArray(args.paths)?args.paths:[]).slice(0,20).map(raw=>{
+        const p = norm(raw);
+        if(!disk.files[p]) return {path:p, error:"no such file"};
+        ctx.read && ctx.read.add(p);
+        const c = disk.files[p].content;
+        return {path:p, bytes:c.length, truncated:c.length>cap, content:c.slice(0,cap)};
+      });
+      return {files};
+    }
     case "disk_write": {
-      const p = writeFile(args.path, args.content);
-      if(ctx.depth===0 && mode!=="stage") openFile(p);
-      return {ok:true, path:p, bytes:String(args.content??"").length};
+      const p = norm(args.path);
+      const existed = !!disk.files[p];
+      if(existed && S.confirmDel && atDepth0 && !ctx.read?.has(p)){
+        /* Overwriting a file the model never read this session is the classic
+           way work gets silently destroyed. */
+        if(!confirm(`The model wants to REPLACE ${p} (${fmtBytes(disk.files[p].content.length)}) without having read it this session.\n\nAllow?`))
+          throw new Error("User declined the overwrite. Read the file first, then use disk_edit to change only what you need.");
+      }
+      writeFile(p, args.content);
+      ctx.read && ctx.read.add(p);
+      if(atDepth0 && mode!=="stage") openFile(p);
+      return {ok:true, path:p, bytes:String(args.content??"").length, replaced:existed,
+              ...(existed?{note:"Previous version saved to history; disk_revert can restore it."}:{})};
     }
     case "disk_edit": {
-      const p = norm(args.path), cur = readFile(p);
-      const n = cur.split(args.old_text).length - 1;
-      if(n === 0) throw new Error("old_text not found in "+p);
-      if(n > 1)   throw new Error(`old_text appears ${n} times in ${p} — include more context to make it unique`);
-      writeFile(p, cur.replace(args.old_text, args.new_text));
-      if(ctx.depth===0 && mode!=="stage") openFile(p);
-      return {ok:true, path:p};
+      const p = norm(args.path);
+      let cur = readFile(p);
+      const list = Array.isArray(args.edits) && args.edits.length
+        ? args.edits
+        : (args.old_text !== undefined ? [{old_text:args.old_text, new_text:args.new_text, replace_all:args.replace_all}] : []);
+      if(!list.length) throw new Error("pass edits:[{old_text,new_text}] or a single old_text/new_text");
+
+      const applied = [];
+      for(let i=0;i<list.length;i++){
+        const {old_text, new_text, replace_all} = list[i];
+        if(typeof old_text !== "string" || !old_text) throw new Error(`edit ${i+1}: old_text is required`);
+        const n = cur.split(old_text).length - 1;
+        if(n === 0) throw new Error(`edit ${i+1}: old_text not found in ${p}. Nothing was written — re-read the file, the content may differ from what you expect.`);
+        if(n > 1 && !replace_all) throw new Error(`edit ${i+1}: old_text appears ${n} times in ${p}. Nothing was written — add surrounding context to make it unique, or set replace_all:true.`);
+        cur = replace_all ? cur.split(old_text).join(String(new_text??"")) : cur.replace(old_text, String(new_text??""));
+        applied.push({edit:i+1, occurrences:replace_all?n:1});
+      }
+      writeFile(p, cur);
+      ctx.read && ctx.read.add(p);
+      if(atDepth0 && mode!=="stage") openFile(p);
+      return {ok:true, path:p, edits_applied:applied.length, detail:applied, bytes:cur.length};
     }
     case "disk_grep": {
-      const max = Math.min(200, Math.max(1, Number(args.max_results)||60));
+      const max = Math.min(300, Math.max(1, Number(args.max_results)||60));
+      const ctxN = Math.min(5, Math.max(0, Number(args.context)||0));
       let test;
       if(args.is_regex){
         let re; try{ re = new RegExp(args.pattern,"i"); }catch(e){ throw new Error("Bad regex: "+e.message); }
@@ -1653,30 +2079,72 @@ async function execTool(name, args, ctx){
         const needle = String(args.pattern).toLowerCase();
         test = l => l.toLowerCase().includes(needle);
       }
-      const filt = args.path_filter ? String(args.path_filter).toLowerCase() : "";
+      let pathOk = ()=>true;
+      if(args.path_filter){
+        const f = String(args.path_filter);
+        if(/[*?]/.test(f)){ const re = globRe(f); pathOk = p => re.test(p) || re.test(p.split("/").pop()); }
+        else pathOk = p => p.toLowerCase().includes(f.toLowerCase());
+      }
       const matches = [];
       for(const p of Object.keys(disk.files).sort()){
-        if(filt && !p.toLowerCase().includes(filt)) continue;
+        if(!pathOk(p)) continue;
         const lines = disk.files[p].content.split("\n");
         for(let i=0;i<lines.length;i++){
-          if(test(lines[i])){
-            matches.push({path:p, line:i+1, text:lines[i].trim().slice(0,240)});
-            if(matches.length >= max) return {matches, truncated:true};
+          if(!test(lines[i])) continue;
+          const hit = {path:p, line:i+1, text:lines[i].slice(0,300)};
+          if(ctxN){
+            hit.before = lines.slice(Math.max(0,i-ctxN), i).map((l,k)=>(i-ctxN+k+1)+"| "+l.slice(0,200));
+            hit.after  = lines.slice(i+1, i+1+ctxN).map((l,k)=>(i+2+k)+"| "+l.slice(0,200));
           }
+          matches.push(hit);
+          if(matches.length >= max) return {matches, count:matches.length, truncated:true};
         }
       }
-      return {matches, count:matches.length};
+      return {matches, count:matches.length, files_searched:Object.keys(disk.files).filter(pathOk).length};
     }
-    case "disk_move": {
+    case "disk_move": case "disk_copy": {
       const from = norm(args.from), to = norm(args.to);
       if(!disk.files[from]) throw new Error("No such file: "+from);
       if(!to) throw new Error("Destination path is empty");
       if(disk.files[to] && !args.overwrite) throw new Error(to+" already exists. Pass overwrite:true.");
       writeFile(to, disk.files[from].content);
-      if(to !== from) deleteFile(from);
-      return {ok:true, from, to};
+      if(name==="disk_move" && to !== from) deleteFile(from);
+      return {ok:true, from, to, moved:name==="disk_move"};
     }
-    case "disk_delete": deleteFile(args.path); return {ok:true, deleted:norm(args.path)};
+    case "disk_delete": {
+      let list = Array.isArray(args.paths) ? args.paths : (args.path ? [args.path] : []);
+      list = list.map(norm).filter(Boolean);
+      if(!list.length) throw new Error("pass path or paths");
+      const missing = list.filter(p=>!disk.files[p]);
+      if(missing.length) throw new Error("no such file(s): "+missing.join(", "));
+      if(S.confirmDel && atDepth0 && list.length > 2){
+        if(!confirm(`The model wants to delete ${list.length} files:\n\n${list.join("\n")}\n\nAllow?`))
+          throw new Error("User declined the bulk delete.");
+      }
+      list.forEach(deleteFile);
+      return {ok:true, deleted:list, note:"Contents remain in history this session; disk_revert can restore them."};
+    }
+    case "disk_history": {
+      const p = norm(args.path);
+      const h = history[p] || [];
+      return {path:p, versions:h.length,
+        current: disk.files[p] ? {bytes:disk.files[p].content.length, modified:new Date(disk.files[p].updated).toISOString()} : null,
+        history: h.map((v,i)=>({steps_back:i+1, bytes:v.content.length, age:fmtWhen(v.at)}))};
+    }
+    case "disk_revert": {
+      const p = norm(args.path);
+      const steps = Math.max(1, Number(args.steps)||1);
+      const h = history[p] || [];
+      if(!h.length) throw new Error("no saved history for "+p+" (history is per-session)");
+      if(steps > h.length) throw new Error(`only ${h.length} version(s) available for ${p}`);
+      const target = h[steps-1];
+      const now = disk.files[p]?.content;
+      history[p] = h.slice(steps);
+      writeFile(p, target.content, {noHistory:true});
+      if(now !== undefined) pushHistory(p, now);
+      if(atDepth0 && mode!=="stage") openFile(p);
+      return {ok:true, path:p, restored_from:fmtWhen(target.at), bytes:target.content.length};
+    }
     case "disk_stats": {
       const paths = Object.keys(disk.files);
       const bytes = paths.reduce((n,p)=>n+disk.files[p].content.length,0);
@@ -1685,7 +2153,7 @@ async function execTool(name, args, ctx){
       return {chat:index.find(c=>c.id===curId)?.title, files:paths.length, bytes, human:fmtBytes(bytes),
               chats_total:index.length,
               browser_storage: est ? {used:fmtBytes(est.usage||0), quota:fmtBytes(est.quota||0)} : "unavailable",
-              note:"Storage is IndexedDB-backed and shared across chats. Reading a huge file in full still costs context for the rest of the conversation — a line range is cheaper."};
+              session_tokens:{input:usage.in, output:usage.out, requests:usage.calls}};
     }
 
     case "install_library": {
@@ -1699,13 +2167,14 @@ async function execTool(name, args, ctx){
       return {result:r.result, console:r.logs, error:r.error||null};
     }
 
+    /* ---- playtest ---- */
     case "playtest": {
       if(!S.test) throw new Error("Playtest tools are disabled in this app's settings.");
       const steps = Array.isArray(args.steps) ? args.steps.slice(0,60) : [];
       const {sess, temp} = await getSession(args);
       try{
         await sleep(Math.min(5000, Math.max(0, args.settle_ms ?? 500)));
-        const res = await sess.send("run", {steps}, 120000);
+        const res = await sess.send("run", {steps}, 150000);
         const out = [], captured = [];
         (res.data||[]).forEach(r=>{
           if(r.shot){
@@ -1752,7 +2221,6 @@ async function execTool(name, args, ctx){
         return result;
       } finally { if(temp) sess.close(); }
     }
-
     case "screenshot": {
       if(!S.test) throw new Error("Playtest tools are disabled in this app's settings.");
       const {sess, temp} = await getSession(args);
@@ -1761,18 +2229,12 @@ async function execTool(name, args, ctx){
         const r = await sess.send("shot", {opt:{max_width:S.shotW, selector:args.selector, full_page:!!args.full_page}}, 45000);
         const rec = addShot(r.data.dataUrl, (args.label||"screenshot")+" · "+sess.path, r.data.w, r.data.h);
         const sent = queueVision(rec);
-        return {
-          path:sess.path, session: temp?null:sess.id,
-          label:rec.label, width:rec.w, height:rec.h,
-          runtime_errors:(r.errors||[]).slice(0,20),
-          delivered: sent,
-          note: sent
-            ? "The image follows in the next message — describe what you actually see, don't assume."
-            : "Vision is OFF, so you cannot see this image (the user can). Use inspect_dom for layout and content."
-        };
+        return {path:sess.path, session: temp?null:sess.id, label:rec.label, width:rec.w, height:rec.h,
+                runtime_errors:(r.errors||[]).slice(0,20), delivered:sent,
+                note: sent ? "The image follows in the next message — describe what you actually see."
+                           : "Vision is OFF, so you cannot see this image. Use inspect_dom instead."};
       } finally { if(temp) sess.close(); }
     }
-
     case "inspect_dom": {
       if(!S.test) throw new Error("Playtest tools are disabled in this app's settings.");
       const {sess, temp} = await getSession(args);
@@ -1782,14 +2244,12 @@ async function execTool(name, args, ctx){
         return {path:sess.path, session: temp?null:sess.id, ...r.data, runtime_errors:(r.errors||[]).slice(0,20)};
       } finally { if(temp) sess.close(); }
     }
-
     case "session_close": {
       if(String(args.session)==="all"){ const n = sessions.size; closeAllSessions(); return {ok:true, closed:n}; }
       const s = sessions.get(args.session);
       if(!s) return {ok:true, note:"no such session (already closed)"};
       s.close(); return {ok:true, closed:args.session};
     }
-
     case "check_app": {
       if(!S.test) throw new Error("Playtest tools are disabled in this app's settings.");
       const p = norm(args.path);
@@ -1807,6 +2267,7 @@ async function execTool(name, args, ctx){
       } finally { sess.close(); }
     }
 
+    /* ---- web ---- */
     case "web_search": {
       if(!S.web) throw new Error("Web tools are disabled in this app's settings.");
       const j = await workerTool("/tools/search", {
@@ -1867,10 +2328,11 @@ async function execTool(name, args, ctx){
 let agents = [], agentSeq = 0, spawnedThisTurn = 0;
 
 function resolveModel(m){
-  if(!m) return S.agentModel;
+  if(!m) return canUse(S.agentModel) ? S.agentModel : firstAvailable();
   const id = String(m).replace(/\./g,"-").trim();
-  return MODELS.some(x=>x.id===id) ? id : S.agentModel;
+  return (MODELS.some(x=>x.id===id) && canUse(id)) ? id : (canUse(S.agentModel) ? S.agentModel : firstAvailable());
 }
+function firstAvailable(){ return (MODELS.find(m=>canUse(m.id))||MODELS[0]).id; }
 async function pool(jobs, limit){
   const out = new Array(jobs.length);
   let i = 0;
@@ -1895,14 +2357,12 @@ async function spawnAgents(args, ctx){
     notes.push(`Budget allowed only ${room} more agent(s) this message; the rest were dropped.`);
     list = list.slice(0, room);
   }
-  spawnedThisTurn += list.length;
-  renderAgents();
+  spawnedThisTurn += list.length; renderAgents();
   const results = await pool(list.map(spec => () => runAgent(spec, ctx.depth+1)), AGENT.maxConcurrent);
   const out = {agents: results};
   if(notes.length) out.orchestrator_notes = notes;
   return out;
 }
-
 async function runAgent(spec, depth){
   const rec = {
     id:"ag"+(++agentSeq),
@@ -1918,6 +2378,7 @@ async function runAgent(spec, depth){
     {role:"system", content: AGENT_SYS(rec)},
     {role:"user",   content: rec.task + (rec.context ? "\n\n--- Context from orchestrator ---\n"+rec.context : "")}
   ];
+  const readSet = new Set();
 
   try{
     for(let step=0; step<AGENT.maxSteps; step++){
@@ -1928,8 +2389,7 @@ async function runAgent(spec, depth){
 
       if(!out.calls.length){ rec.report = out.content || "(empty report)"; break; }
 
-      const localVision = [];
-      const before = pendingVision;
+      const localVision = [], before = pendingVision;
       pendingVision = localVision;
       for(const tc of out.calls){
         let a = {};
@@ -1941,7 +2401,7 @@ async function runAgent(spec, depth){
           continue;
         }
         let res;
-        try{ res = await execTool(tc.function.name, a, {depth}); }
+        try{ res = await execTool(tc.function.name, a, {depth, read:readSet}); }
         catch(e){ res = {error:String(e.message||e)}; }
         msgs.push({role:"tool", tool_call_id:tc.id, content:JSON.stringify(res).slice(0,60000)});
         rec.log.push({kind:"tool", name:tc.function.name, args:a, result:res});
@@ -1958,12 +2418,11 @@ async function runAgent(spec, depth){
     rec.status = (e.name === "AbortError") ? "aborted" : "error";
     rec.report = String(e.message||e);
   }
-  rec.ms = Date.now()-rec.started;
-  renderAgents();
+  rec.ms = Date.now()-rec.started; renderAgents();
 
   const touched = [...new Set(rec.log
-    .filter(l => l.kind==="tool" && /^disk_(write|edit|delete|move)$/.test(l.name) && l.args && (l.args.path||l.args.to) && !l.result?.error)
-    .map(l => norm(l.args.to || l.args.path)))];
+    .filter(l => l.kind==="tool" && /^disk_(write|edit|delete|move|copy|revert)$/.test(l.name) && !l.result?.error)
+    .flatMap(l => l.result?.deleted || [l.args?.to || l.args?.path].filter(Boolean)).map(norm))];
   const sources = [...new Set(rec.log
     .filter(l => l.kind==="tool" && /^(web_fetch|wikipedia)$/.test(l.name) && l.result)
     .flatMap(l => l.result.url ? [l.result.url]
@@ -1971,13 +2430,9 @@ async function runAgent(spec, depth){
   const tested = rec.log.filter(l=>l.kind==="tool" && /^(playtest|check_app)$/.test(l.name) && l.result)
     .map(l=>({path:l.result.path, failed:l.result.steps_failed ?? l.result.error_count, verdict:l.result.verdict||l.result.note}));
 
-  return {
-    agent:rec.name, status:rec.status, model:rec.model, steps:rec.steps,
-    files_touched:touched, ...(sources.length?{sources}:{}), ...(tested.length?{tests:tested}:{}),
-    report:rec.report
-  };
+  return {agent:rec.name, status:rec.status, model:rec.model, steps:rec.steps,
+    files_touched:touched, ...(sources.length?{sources}:{}), ...(tested.length?{tests:tested}:{}), report:rec.report};
 }
-
 function renderAgents(){
   const c = $("agentList");
   const budget = Number(S.maxAgents)||12;
@@ -2060,48 +2515,60 @@ function md(src){
    ============================================================ */
 const WEB_NAMES  = /^(web_search|web_fetch|wikipedia|npm_search)$/;
 const TEST_NAMES = /^(playtest|screenshot|inspect_dom|check_app|session_close)$/;
+const PLAN_NAMES = /^(todo_write|todo_read)$/;
+
 function renderChat(){
   const c=$("msgs"); c.innerHTML="";
   if(!chat.length){ c.innerHTML = welcomeHtml(); return; }
-  chat.forEach(m=>{ if(m.role==="system"||m.role==="tool") return; c.appendChild(msgEl(m)); });
+  chat.forEach((m,i)=>{ if(m.role==="system"||m.role==="tool") return; c.appendChild(msgEl(m,i)); });
   c.scrollTop = c.scrollHeight;
 }
-function msgEl(m){
+function msgEl(m, idx){
   const d=document.createElement("div");
   d.className="msg "+m.role;
-  let body = `<div class="who">${m.role==="user"?"You":"Assistant"}</div>`;
+  let body = `<div class="who">${m.role==="user"?"You":"Assistant"}`;
+  if(m.role==="user" && m.ckpt) body += `<button class="ck" title="Restore the disk and transcript to just before this message">↩ checkpoint</button>`;
+  body += `</div>`;
   if(m.reasoning) body += `<details class="think"><summary>Thinking</summary><div class="body">${esc(m.reasoning)}</div></details>`;
 
   if(m.role==="user"){
     if(Array.isArray(m.content)){
       const txt = m.content.filter(b=>b.type==="text").map(b=>b.text).join("\n");
-      const imgs = m.content.filter(b=>b.type==="image_url"||b.type==="image")
-        .map(b=>b.type==="image_url" ? b.image_url.url : "data:"+b.source.media_type+";base64,"+b.source.data);
+      const imgs = m.content.filter(b=>b.type==="image_url")
+        .map(b=>({url:b.image_url.url, label:b.__label||""}));
       body += `<div class="bubble">${esc(txt)}</div>`;
-      if(imgs.length) body += `<div class="shots">${imgs.map(u=>`<img src="${u}" alt="screenshot sent to the model">`).join("")}</div>`;
+      if(imgs.length) body += `<div class="shots">${imgs.map(o=>
+        `<figure><img src="${o.url}" alt="${esc(o.label)}">${o.label?`<figcaption>${esc(o.label)}</figcaption>`:""}</figure>`).join("")}</div>`;
     } else body += `<div class="bubble">${esc(m.content||"")}</div>`;
   } else {
     (m.tool_calls||[]).forEach(tc=>{
       const res = chat.find(x=>x.role==="tool" && x.tool_call_id===tc.id);
       const bad = res && /"error"/.test(res.content||"");
       const nm = tc.function.name;
-      const isSpawn = nm==="spawn_agents", isWeb = WEB_NAMES.test(nm), isTest = TEST_NAMES.test(nm);
+      const isSpawn = nm==="spawn_agents", isWeb = WEB_NAMES.test(nm),
+            isTest = TEST_NAMES.test(nm), isPlan = PLAN_NAMES.test(nm);
       let a = "";
       try{
         const o = JSON.parse(tc.function.arguments||"{}");
         if(isSpawn) a = Array.isArray(o.agents) ? o.agents.map(x=>x&&x.name).filter(Boolean).join(", ") : "";
+        else if(nm==="todo_write") a = (o.items||[]).length+" items · "+((o.items||[]).find(i=>i.status==="active")?.text||"");
         else if(nm==="playtest") a = (o.path||o.session||"")+" · "+(Array.isArray(o.steps)?o.steps.length+" steps":"0 steps");
+        else if(nm==="disk_edit") a = (o.path||"")+" · "+((o.edits||[]).length||1)+" edit(s)";
+        else if(nm==="disk_read_many") a = (o.paths||[]).length+" files";
         else if(Array.isArray(o.urls)) a = o.urls.length===1 ? o.urls[0] : o.urls.length+" urls";
-        else a = o.query || o.url || o.path || o.session || o.pattern || o.name || o.from || Object.values(o)[0] || "";
+        else if(Array.isArray(o.paths)) a = o.paths.length+" paths";
+        else a = o.query || o.url || o.path || o.pattern || o.session || o.name || o.from || Object.values(o)[0] || "";
       }catch(e){ a = String(tc.function.arguments||"").slice(0,60); }
       const label = isSpawn ? "spawn_agents ⇉" : nm;
-      const cls = bad?" err":(isSpawn?" agentcall":(isTest?" testcall":(isWeb?" webcall":"")));
+      const cls = bad?" err":(isSpawn?" agentcall":(isTest?" testcall":(isWeb?" webcall":(isPlan?" plancall":""))));
       body += `<div class="tcall${cls}"><span>${bad?"✕":"✓"}</span><b>${esc(label)}</b><span class="arg">${esc(String(a).slice(0,110))}</span></div>`;
     });
     if(m.content) body += `<div class="bubble">${md(m.content)}</div>`;
   }
   d.innerHTML = body;
   d.querySelectorAll(".shots img").forEach(i=>i.onclick=()=>zoom(i.src));
+  const ck = d.querySelector(".ck");
+  if(ck) ck.onclick = ()=>restoreCheckpoint(idx);
   return d;
 }
 function welcomeHtml(){
@@ -2109,14 +2576,53 @@ function welcomeHtml(){
   return `<div class="msg"><div class="who">Opus Studio</div><div class="bubble">
   <p><b>${esc(e?e.title:"New chat")}</b> — orchestrator <code>${esc(labelOf(S.model))}</code> · agents <code>${esc(labelOf(S.agentModel))}</code> · endpoint <code>${esc(S.base)}</code></p>
   <ul>
-  <li><b>Chats</b> — each one owns its own disk, libraries, and transcript. Switch in the panel on the left; nothing leaks between them.</li>
-  <li><b>Playtest</b> — <code>playtest</code> drives your app with real clicks, typing, held keys, drags, and coordinate hits. Watch it run on the right.</li>
-  <li><b>See</b> — <code>screenshot</code> sends an image to the model when vision is on; <code>inspect_dom</code> returns exact geometry and is always available.</li>
-  <li><b>Research</b> — TinyFish search and fetch, Wikipedia, npm.</li>
+  <li><b>Attach anything</b> — drop, paste, or pick images, GIFs, video, PDFs, and code. Images go to the model directly; video and animated GIF are decoded into labelled keyframes; PDFs are text-extracted in your browser. Everything also lands on this chat's disk.</li>
+  <li><b>Plan</b> — the model keeps a visible todo list for multi-step work, in the left panel.</li>
+  <li><b>Build &amp; verify</b> — read/glob/grep/multi-edit with per-file history and <code>disk_revert</code>, then <code>playtest</code> with real keyboard and mouse, <code>check_app</code>, and <code>inspect_dom</code>.</li>
+  <li><b>Checkpoints</b> — hover any message of yours and click ↩ to roll the disk and transcript back to that moment.</li>
   <li><b>Delegate</b> — up to ${AGENT.maxConcurrent} sub-agents in parallel, depth ${AGENT.maxDepth}.</li>
   </ul>
   <p>Try: <i>"Build a snake game with arrow-key controls, then playtest it: hold each arrow and confirm the snake turns"</i></p>
   </div></div>`;
+}
+
+/* ============================================================
+   Checkpoints — snapshot the disk before each user turn
+   ============================================================ */
+function snapshotDisk(){
+  const files = {};
+  Object.entries(disk.files).forEach(([p,f])=>{ files[p] = f.content; });
+  return {files, libs:JSON.parse(JSON.stringify(disk.libs)), todos:JSON.parse(JSON.stringify(todos))};
+}
+async function restoreCheckpoint(idx){
+  const m = chat[idx];
+  if(!m || !m.ckpt) return;
+  const snap = m.ckpt;
+  const n = Object.keys(snap.files).length;
+  if(!confirm(`Roll back to just before this message?\n\nThe disk returns to ${n} file(s) and everything after this point in the conversation is discarded. This cannot be undone.`)) return;
+
+  closeAllSessions(); revokeBlobs();
+  /* remove files that did not exist then, then restore the rest */
+  for(const p of Object.keys(disk.files)) if(!(p in snap.files)){
+    delete disk.files[p];
+    track(dbDel("files", fkey(curId,p)));
+  }
+  const now = Date.now();
+  for(const [p,c] of Object.entries(snap.files)){
+    disk.files[p] = {content:c, updated:now};
+    track(dbPut("files", {key:fkey(curId,p), chatId:curId, path:p, content:c, updated:now}));
+  }
+  disk.libs = JSON.parse(JSON.stringify(snap.libs));
+  todos = JSON.parse(JSON.stringify(snap.todos));
+  chat = chat.slice(0, idx);
+  history = {};
+  openTabs = openTabs.filter(p=>disk.files[p]);
+  active = openTabs[0] || null;
+  mode = active ? (["html","htm"].includes(ext(active))?"preview":"code") : "code";
+  shots = []; agents = []; spawnedThisTurn = 0;
+  dirty = true; saveNow(); sumCur();
+  renderAll();
+  toast("Rolled back to "+n+" file(s)");
 }
 
 /* ============================================================
@@ -2129,10 +2635,15 @@ function endpoint(){
   const url = S.base.replace(/\/+$/,"") + "/chat/completions";
   return S.proxy ? S.proxy + encodeURIComponent(url) : url;
 }
+/* Strip our own __label markers before the wire. */
+function wireContent(c){
+  if(!Array.isArray(c)) return c;
+  return c.map(b => b.type==="image_url" ? {type:"image_url", image_url:b.image_url} : b);
+}
 function apiMessages(){
   const out=[{role:"system",content:S.sys}];
   chat.forEach(m=>{
-    if(m.role==="user") out.push({role:"user",content:m.content});
+    if(m.role==="user") out.push({role:"user",content:wireContent(m.content)});
     else if(m.role==="assistant"){
       const a={role:"assistant",content:m.content||""};
       if(m.tool_calls && m.tool_calls.length) a.tool_calls=m.tool_calls;
@@ -2143,7 +2654,8 @@ function apiMessages(){
   return out;
 }
 function buildBody({model, reason, messages, tools, withExtras}){
-  const b = {model, messages, max_tokens: Math.max(256, Number(S.max)||8192), stream:true};
+  const b = {model, messages:messages.map(m=>({...m, content:wireContent(m.content)})),
+             max_tokens: Math.max(256, Number(S.max)||8192), stream:true};
   if(tools && tools.length){ b.tools = tools; b.tool_choice = "auto"; }
   if(withExtras && isThinkingModel(model)){
     const r = REASONING[reason] || REASONING.medium;
@@ -2155,7 +2667,27 @@ function buildBody({model, reason, messages, tools, withExtras}){
   }
   return b;
 }
-const hasImages = msgs => msgs.some(m=>Array.isArray(m.content) && m.content.some(b=>b.type==="image_url"||b.type==="image"));
+
+function bumpUsage(u, model, messages, outText){
+  if(u && (u.prompt_tokens || u.completion_tokens)){
+    usage.in  += u.prompt_tokens || 0;
+    usage.out += u.completion_tokens || 0;
+  } else {
+    usage.in  += messages.reduce((n,m)=>n + estTok(typeof m.content==="string" ? m.content : JSON.stringify(m.content||"")), 0);
+    usage.out += estTok(outText);
+  }
+  usage.calls++;
+  renderUsage();
+}
+function renderUsage(){
+  const p = PRICES[S.model] || {in:3,out:3};
+  const cost = (usage.in/1e6)*p.in + (usage.out/1e6)*p.out;
+  const tot = usage.in + usage.out;
+  $("usePill").textContent = (tot>=1000 ? (tot/1000).toFixed(1)+"k" : tot)+" tok · $"+cost.toFixed(3);
+  $("usePill").title = `This chat: ${usage.in.toLocaleString()} in + ${usage.out.toLocaleString()} out over ${usage.calls} request(s).
+Estimated at $${p.in}/$${p.out} per 1M — the gateway is authoritative, not this number.
+Note the ~6.5k-token floor the gateway adds to every request.`;
+}
 
 async function streamOnce(opts){
   const ctrl = new AbortController();
@@ -2181,7 +2713,7 @@ async function streamOnce(opts){
       throw err;
     }
     const reader = res.body.getReader(), dec = new TextDecoder();
-    let buf="", content="", reasoning="", calls=[];
+    let buf="", content="", reasoning="", calls=[], usg=null;
     while(true){
       const {done,value} = await reader.read();
       if(done) break;
@@ -2195,6 +2727,7 @@ async function streamOnce(opts){
           if(!data || data==="[DONE]") continue;
           let j; try{ j=JSON.parse(data); }catch(e){ continue; }
           if(j.error) throw new Error(j.error.message||JSON.stringify(j.error));
+          if(j.usage) usg = j.usage;
           const d = j.choices?.[0]?.delta; if(!d) continue;
           const rc = d.reasoning_content ?? d.reasoning ??
                      (typeof d.thinking==="string" ? d.thinking : d.thinking?.thinking);
@@ -2215,41 +2748,33 @@ async function streamOnce(opts){
         }
       }
     }
+    bumpUsage(usg, opts.model, opts.messages, content + reasoning);
     return {content, reasoning, calls: calls.filter(Boolean)};
   } finally { activeCtrls.delete(ctrl); }
 }
 
-const IMG_ERR = /image|media_type|multimodal|vision|content block|invalid.*content|unsupported.*type/i;
-
+/* Retries: drop reasoning params on a 400 about them, back off on 429/5xx. */
 async function callModel(opts){
-  try{
-    return await streamOnce({...opts, withExtras:true});
-  }catch(e){
-    if(e.status===400 && /reasoning|thinking|budget/i.test(e.raw||e.message)){
-      try{ return await streamOnce({...opts, withExtras:false}); }catch(e2){ e = e2; }
-    }
-    if((e.status===400||e.status===415||e.status===422) && hasImages(opts.messages) && IMG_ERR.test(e.raw||e.message)){
-      S.visionStyle = S.visionStyle==="openai" ? "anthropic" : "openai";
-      const flipped = opts.messages.map(m=>{
-        if(!Array.isArray(m.content)) return m;
-        return {...m, content:m.content.map(b=>{
-          if(b.type==="image_url"){
-            const [meta,data] = String(b.image_url.url).split(",");
-            return {type:"image", source:{type:"base64", media_type:(meta.match(/data:([^;]+)/)||[,"image/jpeg"])[1], data}};
-          }
-          if(b.type==="image") return {type:"image_url", image_url:{url:"data:"+b.source.media_type+";base64,"+b.source.data}};
-          return b;
-        })};
-      });
-      try{ const r = await streamOnce({...opts, messages:flipped, withExtras:true}); save(); return r; }
-      catch(e3){
-        S.vision = false; save();
-        toast("This gateway rejected images — vision turned off");
-        return await streamOnce({...opts, messages:stripImages(opts.messages), withExtras:true});
+  const tries = 4;
+  let extras = true, lastErr = null;
+  for(let i=0;i<tries;i++){
+    try{
+      return await streamOnce({...opts, withExtras:extras});
+    }catch(e){
+      lastErr = e;
+      if(e.name === "AbortError") throw e;
+      if(e.status===400 && extras && /reasoning|thinking|budget/i.test(e.raw||e.message)){ extras = false; continue; }
+      const retriable = e.network || e.status===429 || (e.status>=500 && e.status<600);
+      if(retriable && i < tries-1){
+        const wait = Math.min(12000, 900 * Math.pow(2,i)) + Math.random()*400;
+        setStatus(`Retrying in ${(wait/1000).toFixed(1)}s (${e.status||"network"})…`);
+        await sleep(wait);
+        continue;
       }
+      throw e;
     }
-    throw e;
   }
+  throw lastErr;
 }
 
 function failureNote(e){
@@ -2262,19 +2787,20 @@ function failureNote(e){
           ? "The base URL points straight at `tabitoken.com`, which refuses browser POSTs. Set the base URL to your Worker."
           : "Check that the Worker is deployed and returns `Access-Control-Allow-Origin` for `"+location.origin+"`.");
   }
+  const raw = String(e.raw||"");
+  if(e.status===503 || /model_not_found|No available channel/i.test(raw))
+    return "**No channel for `"+esc(S.model)+"` (503).**\n\nThis key does not have that model provisioned. "+
+           "Open Settings → *Re-check available models*, then pick one that is listed.\n\n```\n"+raw.slice(0,400)+"\n```";
   if(e.status===401 || e.status===403){
-    const raw = String(e.raw||"");
     let cause;
     if(/insufficient_user_quota|预扣费/i.test(raw))
-      cause = "**Your TaBiAI balance is too low for this request.** The gateway places a pre-authorization hold that exceeds "+
-              "your remaining credit — image requests hold noticeably more than text. Top up, or turn off "+
-              "*Send screenshots to the model* in Settings and rely on `inspect_dom`.";
+      cause = "**Balance too low.** The gateway holds credit up front and image requests hold more than text. Top up, or turn off *Send images to the model* in Settings.";
     else if(/origin not allowed/i.test(raw))
       cause = "Your **Worker** rejected this page's origin. `ALLOWED_ORIGIN` must be exactly `"+location.origin+"` — scheme and host only. Redeploy after changing it.";
     else if(/bad app token/i.test(raw))
       cause = "Your **Worker** rejected the token from Settings. It must match `APP_TOKEN` exactly.";
     else if(/TABI_KEY is not bound/i.test(raw))
-      cause = "The **Worker** has no `TABI_KEY` bound. Add the secret, then redeploy.";
+      cause = "The **Worker** has no `TABI_KEY` bound, and no key was passed through. Add the secret or enable passthrough, then redeploy.";
     else if(/TINYFISH_KEY is not bound/i.test(raw))
       cause = "The **Worker** has no `TINYFISH_KEY` bound. Add the secret, then redeploy.";
     else if(/invalid token|new_api_error/i.test(raw))
@@ -2282,36 +2808,139 @@ function failureNote(e){
     else cause = "Unrecognized rejection — see the raw response below.";
     return "**Rejected — HTTP "+e.status+".**\n\n"+cause+"\n\n```\n"+(raw.slice(0,600)||"(empty body)")+"\n```";
   }
-  if(e.status===404) return "**404 from the endpoint.** If this was a web tool, your Worker predates the `/tools/*` routes — redeploy `worker.js`.\n\n```\n"+String(e.raw||"").slice(0,300)+"\n```";
-  if(e.status===429) return "**Rate limited (429).** Sub-agents run 3 at a time; TinyFish allows 30 searches/min. Back off and retry.\n\n```\n"+String(e.raw||"").slice(0,400)+"\n```";
-  if(e.status>=500) return "**Upstream error ("+e.status+").**\n\n```\n"+String(e.raw||"").slice(0,600)+"\n```";
+  if(e.status===404) return "**404 from the endpoint.** If this was a web tool, your Worker predates the `/tools/*` routes — redeploy `worker.js`.\n\n```\n"+raw.slice(0,300)+"\n```";
+  if(e.status===429) return "**Rate limited (429)** after several retries. Sub-agents run 3 at a time; TinyFish allows 30 searches/min.\n\n```\n"+raw.slice(0,400)+"\n```";
+  if(e.status>=500) return "**Upstream error ("+e.status+")** after several retries.\n\n```\n"+raw.slice(0,600)+"\n```";
   return "**Request failed** — "+String(e.message||e);
 }
 
+/* ============================================================
+   Model discovery
+   ============================================================ */
+async function refreshModels(quiet){
+  if(!S.key) return;
+  try{
+    const url = S.base.replace(/\/+$/,"") + "/models";
+    const res = await fetch(S.proxy ? S.proxy + encodeURIComponent(url) : url,
+      {headers:{"Authorization":"Bearer "+S.key}});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const j = await res.json();
+    const ids = (j.data||[]).map(m=>m.id);
+    available = new Set(ids);
+    if(!canUse(S.model)){
+      const pick = firstAvailable();
+      if(canUse(pick)){ S.model = pick; save(); if(!quiet) toast("Switched to "+labelOf(pick)+" — the previous model is not on this key"); }
+    }
+    if(!canUse(S.agentModel)){ S.agentModel = firstAvailable(); save(); }
+    syncModelSelects(); syncHeader(); checkEnv(); renderModelInfo();
+    if(!quiet) toast(ids.length+" model(s) available: "+ids.join(", "));
+  }catch(e){
+    available = null;
+    renderModelInfo("Could not list models ("+e.message+"). All four are offered; unavailable ones fail with a 503.");
+    if(!quiet) toast("Model check failed: "+e.message);
+  }
+}
+function renderModelInfo(msg){
+  const el = $("modelInfo"); if(!el) return;
+  if(msg){ el.textContent = msg; return; }
+  if(!available){ el.textContent = "Not checked yet."; return; }
+  el.innerHTML = MODELS.map(m=>
+    `<span class="mono">${esc(m.label)}</span> <b style="color:${available.has(m.id)?"var(--ok)":"var(--bad)"}">`+
+    (available.has(m.id)?"available":"not on this key")+"</b>").join("<br>");
+}
+function syncModelSelects(){
+  [$("model"), $("sAgentModel")].forEach(sel=>{
+    if(!sel) return;
+    [...sel.options].forEach(o=>{
+      const ok = canUse(o.value);
+      o.disabled = !ok;
+      o.textContent = labelOf(o.value) + (ok ? "" : " (unavailable)");
+    });
+  });
+}
+
+/* ============================================================
+   Compaction — summarize older turns to keep long sessions alive
+   ============================================================ */
+function transcriptTokens(){
+  return apiMessages().reduce((n,m)=>n + estTok(typeof m.content==="string" ? m.content : JSON.stringify(m.content||"")), 0);
+}
+async function compact(auto){
+  const keep = 6;                                     // most recent messages left untouched
+  const cut = chat.length - keep;
+  if(cut < 4){ if(!auto) toast("Not enough history to compact yet"); return false; }
+
+  const older = chat.slice(0, cut);
+  const brief = older.map(m=>{
+    if(m.role==="user") return "USER: "+(typeof m.content==="string" ? m.content : (m.content||[]).filter(b=>b.type==="text").map(b=>b.text).join(" ")).slice(0,1200);
+    if(m.role==="assistant"){
+      const calls = (m.tool_calls||[]).map(t=>t.function.name).join(", ");
+      return "ASSISTANT: "+String(m.content||"").slice(0,1200)+(calls?`\n  [tools: ${calls}]`:"");
+    }
+    if(m.role==="tool") return "TOOL RESULT: "+String(m.content||"").slice(0,300);
+    return "";
+  }).filter(Boolean).join("\n");
+
+  setStatus("Compacting…");
+  try{
+    const model = canUse("claude-opus-4-8") ? "claude-opus-4-8" : firstAvailable();
+    const out = await streamOnce({
+      model, reason:"off", withExtras:false, tools:[],
+      messages:[
+        {role:"system", content:"You compress engineering transcripts. Preserve every decision, file path, API detail, unresolved bug, and user preference. Drop pleasantries and superseded attempts. Write dense prose under 500 words. No preamble."},
+        {role:"user", content:"Summarize this session so work can continue without the original transcript:\n\n"+brief.slice(0,90000)}
+      ]
+    });
+    const files = Object.keys(disk.files).sort();
+    chat = [
+      {role:"user", content:"[Earlier conversation, compacted]\n\n"+out.content+
+        "\n\nDisk now holds "+files.length+" file(s): "+files.join(", ")+
+        (todos.length? "\n\nPlan: "+todos.map(t=>`${t.status==="done"?"[x]":t.status==="active"?"[>]":"[ ]"} ${t.text}`).join("; ") : "")},
+      {role:"assistant", content:"Understood — continuing from that state."},
+      ...chat.slice(cut)
+    ];
+    save(); renderChat();
+    toast("Compacted "+cut+" messages into a summary");
+    return true;
+  }catch(e){
+    toast("Compaction failed: "+e.message);
+    return false;
+  } finally { setStatus("Ready"); }
+}
+
+/* ============================================================
+   Main turn loop
+   ============================================================ */
 async function send(){
   if(busy) return;
   const text = $("ta").value.trim();
-  if(!text) return;
-  if(!S.key){ toast("Set your app token in Settings"); $("btnSet").click(); return; }
+  if(!text && !attach.length) return;
+  if(!S.key){ toast("Set your app token or key in Settings"); $("btnSet").click(); return; }
+  if(attach.some(a=>a.busy)){ toast("Still processing an attachment — one moment"); return; }
+  if(available && !canUse(S.model)){ toast(labelOf(S.model)+" is not available on this key"); $("btnSet").click(); return; }
 
   const firstMsg = !chat.some(m=>m.role==="user");
+  const content = buildUserContent(text);
   $("ta").value=""; $("ta").style.height="";
-  chat.push({role:"user",content:text});
+  chat.push({role:"user", content, ckpt:snapshotDisk()});
+  clearTray();
 
-  /* Name an untouched chat after its first message. */
   if(firstMsg){
     const e = index.find(c=>c.id===curId);
     if(e && /^(New chat|Imported.*)$/.test(e.title)){
-      e.title = text.replace(/\s+/g," ").slice(0,48) + (text.length>48?"…":"");
+      e.title = (text || "attachments").replace(/\s+/g," ").slice(0,48) + (text.length>48?"…":"");
       renderChatList(); syncHeader();
     }
   }
   renderChat(); save();
   busy = true; setBusy(true);
   spawnedThisTurn = 0; agents = []; renderAgents();
+  const readSet = new Set();
 
   try{
-    for(let hop=0; hop<32; hop++){
+    if(S.autoCompact && transcriptTokens() > 140000) await compact(true);
+
+    for(let hop=0; hop<36; hop++){
       const am = {role:"assistant",content:"",reasoning:"",tool_calls:[]};
       chat.push(am);
       renderChat();
@@ -2322,7 +2951,7 @@ async function send(){
         if(st.content!==undefined)   am.content    = st.content;
         if(st.calls!==undefined)     am.tool_calls = st.calls.filter(Boolean);
         const near = $("msgs").scrollHeight - $("msgs").scrollTop - $("msgs").clientHeight < 140;
-        const fresh = msgEl(am);
+        const fresh = msgEl(am, chat.length-1);
         live.replaceWith(fresh); live = fresh;
         if(near) $("msgs").scrollTop = $("msgs").scrollHeight;
       };
@@ -2341,13 +2970,13 @@ async function send(){
       for(const tc of out.calls){
         let args={};
         try{ args = tc.function.arguments ? JSON.parse(tc.function.arguments) : {}; }
-        catch(e){ chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify({error:"Invalid JSON arguments: "+e.message})}); continue; }
+        catch(e){ chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify({error:"Invalid JSON arguments: "+e.message+". Re-issue the call with valid JSON."})}); continue; }
         setStatus(
           tc.function.name==="spawn_agents" ? "Running "+(Array.isArray(args.agents)?args.agents.length:0)+" sub-agent(s)…" :
           tc.function.name==="playtest" ? "Playtesting "+(args.path||args.session||"")+"…" :
           "Running "+tc.function.name+"…");
         try{
-          const r = await execTool(tc.function.name, args, {depth:0});
+          const r = await execTool(tc.function.name, args, {depth:0, read:readSet});
           chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify(r).slice(0,60000)});
         }catch(e){
           chat.push({role:"tool",tool_call_id:tc.id,content:JSON.stringify({error:String(e.message||e)})});
@@ -2364,7 +2993,10 @@ async function send(){
     busy=false; setBusy(false); setStatus("Ready"); saveNow();
   }
 }
-function setBusy(b){ $("btnSend").disabled=b; $("btnStop").style.display=b?"inline-block":"none"; }
+function setBusy(b){
+  $("btnSend").disabled=b; $("btnCompact").disabled=b;
+  $("btnStop").style.display=b?"inline-block":"none";
+}
 function setStatus(t){ $("status").textContent=t; }
 
 /* ============================================================
@@ -2386,15 +3018,19 @@ function syncHeader(){
   const e = index.find(c=>c.id===curId);
   $("chatPill").textContent = e ? e.title : "…";
   $("chatPill").title = e ? `${e.title} — ${e.files||0} file(s), ${fmtBytes(e.bytes||0)}` : "";
+  renderUsage();
 }
 function renderAll(){
-  syncHeader(); renderChatList(); renderDisk(); renderTabs(); renderArtifact();
-  renderChat(); renderAgents(); renderSessions(); renderShotStrip(); checkEnv(); scheduleQuota();
+  syncHeader(); renderChatList(); renderDisk(); renderTodos(); renderTabs(); renderArtifact();
+  renderChat(); renderAgents(); renderSessions(); renderShotStrip(); renderTray(); checkEnv(); scheduleQuota();
 }
 
-$("ta").addEventListener("keydown", e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
+$("ta").addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+});
 $("ta").addEventListener("input", e=>{ e.target.style.height="auto"; e.target.style.height=Math.min(e.target.scrollHeight,200)+"px"; });
 $("btnSend").onclick = send;
+$("btnCompact").onclick = ()=>compact(false);
 $("btnStop").onclick = ()=>{ activeCtrls.forEach(c=>c.abort()); closeAllSessions(); toast("Aborted requests and closed playtest sessions"); };
 $("btnNew").onclick     = ()=>createChat("New chat", true);
 $("btnNewChat").onclick = ()=>createChat("New chat", true);
@@ -2409,28 +3045,11 @@ $("btnNewFile").onclick = ()=>{
     : "";
   openFile(writeFile(p, seed), "code");
 };
-const TEXTY = /\.(html?|css|js|mjs|jsx|ts|tsx|json|md|txt|csv|svg|xml|yml|yaml)$/i;
-$("btnImport").onclick = ()=>{
-  const i=document.createElement("input"); i.type="file"; i.multiple=true;
-  i.onchange=async()=>{
-    let n=0;
-    for(const f of i.files){
-      try{
-        if(TEXTY.test(f.name)) writeFile(f.name, await f.text());
-        else writeFile(f.name, await new Promise((res,rej)=>{     // binary → data URI, usable in previews
-          const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(f);
-        }));
-        n++;
-      }catch(e){ toast("Skipped "+f.name+": "+e.message); }
-    }
-    toast("Imported "+n+" file(s) into this chat");
-  };
-  i.click();
-};
+$("btnImport").onclick = ()=>$("btnAttach").click();
 $("btnExport").onclick = ()=>{
   const e = index.find(c=>c.id===curId);
   const blob = {kind:"opus-studio-chat", exported:new Date().toISOString(),
-    title:e?.title, files:disk.files, libs:disk.libs, messages:storableChat()};
+    title:e?.title, files:disk.files, libs:disk.libs, todos, messages:storableChat()};
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([JSON.stringify(blob,null,2)],{type:"application/json"}));
   a.download=(e?.title||"chat").replace(/[^\w.-]+/g,"_").slice(0,40)+".json"; a.click();
@@ -2442,7 +3061,7 @@ $("btnExportAll").onclick = async ()=>{
     const rec = (await dbGet("chats", e.id)) || {};
     const files = await dbFiles(e.id);
     out.chats.push({title:e.title, created:e.created, updated:e.updated,
-      libs:rec.libs||[], messages:rec.messages||[],
+      libs:rec.libs||[], todos:rec.todos||[], messages:rec.messages||[],
       files:Object.fromEntries(files.map(f=>[f.path,{content:f.content,updated:f.updated}]))});
   }
   const a=document.createElement("a");
@@ -2467,13 +3086,22 @@ $("btnSet").onclick=()=>{
   $("sBase").value=S.base; $("sKey").value=S.key; $("sProxy").value=S.proxy;
   $("sSys").value=S.sys; $("sMax").value=S.max;
   $("sTools").checked=!!S.tools; $("sWeb").checked=!!S.web;
-  $("sTest").checked=!!S.test; $("sVision").checked=!!S.vision; $("sShotW").value=S.shotW;
+  $("sTest").checked=!!S.test; $("sVision").checked=!!S.vision;
+  $("sShotW").value=S.shotW; $("sFrames").value=S.frames;
   $("sAgents").checked=!!S.agents; $("sAgentModel").value=S.agentModel; $("sMaxAgents").value=S.maxAgents;
-  refreshQuota();
+  $("sConfirmDel").checked=!!S.confirmDel; $("sAutoCompact").checked=!!S.autoCompact;
+  refreshQuota(); renderModelInfo();
   $("setMask").classList.add("on");
 };
 $("setCancel").onclick=()=>$("setMask").classList.remove("on");
+$("btnResetSys").onclick=()=>{ $("sSys").value = DEFAULT_SYS; };
+$("btnRefreshModels").onclick=()=>{
+  S.key = $("sKey").value.trim() || S.key;
+  S.base = $("sBase").value.trim() || S.base;
+  refreshModels(false);
+};
 $("setSave").onclick=()=>{
+  const keyChanged = S.key !== $("sKey").value.trim() || S.base !== ($("sBase").value.trim()||defaultBase());
   S.base=$("sBase").value.trim()||defaultBase();
   S.key=$("sKey").value.trim();
   S.proxy=$("sProxy").value.trim();
@@ -2482,11 +3110,14 @@ $("setSave").onclick=()=>{
   S.tools=$("sTools").checked; S.web=$("sWeb").checked;
   S.test=$("sTest").checked; S.vision=$("sVision").checked;
   S.shotW=Math.min(1600,Math.max(320,Number($("sShotW").value)||900));
+  S.frames=Math.min(16,Math.max(1,Number($("sFrames").value)||6));
   S.agents=$("sAgents").checked;
   S.agentModel=$("sAgentModel").value;
   S.maxAgents=Math.min(40,Math.max(1,Number($("sMaxAgents").value)||12));
+  S.confirmDel=$("sConfirmDel").checked; S.autoCompact=$("sAutoCompact").checked;
   save(); saveNow(); syncHeader(); checkEnv(); renderAgents();
   $("setMask").classList.remove("on"); toast("Settings saved");
+  if(keyChanged) refreshModels(true);
 };
 $("btnPersist").onclick = async ()=>{
   if(!navigator.storage || !navigator.storage.persist){ toast("This browser has no persistence API"); return; }
@@ -2510,8 +3141,8 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape"){
     document.querySelectorAll(".mask.on").forEach(m=>m.classList.remove("on"));
     $("lightbox").classList.remove("on");
+    $("drop").classList.remove("on");
   }
-  /* Ctrl/Cmd+K cycles chats without touching the mouse. */
   if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
     e.preventDefault();
     const list = index.slice().sort((a,b)=>b.updated-a.updated);
@@ -2519,6 +3150,7 @@ document.addEventListener("keydown",e=>{
     const at = list.findIndex(c=>c.id===curId);
     switchChat(list[(at+1)%list.length].id);
   }
+  if((e.ctrlKey||e.metaKey) && e.key === "Enter"){ e.preventDefault(); send(); }
 });
 window.addEventListener("beforeunload", e=>{
   saveNow();
@@ -2529,7 +3161,6 @@ window.addEventListener("beforeunload", e=>{
    Boot
    ============================================================ */
 async function migrateLocalStorage(){
-  /* One-time lift of any v2/v3/v4 localStorage workspace into IndexedDB. */
   for(const k of ["opusStudio.v4","opusStudio.v3","opusStudio.v2"]){
     let raw;
     try{ raw = JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ continue; }
@@ -2541,7 +3172,7 @@ async function migrateLocalStorage(){
     index.unshift({id, title:"Imported from "+k, created:Date.now(), updated:Date.now(),
       files:paths.length, bytes:paths.reduce((n,p)=>n+String(files[p].content||"").length,0),
       msgs:Array.isArray(raw.chat)?raw.chat.length:0});
-    await dbPut("chats", {id, messages:Array.isArray(raw.chat)?raw.chat:[], libs:(raw.disk&&raw.disk.libs)||[]});
+    await dbPut("chats", {id, messages:Array.isArray(raw.chat)?raw.chat:[], libs:(raw.disk&&raw.disk.libs)||[], todos:[], usage:{in:0,out:0,calls:0}});
     for(const p of paths)
       await dbPut("files", {key:fkey(id,p), chatId:id, path:p, content:String(files[p].content||""), updated:files[p].updated||Date.now()});
     await dbPut("meta", S, "settings");
@@ -2571,7 +3202,6 @@ async function boot(){
   let migrated = null;
   if(!index.length) migrated = await migrateLocalStorage();
 
-  /* Model ids drifted across versions; normalise dotted forms. */
   if(/\./.test(S.model)) S.model = S.model.replace(/\./g,"-");
   if(!MODELS.some(m=>m.id===S.model)) S.model = MODELS[0].id;
   if(/\./.test(S.agentModel||"")) S.agentModel = S.agentModel.replace(/\./g,"-");
@@ -2582,6 +3212,7 @@ async function boot(){
   const want = migrated || (await dbGet("meta","active"));
   await switchChat(index.some(c=>c.id===want) ? want : index[0].id, true);
   await refreshQuota();
+  refreshModels(true);          // background: disable models this key cannot reach
 }
 boot().catch(e=>{
   console.error(e);
