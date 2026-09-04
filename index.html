@@ -313,8 +313,14 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
     <div class="sub"><button id="btnResetSys" style="padding:2px 8px;font-size:11px">Reset to default</button></div></div>
   <div class="f"><label>Max output tokens</label><input id="sMax" type="number" min="256" step="256"></div>
   <div class="f"><label><input type="checkbox" id="sTools" style="width:auto"> Disk, library, and sandbox tools</label></div>
-  <div class="f"><label><input type="checkbox" id="sWeb" style="width:auto"> Web tools (TinyFish search &amp; fetch, Wikipedia, npm)</label>
-    <div class="sub">Needs a <span class="mono">TINYFISH_KEY</span> secret on your Worker. Free; 30 searches/min, 150 URLs/min.</div></div>
+  <div class="f"><label><input type="checkbox" id="sWeb" style="width:auto"> Web tools (TinyFish search &amp; fetch, Wikipedia, npm)</label></div>
+  <div class="f"><label>TinyFish API key (optional)</label><input id="sTfKey" type="password" autocomplete="off" placeholder="sk-tinyfish-…">
+    <div class="sub">Sent as <span class="mono">X-Tinyfish-Key</span> and takes precedence over any key bound on the
+    Worker. Leave blank to use the Worker's own. Free tier: 30 searches/min, 150 URLs/min.
+    <b>Stored in this browser only — never hardcode it in the file.</b></div></div>
+  <div class="f"><label><input type="checkbox" id="sTfDirect" style="width:auto"> Call TinyFish directly, bypassing the Worker</label>
+    <div class="sub">Verified working: TinyFish permits browser origins. Needs a key above. The key then travels
+    from your browser to TinyFish instead of staying inside the Worker.</div></div>
   <div class="f"><label><input type="checkbox" id="sTest" style="width:auto"> Playtest tools (keyboard, mouse, DOM inspection)</label></div>
   <div class="f"><label><input type="checkbox" id="sVision" style="width:auto"> Send images to the model (vision)</label>
     <div class="sub">Verified working on this gateway with JPEG, PNG, WebP, and GIF via <span class="mono">image_url</span>.
@@ -331,7 +337,7 @@ details.think .body{padding:0 10px 9px;color:#a9bad2;white-space:pre-wrap;font-f
   <div class="f"><label>Max sub-agents per message</label><input id="sMaxAgents" type="number" min="1" max="40" step="1"></div>
   <div class="f"><label><input type="checkbox" id="sConfirmDel" style="width:auto"> Ask me before the model deletes or overwrites many files</label></div>
   <div class="f"><label><input type="checkbox" id="sAutoCompact" style="width:auto"> Auto-compact when the transcript gets long</label>
-    <div class="sub">Summarizes older turns with the cheap model so long sessions keep working. Costs one extra request.</div></div>
+    <div class="sub">Summarizes older turns with a cheaper model so long sessions keep working. Costs one extra request.</div></div>
   <div class="row"><button class="ghost" id="btnWipe">Delete every chat</button><div class="sp"></div>
     <button id="setCancel">Cancel</button><button class="primary" id="setSave">Save</button></div>
 </div></div>
@@ -393,6 +399,8 @@ const H2C   = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.m
 const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs";
 const PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs";
 const HISTORY_DEPTH = 12;        // versions kept per file for revert
+const TF_SEARCH_URL = "https://api.search.tinyfish.ai";
+const TF_FETCH_URL  = "https://api.fetch.tinyfish.ai";
 
 const DEFAULT_SYS =
 `You are the orchestrator in Opus Studio, a browser IDE. You have a virtual disk, npm library installation, web research, a JavaScript sandbox, a playtest harness that drives real input into your apps, a plan tracker, and a team of sub-agents.
@@ -461,6 +469,7 @@ const SDEF = {
   base: defaultBase(), key:"", proxy:"",
   sys:DEFAULT_SYS, max:8192,
   tools:true, web:true, test:true, vision:true, shotW:900, frames:6,
+  tfKey:"", tfDirect:false,
   model:MODELS[0].id, reason:"medium",
   agents:true, agentModel:"claude-opus-5", maxAgents:12,
   confirmDel:true, autoCompact:true
@@ -1809,31 +1818,101 @@ $("btnCloseArt").onclick=()=>$("right").classList.add("collapsed");
 $("btnArt").onclick=()=>$("right").classList.toggle("collapsed");
 
 /* ============================================================
-   Worker-backed web tools
+   Web tools — your TinyFish key first, Worker's as fallback
    ============================================================ */
 function toolEndpoint(path){
   let origin;
   try{ origin = new URL(S.base, location.href).origin; }
   catch(e){ throw new Error("Base URL is not a valid URL"); }
   if(directToGateway())
-    throw new Error("Web tools need your Worker: the base URL points at tabitoken.com, which has no /tools routes.");
+    throw new Error("Web tools need your Worker (or a TinyFish key with direct mode on): the base URL points at tabitoken.com, which has no /tools routes.");
   const url = origin + path;
   return S.proxy ? S.proxy + encodeURIComponent(url) : url;
 }
 async function workerTool(path, body){
-  const res = await fetch(toolEndpoint(path), {
-    method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+S.key},
-    body: JSON.stringify(body)
-  });
+  const headers = {"Content-Type":"application/json","Authorization":"Bearer "+S.key};
+  if(S.tfKey) headers["X-Tinyfish-Key"] = S.tfKey;      // yours wins over the Worker's secret
+  const res = await fetch(toolEndpoint(path), {method:"POST", headers, body:JSON.stringify(body)});
   const txt = await res.text();
   let j; try{ j = JSON.parse(txt); }catch(e){ throw new Error(`Worker returned non-JSON (HTTP ${res.status}): ${txt.slice(0,200)}`); }
   if(!res.ok || j.error){
     const m = j.error?.message || `HTTP ${res.status}`;
-    if(res.status===404) throw new Error(m+" — your Worker may predate the /tools routes. Redeploy worker.js.");
-    throw new Error(m);
+    const err = new Error(res.status===404 ? m+" — your Worker may predate the /tools routes. Redeploy worker.js." : m);
+    err.status = res.status;
+    throw err;
   }
   return j;
+}
+
+function tfErr(status, txt, what){
+  if(status===401) throw new Error(`TinyFish ${what} 401 — your TinyFish key is wrong or revoked.`);
+  if(status===402) throw new Error(`TinyFish ${what} 402 — this account lacks access to the ${what} API.`);
+  if(status===429) throw new Error(`TinyFish ${what} 429 — rate limited (search 30/min, fetch 150 URLs/min).`);
+  throw new Error(`TinyFish ${what} HTTP ${status}: ${String(txt).slice(0,240)}`);
+}
+async function tfDirectSearch(b){
+  const qs = new URLSearchParams({query:String(b.query||"").trim()});
+  ["purpose","location","language","include_domains","exclude_domains",
+   "recency_minutes","after_date","before_date","domain_type","page"].forEach(k=>{
+    const v = b[k];
+    if(v !== undefined && v !== null && String(v).trim() !== "") qs.set(k, String(v).trim());
+  });
+  const r = await fetch(TF_SEARCH_URL+"?"+qs, {headers:{"X-API-Key":S.tfKey, "Accept":"application/json"}});
+  const txt = await r.text();
+  if(!r.ok) tfErr(r.status, txt, "search");
+  const j = JSON.parse(txt);
+  const count = Math.min(10, Math.max(1, Number(b.count)||6));
+  return {provider:"tinyfish", key_source:"app (direct)", query:j.query, page:j.page,
+    results:(j.results||[]).slice(0,count).map(x=>({
+      position:x.position, title:x.title, url:x.url, site:x.site_name, snippet:x.snippet,
+      ...(x.date?{date:x.date}:{}), ...(x.publisher?{publisher:x.publisher}:{}),
+      ...(x.authors?{authors:x.authors}:{}), ...(x.venue?{venue:x.venue}:{}),
+      ...(x.year?{year:x.year}:{}), ...(x.cited_by_count!==undefined?{cited_by_count:x.cited_by_count}:{}),
+      ...(x.pdf_url?{pdf_url:x.pdf_url}:{})
+    }))};
+}
+async function tfDirectFetch(b){
+  const body = {urls:b.urls, format:["markdown","html","json"].includes(b.format)?b.format:"markdown",
+                per_url_timeout_ms:45000};
+  if(b.purpose) body.purpose = String(b.purpose).slice(0,2000);
+  if(b.links) body.links = true;
+  if(b.include_selectors) body.include_selectors = b.include_selectors;
+  if(b.exclude_selectors) body.exclude_selectors = b.exclude_selectors;
+  const r = await fetch(TF_FETCH_URL, {method:"POST",
+    headers:{"X-API-Key":S.tfKey,"Content-Type":"application/json","Accept":"application/json"},
+    body:JSON.stringify(body)});
+  const txt = await r.text();
+  if(!r.ok) tfErr(r.status, txt, "fetch");
+  const j = JSON.parse(txt);
+  const max = Math.min(120000, Math.max(500, Number(b.max_chars)||20000));
+  return {provider:"tinyfish", key_source:"app (direct)", errors:j.errors||[],
+    results:(j.results||[]).map(p=>{
+      const text = typeof p.text==="string" ? p.text : JSON.stringify(p.text);
+      return {url:p.url, final_url:p.final_url, title:p.title, description:p.description,
+        language:p.language, author:p.author, published_date:p.published_date,
+        format:p.format, latency_ms:p.latency_ms,
+        truncated:text.length>max, text:text.slice(0,max),
+        ...(p.links?{links:p.links.slice(0,200)}:{}),
+        ...(p.unmatched_selectors?{unmatched_selectors:p.unmatched_selectors}:{})};
+    })};
+}
+/* Route: direct if you asked for it, else Worker — falling back to direct
+   if the Worker has no key of its own. */
+async function tfCall(kind, body){
+  const canDirect = !!S.tfKey;
+  if(S.tfDirect && canDirect) return kind==="search" ? tfDirectSearch(body) : tfDirectFetch(body);
+  try{
+    return await workerTool("/tools/"+kind, body);
+  }catch(e){
+    const noKey = /No TinyFish key|TINYFISH_KEY/i.test(e.message||"");
+    const noRoute = e.status===404 || /tools routes/i.test(e.message||"");
+    if(canDirect && (noKey || noRoute)){
+      toast(noRoute ? "Worker lacks /tools — using your TinyFish key directly"
+                    : "Worker has no TinyFish key — using yours directly");
+      return kind==="search" ? tfDirectSearch(body) : tfDirectFetch(body);
+    }
+    throw e;
+  }
 }
 
 /* ============================================================
@@ -2270,20 +2349,20 @@ async function execTool(name, args, ctx){
     /* ---- web ---- */
     case "web_search": {
       if(!S.web) throw new Error("Web tools are disabled in this app's settings.");
-      const j = await workerTool("/tools/search", {
+      const j = await tfCall("search", {
         query:args.query, purpose:args.purpose, count:args.count,
         domain_type:args.domain_type, include_domains:args.include_domains, exclude_domains:args.exclude_domains,
         recency_minutes:args.recency_minutes, after_date:args.after_date, before_date:args.before_date,
         location:args.location, language:args.language
       });
-      return {provider:j.provider, query:j.query, results:j.results,
+      return {provider:j.provider, key_source:j.key_source, query:j.query, results:j.results,
         reminder:"Snippets are previews. Batch the promising URLs into one web_fetch call before asserting facts."};
     }
     case "web_fetch": {
       if(!S.web) throw new Error("Web tools are disabled in this app's settings.");
       const urls = Array.isArray(args.urls) ? args.urls : (args.url ? [args.url] : []);
       if(!urls.length) throw new Error("Pass url or urls");
-      return await workerTool("/tools/fetch", {
+      return await tfCall("fetch", {
         urls, purpose:args.purpose, format:args.format, max_chars:args.max_chars,
         include_selectors:args.include_selectors, exclude_selectors:args.exclude_selectors, links:args.links
       });
@@ -2579,6 +2658,7 @@ function welcomeHtml(){
   <li><b>Attach anything</b> — drop, paste, or pick images, GIFs, video, PDFs, and code. Images go to the model directly; video and animated GIF are decoded into labelled keyframes; PDFs are text-extracted in your browser. Everything also lands on this chat's disk.</li>
   <li><b>Plan</b> — the model keeps a visible todo list for multi-step work, in the left panel.</li>
   <li><b>Build &amp; verify</b> — read/glob/grep/multi-edit with per-file history and <code>disk_revert</code>, then <code>playtest</code> with real keyboard and mouse, <code>check_app</code>, and <code>inspect_dom</code>.</li>
+  <li><b>Search</b> — your own TinyFish key can be entered in Settings; it overrides the Worker's, and can call TinyFish directly.</li>
   <li><b>Checkpoints</b> — hover any message of yours and click ↩ to roll the disk and transcript back to that moment.</li>
   <li><b>Delegate</b> — up to ${AGENT.maxConcurrent} sub-agents in parallel, depth ${AGENT.maxDepth}.</li>
   </ul>
@@ -2799,10 +2879,10 @@ function failureNote(e){
       cause = "Your **Worker** rejected this page's origin. `ALLOWED_ORIGIN` must be exactly `"+location.origin+"` — scheme and host only. Redeploy after changing it.";
     else if(/bad app token/i.test(raw))
       cause = "Your **Worker** rejected the token from Settings. It must match `APP_TOKEN` exactly.";
-    else if(/TABI_KEY is not bound/i.test(raw))
+    else if(/TABI_KEY is not bound|No gateway key/i.test(raw))
       cause = "The **Worker** has no `TABI_KEY` bound, and no key was passed through. Add the secret or enable passthrough, then redeploy.";
-    else if(/TINYFISH_KEY is not bound/i.test(raw))
-      cause = "The **Worker** has no `TINYFISH_KEY` bound. Add the secret, then redeploy.";
+    else if(/TINYFISH_KEY|No TinyFish key/i.test(raw))
+      cause = "No TinyFish key — enter one in Settings, or bind `TINYFISH_KEY` on the Worker.";
     else if(/invalid token|new_api_error/i.test(raw))
       cause = "**TaBiAI** rejected the key the Worker forwarded — wrong key, or out of credit.";
     else cause = "Unrecognized rejection — see the raw response below.";
@@ -3014,7 +3094,7 @@ function syncHeader(){
   $("reason").value = S.reason;
   $("reasonWrap").classList.toggle("hide", !isThinkingModel(S.model));
   $("hostPill").textContent = hostOf(S.base) || S.base;
-  $("hostPill").title = S.base;
+  $("hostPill").title = S.base + (S.tfKey ? (S.tfDirect ? " · TinyFish: your key, direct" : " · TinyFish: your key, via Worker") : " · TinyFish: Worker's key");
   const e = index.find(c=>c.id===curId);
   $("chatPill").textContent = e ? e.title : "…";
   $("chatPill").title = e ? `${e.title} — ${e.files||0} file(s), ${fmtBytes(e.bytes||0)}` : "";
@@ -3086,6 +3166,7 @@ $("btnSet").onclick=()=>{
   $("sBase").value=S.base; $("sKey").value=S.key; $("sProxy").value=S.proxy;
   $("sSys").value=S.sys; $("sMax").value=S.max;
   $("sTools").checked=!!S.tools; $("sWeb").checked=!!S.web;
+  $("sTfKey").value=S.tfKey; $("sTfDirect").checked=!!S.tfDirect;
   $("sTest").checked=!!S.test; $("sVision").checked=!!S.vision;
   $("sShotW").value=S.shotW; $("sFrames").value=S.frames;
   $("sAgents").checked=!!S.agents; $("sAgentModel").value=S.agentModel; $("sMaxAgents").value=S.maxAgents;
@@ -3108,6 +3189,7 @@ $("setSave").onclick=()=>{
   S.sys=$("sSys").value||DEFAULT_SYS;
   S.max=Math.max(256,Number($("sMax").value)||8192);
   S.tools=$("sTools").checked; S.web=$("sWeb").checked;
+  S.tfKey=$("sTfKey").value.trim(); S.tfDirect=$("sTfDirect").checked;
   S.test=$("sTest").checked; S.vision=$("sVision").checked;
   S.shotW=Math.min(1600,Math.max(320,Number($("sShotW").value)||900));
   S.frames=Math.min(16,Math.max(1,Number($("sFrames").value)||6));
@@ -3115,6 +3197,7 @@ $("setSave").onclick=()=>{
   S.agentModel=$("sAgentModel").value;
   S.maxAgents=Math.min(40,Math.max(1,Number($("sMaxAgents").value)||12));
   S.confirmDel=$("sConfirmDel").checked; S.autoCompact=$("sAutoCompact").checked;
+  if(S.tfDirect && !S.tfKey){ S.tfDirect=false; toast("Direct TinyFish mode needs a key — left it off"); }
   save(); saveNow(); syncHeader(); checkEnv(); renderAgents();
   $("setMask").classList.remove("on"); toast("Settings saved");
   if(keyChanged) refreshModels(true);
@@ -3207,6 +3290,7 @@ async function boot(){
   if(/\./.test(S.agentModel||"")) S.agentModel = S.agentModel.replace(/\./g,"-");
   if(!MODELS.some(m=>m.id===S.agentModel)) S.agentModel = SDEF.agentModel;
   if(PROXY_BASE && /(^|\.)tabitoken\.com/.test(hostOf(S.base))) S.base = defaultBase();
+  if(S.tfDirect && !S.tfKey) S.tfDirect = false;
 
   if(!index.length){ await createChat("New chat", false); }
   const want = migrated || (await dbGet("meta","active"));
