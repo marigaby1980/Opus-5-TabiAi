@@ -375,11 +375,12 @@ const MODELS = [
   {id:"claude-opus-5",            label:"claude-opus-5"},
   {id:"claude-opus-4-8-thinking", label:"claude-opus-4.8-thinking"},
   {id:"claude-opus-4-8",          label:"claude-opus-4.8"}
+  {id:"gpt-5.6-sol",              label:"gpt-5.6-sol"}
 ];
 /* USD per 1M tokens — published rates, used for estimates only. */
 const PRICES = {
   "claude-opus-5":{in:3,out:3}, "claude-opus-5-thinking":{in:3,out:3},
-  "claude-opus-4-8":{in:1,out:5}, "claude-opus-4-8-thinking":{in:1,out:5}
+  "claude-opus-4-8":{in:1,out:5}, "claude-opus-4-8-thinking":{in:1,out:5}, "gpt-5.6-sol":{in:1,out:5}
 };
 let available = null;            // Set of ids the key can reach, or null until checked
 const labelOf = id => (MODELS.find(m=>m.id===id)||{}).label || id;
